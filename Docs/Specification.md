@@ -136,6 +136,10 @@ Packages/com.jtlstudio.sdk/
 | `JTLStudio.SDK.Editor` | `UNITY_EDITOR` | тулкит и всё редакторское |
 | `JTLStudio.SDK.Tests` | `UNITY_INCLUDE_TESTS` | тесты |
 
+Asmdef обязательны: Unity не компилирует скрипты пакета из `Packages` без asmdef (проверено на 2021.3.45f2: `Script '...' will not be compiled because it exists outside the Assets folder and does not belong to any assembly definition file`). Модель та же, что у Prime.
+
+У `JTLStudio.SDK` стоит `"autoReferenced": true`, как у Prime. Код игры в `Assembly-CSharp` видит `JTLSDK` без настроек. Ссылку на `JTLStudio.SDK` добавляют только проекты, где код игры разбит на свои asmdef. Это стандартное поведение Unity для любого пакета.
+
 `.jslib` площадок получают те же define constraints через `PluginImporter.DefineConstraints`, поэтому в билд попадает JS только активной площадки. `jtlsdk.jspre` общий и попадает всегда.
 
 Define-символ активной конфигурации ставится только для WebGL (`BuildTargetGroup.WebGL`) и только один. При смене конфигурации старый символ снимается.
@@ -216,7 +220,8 @@ public class SdkConfiguration : ScriptableObject
 | Файл | Что хранит | В VCS | В билде |
 |---|---|---|---|
 | `Assets/Resources/JTLSDK/JTLSDKSettings.asset` | ссылка на активную конфигурацию, языки, каталог покупок, лидерборды, флаги по умолчанию, таймаут инициализации, задержка автосохранения, логирование | да | да |
-| `Assets/JTLSDK/Configurations/*.asset` | конфигурации | да | только активная (по ссылке) |
+| `Assets/Settings/JTLSDK/Configurations/*.asset` | конфигурации | да | только активная (по ссылке) |
+| `Assets/WebGLTemplates/JTLSDK/` | копия шаблона из пакета, можно править | да | при сборке |
 | `ProjectSettings/JTLSDKEditorSettings.asset` | шаблон (общие настройки), сборка, симуляция по умолчанию, язык тулкита, счётчик билдов | да | нет |
 | `UserSettings/JTLSDKUserSettings.asset` | стартовый язык Play Mode, запомненные результаты прототипов, кеш проверки обновлений | нет | нет |
 
