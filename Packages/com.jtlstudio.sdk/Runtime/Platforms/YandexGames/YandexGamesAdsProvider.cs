@@ -81,7 +81,7 @@ namespace JTLStudio.SDK.YandexGames
 
         public void ShowBanner()
         {
-            Call("ads", "showBanner", null, response => IsBannerVisible = response.IsSuccess);
+            Call("ads", "showBanner", null, response => IsBannerVisible = response.IsSuccess && response.GetBool("visible"));
         }
 
         public void HideBanner()

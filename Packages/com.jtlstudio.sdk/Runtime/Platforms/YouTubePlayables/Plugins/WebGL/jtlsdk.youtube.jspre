@@ -230,6 +230,7 @@
   }
 
   // src/platforms/youtube.ts
+  var DefaultRewardId = "reward";
   var YouTubePlatform = class {
     constructor() {
       this.name = "youtube";
@@ -246,7 +247,7 @@
         ads: {
           actions: {
             showInterstitial: () => this.sdk().ads.requestInterstitialAd().then(() => ({ result: "shown" })),
-            showRewarded: (payload) => this.sdk().ads.requestRewardedAd(this.text(payload, "rewardId")).then((rewarded) => ({ result: rewarded ? "rewarded" : "closed" }))
+            showRewarded: (payload) => this.sdk().ads.requestRewardedAd(this.text(payload, "rewardId", DefaultRewardId)).then((rewarded) => ({ result: rewarded ? "rewarded" : "closed" }))
           }
         },
         data: {

@@ -125,7 +125,7 @@ namespace JTLStudio.SDK.Tests.Core
         }
 
         [Test]
-        public void ContinuePromptReleasesPlatformPause()
+        public void ContinuePromptKeepsPlatformPause()
         {
             _builder.Platform.RequestPause(true);
             bool continued = false;
@@ -133,8 +133,12 @@ namespace JTLStudio.SDK.Tests.Core
             JTLSDK.Pause.ShowContinuePrompt(() => continued = true);
 
             Assert.IsTrue(continued);
-            Assert.IsFalse(JTLSDK.Pause.IsPaused);
+            Assert.IsTrue(JTLSDK.Pause.IsPaused);
             Assert.AreEqual(1, _builder.Platform.ContinuePromptCount);
+
+            _builder.Platform.RequestPause(false);
+
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
         }
 
         [Test]

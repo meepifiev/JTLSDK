@@ -22,6 +22,11 @@ namespace JTLStudio.SDK.Editor.Configuration
                 issues.Add("Compression Format must be Disabled for YouTube Playables.");
             }
 
+            if (configuration.Platform == PlatformId.YouTubePlayables && configuration.PauseOnFocusLoss)
+            {
+                issues.Add("Pause on focus loss must be off for YouTube Playables: the game may resume only on the platform resume event.");
+            }
+
             if (configuration.PlatformProvider == null)
             {
                 issues.Add("The configuration has no platform provider.");

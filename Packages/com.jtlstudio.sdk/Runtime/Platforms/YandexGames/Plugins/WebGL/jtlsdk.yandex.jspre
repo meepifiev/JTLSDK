@@ -281,7 +281,6 @@
       this.sdkPromise = null;
       this.playerPromise = null;
       this.paymentsPromise = null;
-      this.leaderboardsPromise = null;
       this.emit = () => void 0;
       this.eventsBound = false;
       this.modules = {
@@ -295,7 +294,7 @@
           actions: {
             showInterstitial: (payload) => this.showInterstitial(payload),
             showRewarded: (payload) => this.showRewarded(payload),
-            showBanner: () => this.sdk().then((sdk) => sdk.adv.showBannerAdv()).then(() => ({})),
+            showBanner: () => this.sdk().then((sdk) => sdk.adv.showBannerAdv()).then((status) => ({ visible: (status == null ? void 0 : status.stickyAdvIsShowing) === true })),
             hideBanner: () => this.sdk().then((sdk) => sdk.adv.hideBannerAdv()).then(() => ({})),
             bannerStatus: () => this.sdk().then((sdk) => sdk.adv.getBannerAdvStatus()).then((status) => ({ visible: status.stickyAdvIsShowing }))
           }
@@ -324,7 +323,7 @@
           actions: {
             setScore: (payload) => this.leaderboards().then((boards) => {
               var _a;
-              return boards.setLeaderboardScore(this.text(payload, "id"), Number((_a = payload.score) != null ? _a : 0));
+              return boards.setScore(this.text(payload, "id"), Number((_a = payload.score) != null ? _a : 0));
             }).then(() => ({})),
             playerEntry: (payload) => this.playerEntry(payload),
             load: (payload) => this.loadLeaderboard(payload)
@@ -414,21 +413,18 @@
     }
     player() {
       if (this.playerPromise === null) {
-        this.playerPromise = this.sdk().then((sdk) => sdk.getPlayer({ scopes: false }));
+        this.playerPromise = this.sdk().then((sdk) => sdk.getPlayer());
       }
       return this.playerPromise;
     }
     payments() {
       if (this.paymentsPromise === null) {
-        this.paymentsPromise = this.sdk().then((sdk) => sdk.getPayments({ signed: true }));
+        this.paymentsPromise = this.sdk().then((sdk) => sdk.getPayments({ signed: false }));
       }
       return this.paymentsPromise;
     }
     leaderboards() {
-      if (this.leaderboardsPromise === null) {
-        this.leaderboardsPromise = this.sdk().then((sdk) => sdk.getLeaderboards());
-      }
-      return this.leaderboardsPromise;
+      return this.sdk().then((sdk) => sdk.leaderboards);
     }
     async initializePlatform() {
       const sdk = await this.sdk();
@@ -513,7 +509,7 @@
     }
     async playerInfo() {
       const player = await this.player();
-      const authorized = player.getMode() !== "lite";
+      const authorized = player.isAuthorized();
       return {
         authorized,
         id: authorized ? player.getUniqueID() : "",
@@ -526,7 +522,7 @@
       try {
         await sdk.auth.openAuthDialog();
       } catch (e) {
-        return { authorized: false, id: "", name: "", avatar: "" };
+        return this.playerInfo();
       }
       this.playerPromise = null;
       return this.playerInfo();
@@ -534,7 +530,7 @@
     async playerEntry(payload) {
       const boards = await this.leaderboards();
       try {
-        const entry = await boards.getLeaderboardPlayerEntry(this.text(payload, "id"));
+        const entry = await boards.getPlayerEntry(this.text(payload, "id"));
         return __spreadValues({ found: true }, this.mapEntry(entry, true));
       } catch (e) {
         return { found: false };
@@ -543,9 +539,9 @@
     async loadLeaderboard(payload) {
       var _a, _b;
       const boards = await this.leaderboards();
-      const result = await boards.getLeaderboardEntries(this.text(payload, "id"), {
-        quantityTop: Number((_a = payload.top) != null ? _a : 10),
-        quantityAround: Number((_b = payload.around) != null ? _b : 5),
+      const result = await boards.getEntries(this.text(payload, "id"), {
+        quantityTop: Math.min(20, Math.max(1, Number((_a = payload.top) != null ? _a : 10))),
+        quantityAround: Math.min(10, Math.max(1, Number((_b = payload.around) != null ? _b : 5))),
         includeUser: true
       });
       return {

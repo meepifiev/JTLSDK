@@ -40,6 +40,7 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.Review = new UnsupportedReviewProvider();
                     configuration.GameLabel = new UnsupportedGameLabelProvider();
                     configuration.DefineSymbol = "JTLSDK_YOUTUBE_PLAYABLES";
+                    configuration.PauseOnFocusLoss = false;
                     break;
 
                 default:

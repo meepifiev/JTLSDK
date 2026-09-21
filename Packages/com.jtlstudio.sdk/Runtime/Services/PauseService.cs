@@ -72,12 +72,12 @@ namespace JTLStudio.SDK.Services
                 return;
             }
 
-            Set(PauseSources.Platform, hasFocus == false);
+            Set(PauseSources.Focus, hasFocus == false);
         }
 
         private void OnContinuePromptClosed(Action onContinue)
         {
-            Set(PauseSources.Platform, false);
+            Set(PauseSources.Focus, false);
             onContinue?.Invoke();
         }
 

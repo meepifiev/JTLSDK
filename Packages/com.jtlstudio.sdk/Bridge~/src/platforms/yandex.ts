@@ -7,7 +7,7 @@ const SdkScriptUrl = "/sdk.js";
 const DataKey = "jtlsdk";
 
 interface YandexPlayer {
-  getMode(): string;
+  isAuthorized(): boolean;
   getUniqueID(): string;
   getName(): string;
   getPhoto(size: string): string;
@@ -42,9 +42,9 @@ interface YandexLeaderboardEntry {
 }
 
 interface YandexLeaderboards {
-  setLeaderboardScore(name: string, score: number): Promise<void>;
-  getLeaderboardPlayerEntry(name: string): Promise<YandexLeaderboardEntry>;
-  getLeaderboardEntries(name: string, options: { quantityTop: number; quantityAround: number; includeUser: boolean }): Promise<{ entries: YandexLeaderboardEntry[]; userRank: number }>;
+  setScore(name: string, score: number): Promise<void>;
+  getPlayerEntry(name: string): Promise<YandexLeaderboardEntry>;
+  getEntries(name: string, options: { quantityTop: number; quantityAround: number; includeUser: boolean }): Promise<{ entries: YandexLeaderboardEntry[]; userRank: number }>;
 }
 
 interface YandexAdCallbacks {
@@ -62,16 +62,16 @@ interface YandexSdk {
   adv: {
     showFullscreenAdv(options: { callbacks: YandexAdCallbacks }): void;
     showRewardedVideo(options: { callbacks: YandexAdCallbacks }): void;
-    showBannerAdv(): Promise<unknown>;
+    showBannerAdv(): Promise<{ stickyAdvIsShowing?: boolean }>;
     hideBannerAdv(): Promise<unknown>;
     getBannerAdvStatus(): Promise<{ stickyAdvIsShowing: boolean }>;
   };
   auth: { openAuthDialog(): Promise<void> };
   feedback: { canReview(): Promise<{ value: boolean }>; requestReview(): Promise<{ feedbackSent: boolean }> };
   shortcut: { canShowPrompt(): Promise<{ canShow: boolean }>; showPrompt(): Promise<{ outcome: string }> };
-  getPlayer(options: { scopes: boolean }): Promise<YandexPlayer>;
+  getPlayer(): Promise<YandexPlayer>;
   getPayments(options: { signed: boolean }): Promise<YandexPayments>;
-  getLeaderboards(): Promise<YandexLeaderboards>;
+  leaderboards: YandexLeaderboards;
   getFlags(options: { defaultFlags: Record<string, string> }): Promise<Record<string, string>>;
   serverTime(): number;
   on(event: string, handler: () => void): void;
@@ -90,7 +90,6 @@ export class YandexPlatform implements PlatformAdapter {
   private sdkPromise: Promise<YandexSdk> | null = null;
   private playerPromise: Promise<YandexPlayer> | null = null;
   private paymentsPromise: Promise<YandexPayments> | null = null;
-  private leaderboardsPromise: Promise<YandexLeaderboards> | null = null;
   private emit: EventEmitter = () => undefined;
   private eventsBound = false;
 
@@ -106,7 +105,7 @@ export class YandexPlatform implements PlatformAdapter {
         actions: {
           showInterstitial: (payload) => this.showInterstitial(payload),
           showRewarded: (payload) => this.showRewarded(payload),
-          showBanner: () => this.sdk().then((sdk) => sdk.adv.showBannerAdv()).then(() => ({})),
+          showBanner: () => this.sdk().then((sdk) => sdk.adv.showBannerAdv()).then((status) => ({ visible: status?.stickyAdvIsShowing === true })),
           hideBanner: () => this.sdk().then((sdk) => sdk.adv.hideBannerAdv()).then(() => ({})),
           bannerStatus: () => this.sdk().then((sdk) => sdk.adv.getBannerAdvStatus()).then((status) => ({ visible: status.stickyAdvIsShowing })),
         },
@@ -133,7 +132,7 @@ export class YandexPlatform implements PlatformAdapter {
       },
       leaderboards: {
         actions: {
-          setScore: (payload) => this.leaderboards().then((boards) => boards.setLeaderboardScore(this.text(payload, "id"), Number(payload.score ?? 0))).then(() => ({})),
+          setScore: (payload) => this.leaderboards().then((boards) => boards.setScore(this.text(payload, "id"), Number(payload.score ?? 0))).then(() => ({})),
           playerEntry: (payload) => this.playerEntry(payload),
           load: (payload) => this.loadLeaderboard(payload),
         },
@@ -219,7 +218,7 @@ export class YandexPlatform implements PlatformAdapter {
 
   private player(): Promise<YandexPlayer> {
     if (this.playerPromise === null) {
-      this.playerPromise = this.sdk().then((sdk) => sdk.getPlayer({ scopes: false }));
+      this.playerPromise = this.sdk().then((sdk) => sdk.getPlayer());
     }
 
     return this.playerPromise;
@@ -227,18 +226,14 @@ export class YandexPlatform implements PlatformAdapter {
 
   private payments(): Promise<YandexPayments> {
     if (this.paymentsPromise === null) {
-      this.paymentsPromise = this.sdk().then((sdk) => sdk.getPayments({ signed: true }));
+      this.paymentsPromise = this.sdk().then((sdk) => sdk.getPayments({ signed: false }));
     }
 
     return this.paymentsPromise;
   }
 
   private leaderboards(): Promise<YandexLeaderboards> {
-    if (this.leaderboardsPromise === null) {
-      this.leaderboardsPromise = this.sdk().then((sdk) => sdk.getLeaderboards());
-    }
-
-    return this.leaderboardsPromise;
+    return this.sdk().then((sdk) => sdk.leaderboards);
   }
 
   private async initializePlatform(): Promise<unknown> {
@@ -338,7 +333,7 @@ export class YandexPlatform implements PlatformAdapter {
 
   private async playerInfo(): Promise<unknown> {
     const player = await this.player();
-    const authorized = player.getMode() !== "lite";
+    const authorized = player.isAuthorized();
 
     return {
       authorized,
@@ -354,7 +349,7 @@ export class YandexPlatform implements PlatformAdapter {
     try {
       await sdk.auth.openAuthDialog();
     } catch {
-      return { authorized: false, id: "", name: "", avatar: "" };
+      return this.playerInfo();
     }
 
     this.playerPromise = null;
@@ -365,7 +360,7 @@ export class YandexPlatform implements PlatformAdapter {
     const boards = await this.leaderboards();
 
     try {
-      const entry = await boards.getLeaderboardPlayerEntry(this.text(payload, "id"));
+      const entry = await boards.getPlayerEntry(this.text(payload, "id"));
       return { found: true, ...this.mapEntry(entry, true) };
     } catch {
       return { found: false };
@@ -374,9 +369,9 @@ export class YandexPlatform implements PlatformAdapter {
 
   private async loadLeaderboard(payload: Payload): Promise<unknown> {
     const boards = await this.leaderboards();
-    const result = await boards.getLeaderboardEntries(this.text(payload, "id"), {
-      quantityTop: Number(payload.top ?? 10),
-      quantityAround: Number(payload.around ?? 5),
+    const result = await boards.getEntries(this.text(payload, "id"), {
+      quantityTop: Math.min(20, Math.max(1, Number(payload.top ?? 10))),
+      quantityAround: Math.min(10, Math.max(1, Number(payload.around ?? 5))),
       includeUser: true,
     });
 

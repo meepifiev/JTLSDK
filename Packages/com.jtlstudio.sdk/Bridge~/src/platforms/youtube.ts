@@ -36,6 +36,8 @@ interface PageState {
   firstFrameReadySent?: boolean;
 }
 
+const DefaultRewardId = "reward";
+
 export class YouTubePlatform implements PlatformAdapter {
   public readonly name = "youtube";
   public readonly modules: Record<string, ModuleAdapter>;
@@ -55,7 +57,7 @@ export class YouTubePlatform implements PlatformAdapter {
       ads: {
         actions: {
           showInterstitial: () => this.sdk().ads.requestInterstitialAd().then(() => ({ result: "shown" })),
-          showRewarded: (payload) => this.sdk().ads.requestRewardedAd(this.text(payload, "rewardId")).then((rewarded) => ({ result: rewarded ? "rewarded" : "closed" })),
+          showRewarded: (payload) => this.sdk().ads.requestRewardedAd((this.text(payload, "rewardId") || DefaultRewardId)).then((rewarded) => ({ result: rewarded ? "rewarded" : "closed" })),
         },
       },
       data: {
