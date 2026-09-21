@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using JTLStudio.SDK.Providers;
 using JTLStudio.SDK.Services;
+#if UNITY_EDITOR
+using JTLStudio.SDK.Prototype;
+#endif
 using UnityEngine;
 
 namespace JTLStudio.SDK
@@ -57,6 +60,25 @@ namespace JTLStudio.SDK
 
             bool pauseOnFocusLoss = configuration == null || configuration.PauseOnFocusLoss;
             PlatformId platformId = configuration == null ? PlatformId.Editor : configuration.Platform;
+
+#if UNITY_EDITOR
+            if (settings.UsePrototypesInEditor)
+            {
+                PrototypeFactory prototypes = new PrototypeFactory(platformId, settings);
+                platformProvider = prototypes.Platform(platformProvider);
+                adsProvider = prototypes.Ads(adsProvider);
+                dataProvider = prototypes.Data(dataProvider);
+                paymentsProvider = prototypes.Payments(paymentsProvider);
+                languageProvider = prototypes.Language(languageProvider);
+                playerProvider = prototypes.Player(playerProvider);
+                leaderboardsProvider = prototypes.Leaderboards(leaderboardsProvider);
+                flagsProvider = prototypes.Flags(flagsProvider);
+                timeProvider = prototypes.Time(timeProvider);
+                gameplayProvider = prototypes.Gameplay(gameplayProvider);
+                reviewProvider = prototypes.Review(reviewProvider);
+                shortcutProvider = prototypes.Shortcut(shortcutProvider);
+            }
+#endif
 
             _pause = new PauseService(platformProvider, pauseOnFocusLoss, _logger);
             _time = new TimeService(timeProvider, _pause, _logger);

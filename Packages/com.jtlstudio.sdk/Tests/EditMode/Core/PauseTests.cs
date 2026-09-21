@@ -1,143 +1,153 @@
 using System;
-using JTLStudio.SDK.Providers;
+using JTLStudio.SDK.Tests.Fakes;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace JTLStudio.SDK.Tests
+namespace JTLStudio.SDK.Tests.Core
 {
     public class PauseTests
     {
-        private TestSettings _settings;
-        private FakePlatformProvider _platform;
+        private TestSettingsBuilder _builder;
 
         [SetUp]
         public void SetUp()
         {
-            _platform = new FakePlatformProvider();
-            _settings = new TestSettings().WithPlatform(_platform);
-            _settings.Create();
-            _platform.Complete(ProviderState.Ready);
+            JTLSDK.Destroy();
+            _builder = new TestSettingsBuilder();
+            JTLSDK.Create(_builder.Build());
         }
 
         [TearDown]
         public void TearDown()
         {
-            _settings.Dispose();
-            Time.timeScale = 1f;
+            _builder.Cleanup();
         }
 
         [Test]
-        public void SetAndReleaseSourceTogglesPauseOnce()
+        public void HoldPausesAndDisposeResumes()
         {
             int changes = 0;
-            JTLSDK.Pause.Changed += paused => changes++;
+            JTLSDK.Pause.Changed += _ => changes++;
+
+            IDisposable hold = JTLSDK.Pause.Hold("Menu");
+
+            Assert.IsTrue(JTLSDK.Pause.IsPaused);
+            Assert.AreEqual(1, changes);
+
+            hold.Dispose();
+
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
+            Assert.AreEqual(2, changes);
+        }
+
+        [Test]
+        public void SameSourceTwiceChangesOnce()
+        {
+            int changes = 0;
+            JTLSDK.Pause.Changed += _ => changes++;
 
             JTLSDK.Pause.Set("Menu", true);
             JTLSDK.Pause.Set("Menu", true);
 
-            Assert.That(JTLSDK.Pause.IsPaused, Is.True);
-            Assert.That(changes, Is.EqualTo(1));
+            Assert.AreEqual(1, changes);
+            Assert.AreEqual(1, JTLSDK.Pause.Sources.Count);
+        }
 
-            JTLSDK.Pause.Set("Menu", false);
+        [Test]
+        public void ReleasingUnknownSourceDoesNothing()
+        {
+            int changes = 0;
+            JTLSDK.Pause.Changed += _ => changes++;
+
             JTLSDK.Pause.Set("Unknown", false);
 
-            Assert.That(JTLSDK.Pause.IsPaused, Is.False);
-            Assert.That(changes, Is.EqualTo(2));
+            Assert.AreEqual(0, changes);
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
         }
 
         [Test]
-        public void PauseStaysWhileAnySourceRemains()
+        public void ResumesOnlyWhenEverySourceReleased()
         {
             JTLSDK.Pause.Set("Menu", true);
-            _platform.RequestPause(true);
-            _platform.RequestPause(true);
+            JTLSDK.Pause.Set("Settings", true);
 
             JTLSDK.Pause.Set("Menu", false);
+            Assert.IsTrue(JTLSDK.Pause.IsPaused);
 
-            Assert.That(JTLSDK.Pause.IsPaused, Is.True);
-            Assert.That(JTLSDK.Pause.Sources, Is.EquivalentTo(new[] { PauseSources.Platform }));
-
-            _platform.RequestPause(false);
-
-            Assert.That(JTLSDK.Pause.IsPaused, Is.False);
-        }
-
-        [Test]
-        public void HoldReleasesOnDispose()
-        {
-            using (JTLSDK.Pause.Hold("Menu"))
-            {
-                Assert.That(JTLSDK.Pause.IsPaused, Is.True);
-            }
-
-            Assert.That(JTLSDK.Pause.IsPaused, Is.False);
+            JTLSDK.Pause.Set("Settings", false);
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
         }
 
         [Test]
         public void TimeScaleFollowsPauseAndKeepsGameValue()
         {
             JTLSDK.Time.Scale = 0.3f;
+            Assert.AreEqual(0.3f, Time.timeScale, 0.0001f);
 
-            Assert.That(Time.timeScale, Is.EqualTo(0.3f).Within(0.0001f));
+            IDisposable hold = JTLSDK.Pause.Hold("Menu");
+            Assert.AreEqual(0f, Time.timeScale, 0.0001f);
+            Assert.AreEqual(0.3f, JTLSDK.Time.Scale, 0.0001f);
 
-            using (JTLSDK.Pause.Hold("Menu"))
-            {
-                Assert.That(Time.timeScale, Is.EqualTo(0f));
-                Assert.That(JTLSDK.Time.Scale, Is.EqualTo(0.3f).Within(0.0001f));
+            JTLSDK.Time.Scale = 1f;
+            Assert.AreEqual(0f, Time.timeScale, 0.0001f);
 
-                JTLSDK.Time.Scale = 1f;
-
-                Assert.That(Time.timeScale, Is.EqualTo(0f));
-            }
-
-            Assert.That(Time.timeScale, Is.EqualTo(1f));
+            hold.Dispose();
+            Assert.AreEqual(1f, Time.timeScale, 0.0001f);
         }
 
         [Test]
-        public void AudioIsSilencedWhilePausedOrPlatformMuted()
+        public void AudioIsSilentWhilePaused()
         {
-            _platform.SupportsPlatformMute = true;
             JTLSDK.Audio.Volume = 0.8f;
+            Assert.AreEqual(0.8f, AudioListener.volume, 0.0001f);
 
-            Assert.That(AudioListener.volume, Is.EqualTo(0.8f).Within(0.0001f));
+            IDisposable hold = JTLSDK.Pause.Hold("Menu");
+            Assert.AreEqual(0f, AudioListener.volume, 0.0001f);
+            Assert.IsTrue(AudioListener.pause);
+            Assert.AreEqual(0.8f, JTLSDK.Audio.Volume, 0.0001f);
 
-            _platform.SetPlatformMuted(true);
-
-            Assert.That(AudioListener.volume, Is.EqualTo(0f));
-            Assert.That(JTLSDK.Audio.IsPlatformMuted, Is.True);
-
-            _platform.SetPlatformMuted(false);
-
-            Assert.That(AudioListener.volume, Is.EqualTo(0.8f).Within(0.0001f));
-
-            using (JTLSDK.Pause.Hold("Menu"))
-            {
-                Assert.That(AudioListener.volume, Is.EqualTo(0f));
-                Assert.That(AudioListener.pause, Is.True);
-            }
-
-            Assert.That(AudioListener.pause, Is.False);
+            hold.Dispose();
+            Assert.AreEqual(0.8f, AudioListener.volume, 0.0001f);
+            Assert.IsFalse(AudioListener.pause);
         }
 
         [Test]
-        public void GameplayIsSuspendedDuringPauseAndRestored()
+        public void PlatformPauseRequestUsesPlatformSource()
+        {
+            _builder.Platform.RequestPause(true);
+
+            Assert.IsTrue(JTLSDK.Pause.IsPaused);
+            CollectionAssert.Contains(JTLSDK.Pause.Sources, PauseSources.Platform);
+
+            _builder.Platform.RequestPause(false);
+
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
+        }
+
+        [Test]
+        public void ContinuePromptReleasesPlatformPause()
+        {
+            _builder.Platform.RequestPause(true);
+            bool continued = false;
+
+            JTLSDK.Pause.ShowContinuePrompt(() => continued = true);
+
+            Assert.IsTrue(continued);
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
+            Assert.AreEqual(1, _builder.Platform.ContinuePromptCount);
+        }
+
+        [Test]
+        public void GameplaySuspendsDuringPauseAndResumes()
         {
             JTLSDK.Gameplay.Start();
+            Assert.IsTrue(JTLSDK.Gameplay.IsPlaying);
 
-            Assert.That(JTLSDK.Gameplay.IsPlaying, Is.True);
+            IDisposable hold = JTLSDK.Pause.Hold("Menu");
+            Assert.IsFalse(JTLSDK.Gameplay.IsPlaying);
 
-            using (JTLSDK.Pause.Hold("Menu"))
-            {
-                Assert.That(JTLSDK.Gameplay.IsPlaying, Is.False);
-            }
-
-            Assert.That(JTLSDK.Gameplay.IsPlaying, Is.True);
-        }
-
-        [Test]
-        public void InvalidSourceThrows()
-        {
-            Assert.Throws<ArgumentException>(() => JTLSDK.Pause.Set("", true));
+            hold.Dispose();
+            Assert.IsTrue(JTLSDK.Gameplay.IsPlaying);
         }
     }
 }

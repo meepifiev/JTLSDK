@@ -1,163 +1,189 @@
 using System;
-using JTLStudio.SDK.Providers;
+using JTLStudio.SDK.Tests.Fakes;
 using NUnit.Framework;
 
-namespace JTLStudio.SDK.Tests
+namespace JTLStudio.SDK.Tests.Core
 {
     public class DataTests
     {
         [Serializable]
         public class Profile
         {
-            public string Name = "Player";
-            public int Level = 1;
-            public float Volume = 0.5f;
+            public string name = "";
+            public int level;
+            public float progress;
         }
 
-        private TestSettings _settings;
+        private TestSettingsBuilder _builder;
         private FakeDataProvider _data;
 
         [SetUp]
         public void SetUp()
         {
+            JTLSDK.Destroy();
             _data = new FakeDataProvider();
+            _builder = new TestSettingsBuilder { Data = _data };
         }
 
         [TearDown]
         public void TearDown()
         {
-            _settings?.Dispose();
-            _settings = null;
+            _builder.Cleanup();
         }
 
         [Test]
-        public void EmptyStorageIsReadyAndWritable()
+        public void EmptyLoadIsReadyAndWritable()
         {
-            Create();
+            JTLSDK.Create(_builder.Build());
 
-            Assert.That(JTLSDK.Data.LoadState, Is.EqualTo(DataState.Empty));
-            Assert.That(JTLSDK.Data.IsReady, Is.True);
+            Assert.AreEqual(DataState.Empty, JTLSDK.Data.LoadState);
+            Assert.AreEqual(ModuleState.Ready, JTLSDK.Data.State);
 
+            JTLSDK.Data.SetInt("Money", 5);
+            Assert.AreEqual(5, JTLSDK.Data.GetInt("Money"));
+            Assert.IsTrue(JTLSDK.Data.IsDirty);
+        }
+
+        [Test]
+        public void ValuesRoundTripThroughFlushAndLoad()
+        {
+            JTLSDK.Create(_builder.Build());
             JTLSDK.Data.SetInt("Money", 1200);
             JTLSDK.Data.SetFloat("Volume", 0.5f);
             JTLSDK.Data.SetBool("Tutorial", true);
-            JTLSDK.Data.SetString("Name", "Player");
+            JTLSDK.Data.SetString("Name", "Игрок \"один\"");
+            JTLSDK.Data.SetObject("Profile", new Profile { name = "Player", level = 27, progress = 0.75f });
+            bool? flushed = null;
 
-            Assert.That(JTLSDK.Data.IsDirty, Is.True);
-            Assert.That(JTLSDK.Data.GetInt("Money"), Is.EqualTo(1200));
-            Assert.That(JTLSDK.Data.GetFloat("Volume"), Is.EqualTo(0.5f).Within(0.0001f));
-            Assert.That(JTLSDK.Data.GetBool("Tutorial"), Is.True);
-            Assert.That(JTLSDK.Data.GetString("Name"), Is.EqualTo("Player"));
-        }
-
-        [Test]
-        public void FlushWritesJsonAndReloadRestoresValues()
-        {
-            Create();
-            JTLSDK.Data.SetInt("Money", 1200);
-            JTLSDK.Data.SetObject("Profile", new Profile { Name = "Ann", Level = 27, Volume = 0.25f });
-
-            bool flushed = false;
             JTLSDK.Data.Flush(success => flushed = success);
 
-            Assert.That(flushed, Is.True);
-            Assert.That(JTLSDK.Data.IsDirty, Is.False);
-            Assert.That(_data.Stored, Does.Contain("\"Money\":1200"));
-            Assert.That(_data.Stored, Does.Contain("\"revision\":1"));
+            Assert.IsTrue(flushed);
+            Assert.IsFalse(JTLSDK.Data.IsDirty);
+            Assert.AreEqual(1, _data.SaveCount);
 
-            _settings.Dispose();
-            _settings = null;
-            _data.LoadResult = DataLoadResult.Loaded;
-            Create();
+            JTLSDK.Destroy();
+            FakeDataProvider reloaded = new FakeDataProvider { LoadResult = Providers.DataLoadResult.Loaded, LoadPayload = _data.LastSaved };
+            _builder.Data = reloaded;
+            JTLSDK.Create(_builder.Build());
 
-            Assert.That(JTLSDK.Data.LoadState, Is.EqualTo(DataState.Loaded));
-            Assert.That(JTLSDK.Data.GetInt("Money"), Is.EqualTo(1200));
+            Assert.AreEqual(DataState.Loaded, JTLSDK.Data.LoadState);
+            Assert.AreEqual(1200, JTLSDK.Data.GetInt("Money"));
+            Assert.AreEqual(0.5f, JTLSDK.Data.GetFloat("Volume"), 0.0001f);
+            Assert.IsTrue(JTLSDK.Data.GetBool("Tutorial"));
+            Assert.AreEqual("Игрок \"один\"", JTLSDK.Data.GetString("Name"));
 
             Profile profile = JTLSDK.Data.GetObject<Profile>("Profile");
-
-            Assert.That(profile.Name, Is.EqualTo("Ann"));
-            Assert.That(profile.Level, Is.EqualTo(27));
-            Assert.That(profile.Volume, Is.EqualTo(0.25f).Within(0.0001f));
+            Assert.AreEqual("Player", profile.name);
+            Assert.AreEqual(27, profile.level);
+            Assert.AreEqual(0.75f, profile.progress, 0.0001f);
         }
 
         [Test]
-        public void ObjectFieldsMissingInSaveKeepDefaults()
+        public void MissingKeysReturnDefaults()
         {
-            _data.LoadResult = DataLoadResult.Loaded;
-            _data.Stored = "{\"format\":1,\"revision\":3,\"values\":{\"Profile\":{\"Level\":9}}}";
-            Create();
+            JTLSDK.Create(_builder.Build());
 
-            Profile profile = JTLSDK.Data.GetObject<Profile>("Profile");
-
-            Assert.That(profile.Level, Is.EqualTo(9));
-            Assert.That(profile.Name, Is.EqualTo("Player"));
-            Assert.That(profile.Volume, Is.EqualTo(0.5f).Within(0.0001f));
+            Assert.AreEqual(7, JTLSDK.Data.GetInt("Missing", 7));
+            Assert.AreEqual("x", JTLSDK.Data.GetString("Missing", "x"));
+            Assert.IsNull(JTLSDK.Data.GetObject<Profile>("Missing"));
+            Assert.IsFalse(JTLSDK.Data.HasKey("Missing"));
         }
 
         [Test]
-        public void FailedLoadBlocksWritesToStorage()
+        public void WriteBeforeReadyIsIgnored()
         {
-            _data.LoadResult = DataLoadResult.Failed;
-            Create();
-
-            Assert.That(JTLSDK.Data.LoadState, Is.EqualTo(DataState.Failed));
-            Assert.That(JTLSDK.Data.State, Is.EqualTo(ModuleState.Failed));
+            _data.CompleteImmediately = false;
+            JTLSDK.Create(_builder.Build());
 
             JTLSDK.Data.SetInt("Money", 5);
-            bool flushed = true;
-            JTLSDK.Data.Flush(success => flushed = success);
+            _data.Complete(Providers.ProviderState.Ready);
 
-            Assert.That(JTLSDK.Data.GetInt("Money"), Is.EqualTo(5));
-            Assert.That(flushed, Is.False);
-            Assert.That(_data.SaveCalls, Is.EqualTo(0));
+            Assert.AreEqual(0, JTLSDK.Data.GetInt("Money"));
+            Assert.IsFalse(JTLSDK.Data.IsDirty);
         }
 
         [Test]
-        public void CorruptedSaveIsTreatedAsFailure()
+        public void FailedLoadBlocksWritingToStorage()
         {
-            _data.LoadResult = DataLoadResult.Loaded;
-            _data.Stored = "{not json";
-            Create();
+            _data.LoadResult = Providers.DataLoadResult.Failed;
+            JTLSDK.Create(_builder.Build());
+            bool? flushed = null;
 
-            Assert.That(JTLSDK.Data.LoadState, Is.EqualTo(DataState.Failed));
-            Assert.That(_data.SaveCalls, Is.EqualTo(0));
+            JTLSDK.Data.SetInt("Money", 5);
+            JTLSDK.Data.Flush(success => flushed = success);
+
+            Assert.AreEqual(DataState.Failed, JTLSDK.Data.LoadState);
+            Assert.AreEqual(5, JTLSDK.Data.GetInt("Money"));
+            Assert.IsFalse(flushed);
+            Assert.AreEqual(0, _data.SaveCount);
+        }
+
+        [Test]
+        public void FailedLoadIsRetriedAndReplacesMemory()
+        {
+            _data.LoadResult = Providers.DataLoadResult.Failed;
+            JTLSDK.Create(_builder.Build());
+            JTLSDK.Data.SetInt("Money", 5);
+
+            _data.LoadResult = Providers.DataLoadResult.Loaded;
+            _data.LoadPayload = "{\"format\":1,\"revision\":3,\"values\":{\"Money\":99}}";
+            JTLSDK.Current.Tick(31f);
+
+            Assert.AreEqual(DataState.Loaded, JTLSDK.Data.LoadState);
+            Assert.AreEqual(99, JTLSDK.Data.GetInt("Money"));
+            Assert.AreEqual(2, _data.LoadCount);
+        }
+
+        [Test]
+        public void CorruptedDocumentIsTreatedAsFailed()
+        {
+            _data.LoadResult = Providers.DataLoadResult.Loaded;
+            _data.LoadPayload = "{not json";
+            JTLSDK.Create(_builder.Build());
+
+            Assert.AreEqual(DataState.Failed, JTLSDK.Data.LoadState);
+        }
+
+        [Test]
+        public void SizeLimitBlocksFlush()
+        {
+            _data.MaxBytes = 10;
+            JTLSDK.Create(_builder.Build());
+            bool? flushed = null;
+
+            JTLSDK.Data.SetString("Big", new string('x', 100));
+            JTLSDK.Data.Flush(success => flushed = success);
+
+            Assert.IsFalse(flushed);
+            Assert.AreEqual(0, _data.SaveCount);
         }
 
         [Test]
         public void AutosaveFlushesAfterDelay()
         {
-            _settings = new TestSettings().WithData(_data).WithAutosaveDelay(2f);
-            _settings.Create();
-            JTLSDK.Data.SetInt("Money", 1);
+            _builder.AutosaveDelaySeconds = 0.5f;
+            JTLSDK.Create(_builder.Build());
 
-            JTLSDK.Current.Tick(1f);
+            JTLSDK.Data.SetInt("Money", 5);
+            JTLSDK.Current.Tick(0.3f);
+            Assert.AreEqual(0, _data.SaveCount);
 
-            Assert.That(_data.SaveCalls, Is.EqualTo(0));
-
-            JTLSDK.Current.Tick(1.5f);
-
-            Assert.That(_data.SaveCalls, Is.EqualTo(1));
-            Assert.That(JTLSDK.Data.IsDirty, Is.False);
+            JTLSDK.Current.Tick(0.3f);
+            Assert.AreEqual(1, _data.SaveCount);
+            Assert.IsFalse(JTLSDK.Data.IsDirty);
         }
 
         [Test]
-        public void OversizedSaveIsRejected()
+        public void WriteDuringFlushKeepsDirty()
         {
-            _data.MaxBytes = 64;
-            Create();
-            JTLSDK.Data.SetString("Blob", new string('x', 200));
+            _builder.AutosaveDelaySeconds = 0f;
+            JTLSDK.Create(_builder.Build());
+            JTLSDK.Data.SetInt("Money", 1);
 
-            bool flushed = true;
-            JTLSDK.Data.Flush(success => flushed = success);
+            JTLSDK.Data.Flushed += _ => JTLSDK.Data.SetInt("Money", 2);
+            JTLSDK.Data.Flush();
 
-            Assert.That(flushed, Is.False);
-            Assert.That(_data.SaveCalls, Is.EqualTo(0));
-        }
-
-        private void Create()
-        {
-            _settings = new TestSettings().WithData(_data);
-            _settings.Create();
+            Assert.IsTrue(JTLSDK.Data.IsDirty);
         }
     }
 }

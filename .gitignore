@@ -51,3 +51,6 @@ crashlytics-build.properties
 
 # UPM samples imported for development
 /Assets/Samples/
+
+# Agent worktrees
+/.claude/worktrees/

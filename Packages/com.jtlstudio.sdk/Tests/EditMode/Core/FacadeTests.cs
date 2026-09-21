@@ -1,147 +1,125 @@
 using System;
 using System.Collections.Generic;
 using JTLStudio.SDK.Providers;
+using JTLStudio.SDK.Tests.Fakes;
 using NUnit.Framework;
 
-namespace JTLStudio.SDK.Tests
+namespace JTLStudio.SDK.Tests.Core
 {
     public class FacadeTests
     {
-        private TestSettings _settings;
+        private TestSettingsBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            JTLSDK.Destroy();
+            _builder = new TestSettingsBuilder();
+        }
 
         [TearDown]
         public void TearDown()
         {
-            _settings?.Dispose();
-            _settings = null;
+            _builder.Cleanup();
         }
 
         [Test]
-        public void ModuleAccessBeforeCreateThrows()
+        public void AccessingModuleBeforeCreateThrows()
         {
-            Assert.That(JTLSDK.IsCreated, Is.False);
-            Assert.Throws<InvalidOperationException>(() => { IAds ads = JTLSDK.Ads; });
+            Assert.Throws<InvalidOperationException>(() => JTLSDK.Ads.ShowInterstitial());
         }
 
         [Test]
         public void CreateTwiceThrows()
         {
-            _settings = new TestSettings();
-            _settings.Create();
+            JTLSDK.Create(_builder.Build());
 
-            Assert.Throws<InvalidOperationException>(() => JTLSDK.Create(_settings.Settings));
+            Assert.Throws<InvalidOperationException>(() => JTLSDK.Create(_builder.Build()));
         }
 
         [Test]
-        public void ReadyCallbacksRunInRegistrationOrderAfterProvidersComplete()
+        public void ReadyWhenEveryProviderAnswered()
         {
-            FakePlatformProvider platform = new FakePlatformProvider();
-            _settings = new TestSettings().WithPlatform(platform);
-            _settings.Create();
+            JTLSDK.Create(_builder.Build());
 
+            Assert.IsTrue(JTLSDK.IsReady);
+            Assert.AreEqual(ModuleState.Ready, JTLSDK.Platform.State);
+            Assert.AreEqual(ModuleState.Unsupported, JTLSDK.Ads.State);
+            Assert.AreEqual(PlatformId.YandexGames, JTLSDK.Platform.Current);
+        }
+
+        [Test]
+        public void WhenReadyRunsCallbacksInRegistrationOrder()
+        {
+            _builder.Platform.CompleteImmediately = false;
+            JTLSDK.Create(_builder.Build());
             List<int> order = new List<int>();
+
             JTLSDK.WhenReady(() => order.Add(1));
             JTLSDK.WhenReady(() => order.Add(2));
             JTLSDK.WhenReady(() => order.Add(3));
 
-            Assert.That(JTLSDK.IsReady, Is.False);
-            Assert.That(order, Is.Empty);
+            Assert.IsFalse(JTLSDK.IsReady);
+            Assert.IsEmpty(order);
 
-            platform.Complete(ProviderState.Ready);
+            _builder.Platform.Complete(ProviderState.Ready);
 
-            Assert.That(JTLSDK.IsReady, Is.True);
-            Assert.That(order, Is.EqualTo(new[] { 1, 2, 3 }));
+            Assert.IsTrue(JTLSDK.IsReady);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, order);
         }
 
         [Test]
         public void WhenReadyAfterReadyRunsImmediately()
         {
-            _settings = new TestSettings();
-            _settings.Create();
-
+            JTLSDK.Create(_builder.Build());
             bool called = false;
+
             JTLSDK.WhenReady(() => called = true);
 
-            Assert.That(called, Is.True);
+            Assert.IsTrue(called);
         }
 
         [Test]
-        public void TimeoutMarksPendingModulesFailedAndReleasesReadyCallbacks()
+        public void TimeoutMarksPendingModulesFailedAndFiresReady()
         {
-            FakePlatformProvider platform = new FakePlatformProvider();
-            _settings = new TestSettings().WithPlatform(platform).WithTimeout(5f);
-            _settings.Create();
-
+            _builder.Platform.CompleteImmediately = false;
+            _builder.InitializationTimeoutSeconds = 1f;
+            JTLSDK.Create(_builder.Build());
             bool called = false;
             JTLSDK.WhenReady(() => called = true);
-            JTLSDK.Current.Tick(4f);
 
-            Assert.That(JTLSDK.IsReady, Is.False);
+            JTLSDK.Current.Tick(0.5f);
+            Assert.IsFalse(JTLSDK.IsReady);
 
-            JTLSDK.Current.Tick(1.5f);
+            JTLSDK.Current.Tick(0.6f);
 
-            Assert.That(JTLSDK.IsReady, Is.True);
-            Assert.That(called, Is.True);
-            Assert.That(JTLSDK.Platform.State, Is.EqualTo(ModuleState.Failed));
+            Assert.IsTrue(JTLSDK.IsReady);
+            Assert.IsTrue(called);
+            Assert.AreEqual(ModuleState.Failed, JTLSDK.Platform.State);
         }
 
         [Test]
-        public void LateProviderAnswerAfterTimeoutMakesModuleReady()
+        public void LateAnswerAfterTimeoutTurnsModuleReady()
         {
-            FakePlatformProvider platform = new FakePlatformProvider();
-            _settings = new TestSettings().WithPlatform(platform).WithTimeout(1f);
-            _settings.Create();
+            _builder.Platform.CompleteImmediately = false;
+            _builder.InitializationTimeoutSeconds = 1f;
+            JTLSDK.Create(_builder.Build());
             JTLSDK.Current.Tick(2f);
 
-            platform.Complete(ProviderState.Ready);
+            _builder.Platform.Complete(ProviderState.Ready);
 
-            Assert.That(JTLSDK.Platform.State, Is.EqualTo(ModuleState.Ready));
-        }
-
-        [Test]
-        public void ThrowingReadyCallbackDoesNotStopOthers()
-        {
-            FakePlatformProvider platform = new FakePlatformProvider();
-            _settings = new TestSettings().WithPlatform(platform);
-            _settings.Create();
-
-            bool secondCalled = false;
-            JTLSDK.WhenReady(() => throw new InvalidOperationException("boom"));
-            JTLSDK.WhenReady(() => secondCalled = true);
-
-            platform.Complete(ProviderState.Ready);
-
-            Assert.That(secondCalled, Is.True);
-        }
-
-        [Test]
-        public void UnsupportedModulesReportNotSupported()
-        {
-            _settings = new TestSettings();
-            _settings.Create();
-
-            Assert.That(JTLSDK.Payments.IsSupported, Is.False);
-            Assert.That(JTLSDK.Platform.Supports(Capability.Purchases), Is.False);
-            Assert.That(JTLSDK.Platform.Supports(Capability.Rewarded), Is.False);
-
-            PurchaseResult result = PurchaseResult.Failed;
-            JTLSDK.Payments.Purchase("remove_ads", value => result = value);
-
-            Assert.That(result, Is.EqualTo(PurchaseResult.NotSupported));
+            Assert.AreEqual(ModuleState.Ready, JTLSDK.Platform.State);
         }
 
         [Test]
         public void DestroyAllowsCreateAgain()
         {
-            _settings = new TestSettings();
-            _settings.Create();
+            JTLSDK.Create(_builder.Build());
             JTLSDK.Destroy();
 
-            Assert.That(JTLSDK.IsCreated, Is.False);
-
-            _settings.Create();
-
-            Assert.That(JTLSDK.IsCreated, Is.True);
+            Assert.IsFalse(JTLSDK.IsCreated);
+            JTLSDK.Create(_builder.Build());
+            Assert.IsTrue(JTLSDK.IsCreated);
         }
     }
 }

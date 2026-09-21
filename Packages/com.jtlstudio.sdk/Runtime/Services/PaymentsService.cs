@@ -129,6 +129,7 @@ namespace JTLStudio.SDK.Services
 
         internal override void Initialize()
         {
+            _provider.Configure(_catalog, _platform);
             _provider.Initialize(OnProviderInitialized);
         }
 

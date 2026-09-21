@@ -1,7 +1,7 @@
 using System;
 using JTLStudio.SDK.Providers;
 
-namespace JTLStudio.SDK.Tests
+namespace JTLStudio.SDK.Tests.Fakes
 {
     public class FakePlatformProvider : IPlatformProvider
     {
@@ -14,17 +14,19 @@ namespace JTLStudio.SDK.Tests
         public string AppId { get; set; } = "test-app";
         public DeviceType DeviceType { get; set; } = DeviceType.Desktop;
         public bool SupportsPlatformMute { get; set; }
-        public bool IsPlatformMuted { get; set; }
-        public bool IsInitializing => _onInitialized != null;
+        public bool IsPlatformMuted { get; private set; }
+        public bool CompleteImmediately { get; set; } = true;
+        public int ContinuePromptCount { get; private set; }
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            _onInitialized = onInitialized;
-        }
+            if (CompleteImmediately)
+            {
+                onInitialized(ProviderState.Ready);
+                return;
+            }
 
-        public void ShowContinuePrompt(Action onContinue)
-        {
-            onContinue?.Invoke();
+            _onInitialized = onInitialized;
         }
 
         public void Complete(ProviderState state)
@@ -32,6 +34,12 @@ namespace JTLStudio.SDK.Tests
             Action<ProviderState> callback = _onInitialized;
             _onInitialized = null;
             callback?.Invoke(state);
+        }
+
+        public void ShowContinuePrompt(Action onContinue)
+        {
+            ContinuePromptCount++;
+            onContinue?.Invoke();
         }
 
         public void RequestPause(bool paused)

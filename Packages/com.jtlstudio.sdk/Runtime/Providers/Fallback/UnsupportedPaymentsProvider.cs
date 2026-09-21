@@ -12,6 +12,10 @@ namespace JTLStudio.SDK.Providers
         public IReadOnlyList<PlatformProduct> Products => _products;
         public IReadOnlyList<PlatformPurchase> Purchases => _purchases;
 
+        public void Configure(IReadOnlyList<ProductDefinition> products, PlatformId platform)
+        {
+        }
+
         public void Initialize(Action<ProviderState> onInitialized)
         {
             onInitialized(ProviderState.Unsupported);

@@ -1,36 +1,50 @@
 using System;
 using JTLStudio.SDK.Providers;
 
-namespace JTLStudio.SDK.Tests
+namespace JTLStudio.SDK.Tests.Fakes
 {
     public class FakeDataProvider : IDataProvider
     {
+        private Action<ProviderState> _onInitialized;
+
         public int MaxBytes { get; set; } = 200 * 1024;
         public int RecommendedBytes { get; set; } = 100 * 1024;
-        public string Stored { get; set; } = "";
         public DataLoadResult LoadResult { get; set; } = DataLoadResult.Empty;
+        public string LoadPayload { get; set; } = "";
         public bool SaveSucceeds { get; set; } = true;
-        public int SaveCalls { get; private set; }
+        public bool CompleteImmediately { get; set; } = true;
+        public int LoadCount { get; private set; }
+        public int SaveCount { get; private set; }
+        public string LastSaved { get; private set; }
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Ready);
+            if (CompleteImmediately)
+            {
+                onInitialized(ProviderState.Ready);
+                return;
+            }
+
+            _onInitialized = onInitialized;
+        }
+
+        public void Complete(ProviderState state)
+        {
+            Action<ProviderState> callback = _onInitialized;
+            _onInitialized = null;
+            callback?.Invoke(state);
         }
 
         public void Load(Action<DataLoadResult, string> onLoaded)
         {
-            onLoaded(LoadResult, Stored);
+            LoadCount++;
+            onLoaded(LoadResult, LoadPayload);
         }
 
         public void Save(string serialized, Action<bool> onSaved)
         {
-            SaveCalls++;
-
-            if (SaveSucceeds)
-            {
-                Stored = serialized;
-            }
-
+            SaveCount++;
+            LastSaved = serialized;
             onSaved(SaveSucceeds);
         }
     }

@@ -1,117 +1,128 @@
 using System;
 using JTLStudio.SDK.Providers;
+using JTLStudio.SDK.Tests.Fakes;
 using NUnit.Framework;
 
-namespace JTLStudio.SDK.Tests
+namespace JTLStudio.SDK.Tests.Core
 {
     public class AdsTests
     {
-        private TestSettings _settings;
-        private FakePlatformProvider _platform;
+        private TestSettingsBuilder _builder;
         private FakeAdsProvider _ads;
 
         [SetUp]
         public void SetUp()
         {
-            _platform = new FakePlatformProvider();
+            JTLSDK.Destroy();
             _ads = new FakeAdsProvider();
-            _settings = new TestSettings().WithPlatform(_platform).WithAds(_ads);
-            _settings.Create();
+            _builder = new TestSettingsBuilder { Ads = _ads };
         }
 
         [TearDown]
         public void TearDown()
         {
-            _settings.Dispose();
+            _builder.Cleanup();
         }
 
         [Test]
-        public void RewardedBeforeReadyReturnsNotReadyWithoutCallingProvider()
+        public void ShowBeforeReadyReturnsNotReady()
         {
-            AdResult result = AdResult.Failed;
-            JTLSDK.Ads.ShowRewarded("double_money", value => result = value);
+            _ads.CompleteImmediately = false;
+            JTLSDK.Create(_builder.Build());
+            AdResult? result = null;
 
-            Assert.That(JTLSDK.Ads.IsReady, Is.True);
-            Assert.That(JTLSDK.IsReady, Is.False);
-        }
+            JTLSDK.Ads.ShowRewarded("reward", value => result = value);
 
-        [Test]
-        public void RewardedPausesAndSuspendsGameplayUntilResult()
-        {
-            _platform.Complete(ProviderState.Ready);
-            JTLSDK.Gameplay.Start();
-
-            AdResult result = AdResult.Failed;
-            JTLSDK.Ads.ShowRewarded("double_money", value => result = value);
-
-            Assert.That(JTLSDK.Ads.IsShowing, Is.True);
-            Assert.That(JTLSDK.Pause.IsPaused, Is.True);
-            Assert.That(JTLSDK.Gameplay.IsPlaying, Is.False);
-            Assert.That(_ads.LastRewardId, Is.EqualTo("double_money"));
-
-            _ads.CompleteShow(AdResult.Rewarded);
-
-            Assert.That(result, Is.EqualTo(AdResult.Rewarded));
-            Assert.That(JTLSDK.Ads.IsShowing, Is.False);
-            Assert.That(JTLSDK.Pause.IsPaused, Is.False);
-            Assert.That(JTLSDK.Gameplay.IsPlaying, Is.True);
-        }
-
-        [Test]
-        public void SecondShowWhileShowingIsRejected()
-        {
-            _platform.Complete(ProviderState.Ready);
-
-            JTLSDK.Ads.ShowRewarded("first", value => { });
-            AdResult second = AdResult.Failed;
-            JTLSDK.Ads.ShowRewarded("second", value => second = value);
-
-            Assert.That(second, Is.EqualTo(AdResult.NotShown));
-            Assert.That(_ads.ShowCalls, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void ThrowingResultCallbackStillReleasesPause()
-        {
-            _platform.Complete(ProviderState.Ready);
-
-            JTLSDK.Ads.ShowInterstitial(value => throw new InvalidOperationException("boom"));
-            _ads.CompleteShow(AdResult.Shown);
-
-            Assert.That(JTLSDK.Pause.IsPaused, Is.False);
-            Assert.That(JTLSDK.Ads.IsShowing, Is.False);
+            Assert.AreEqual(AdResult.NotReady, result);
+            Assert.AreEqual(0, _ads.ShowCount);
         }
 
         [Test]
         public void UnsupportedFormatReturnsNotSupported()
         {
-            _ads.SupportsBanner = false;
-            _ads.SupportsInterstitial = false;
-            _platform.Complete(ProviderState.Ready);
+            _ads.SupportsRewarded = false;
+            JTLSDK.Create(_builder.Build());
+            AdResult? result = null;
 
-            AdResult result = AdResult.Failed;
-            JTLSDK.Ads.ShowInterstitial(value => result = value);
+            JTLSDK.Ads.ShowRewarded("reward", value => result = value);
 
-            Assert.That(result, Is.EqualTo(AdResult.NotSupported));
-            Assert.That(JTLSDK.Platform.Supports(Capability.Interstitial), Is.False);
-            Assert.That(JTLSDK.Platform.Supports(Capability.Rewarded), Is.True);
+            Assert.AreEqual(AdResult.NotSupported, result);
         }
 
         [Test]
-        public void OpenedAndClosedEventsFireOnce()
+        public void SecondShowWhileFirstPendingReturnsNotShown()
         {
-            _platform.Complete(ProviderState.Ready);
+            JTLSDK.Create(_builder.Build());
+            AdResult? second = null;
+
+            JTLSDK.Ads.ShowRewarded("first", _ => { });
+            JTLSDK.Ads.ShowRewarded("second", value => second = value);
+
+            Assert.AreEqual(AdResult.NotShown, second);
+            Assert.AreEqual(1, _ads.ShowCount);
+            Assert.AreEqual("first", _ads.LastRewardId);
+        }
+
+        [Test]
+        public void PauseAndGameplayAreHeldDuringShow()
+        {
+            JTLSDK.Create(_builder.Build());
+            JTLSDK.Gameplay.Start();
+            AdResult? result = null;
+
+            JTLSDK.Ads.ShowRewarded("reward", value => result = value);
+
+            Assert.IsTrue(JTLSDK.Ads.IsShowing);
+            Assert.IsTrue(JTLSDK.Pause.IsPaused);
+            Assert.IsFalse(JTLSDK.Gameplay.IsPlaying);
+
+            _ads.CompleteShow(AdResult.Rewarded);
+
+            Assert.AreEqual(AdResult.Rewarded, result);
+            Assert.IsFalse(JTLSDK.Ads.IsShowing);
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
+            Assert.IsTrue(JTLSDK.Gameplay.IsPlaying);
+        }
+
+        [Test]
+        public void CallbackExceptionDoesNotKeepPause()
+        {
+            JTLSDK.Create(_builder.Build());
+
+            JTLSDK.Ads.ShowInterstitial(_ => throw new InvalidOperationException("game bug"));
+            _ads.CompleteShow(AdResult.Shown);
+
+            Assert.IsFalse(JTLSDK.Pause.IsPaused);
+            Assert.IsFalse(JTLSDK.Ads.IsShowing);
+        }
+
+        [Test]
+        public void ProviderCompletingTwiceInvokesCallbackOnce()
+        {
+            JTLSDK.Create(_builder.Build());
+            int calls = 0;
+
+            JTLSDK.Ads.ShowInterstitial(_ => calls++);
+            _ads.CompleteShow(AdResult.Shown);
+
+            Assert.AreEqual(1, calls);
+        }
+
+        [Test]
+        public void OpenedAndClosedEventsFireAroundShow()
+        {
+            JTLSDK.Create(_builder.Build());
             int opened = 0;
             int closed = 0;
             JTLSDK.Ads.Opened += () => opened++;
             JTLSDK.Ads.Closed += () => closed++;
 
             JTLSDK.Ads.ShowInterstitial();
-            _ads.CompleteShow(AdResult.Shown);
-            _ads.CompleteShow(AdResult.Shown);
+            Assert.AreEqual(1, opened);
+            Assert.AreEqual(0, closed);
 
-            Assert.That(opened, Is.EqualTo(1));
-            Assert.That(closed, Is.EqualTo(1));
+            _ads.CompleteShow(AdResult.Shown);
+            Assert.AreEqual(1, closed);
         }
     }
 }

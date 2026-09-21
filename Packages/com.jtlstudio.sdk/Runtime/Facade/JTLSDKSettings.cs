@@ -17,6 +17,7 @@ namespace JTLStudio.SDK
         [SerializeField] private List<ProductDefinition> _products = new List<ProductDefinition>();
         [SerializeField] private List<LeaderboardDefinition> _leaderboards = new List<LeaderboardDefinition>();
         [SerializeField] private List<FlagDefinition> _flags = new List<FlagDefinition>();
+        [SerializeField] private bool _usePrototypesInEditor = true;
 
         public SdkConfiguration ActiveConfiguration
         {
@@ -46,6 +47,12 @@ namespace JTLStudio.SDK
         {
             get => _defaultLanguage;
             internal set => _defaultLanguage = value;
+        }
+
+        public bool UsePrototypesInEditor
+        {
+            get => _usePrototypesInEditor;
+            internal set => _usePrototypesInEditor = value;
         }
 
         public List<Language> SupportedLanguages => _supportedLanguages;
