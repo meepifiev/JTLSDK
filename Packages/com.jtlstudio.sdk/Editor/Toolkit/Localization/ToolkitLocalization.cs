@@ -97,7 +97,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("package.removeMessage", "Remove {0} from the project?", "Удалить {0} из проекта?");
             Add("package.installing", "Installing {0}…", "Установка {0}…");
             Add("package.removing", "Removing {0}…", "Удаление {0}…");
-            Add("build.development", "Development build", "Development build");
+            Add("build.development", "Development build", "Development-сборка");
             Add("build.browse", "Browse", "Выбрать");
             Add("build.number", "Build number", "Build number");
             Add("build.openFolder", "Open folder after build", "Открывать папку после сборки");

@@ -40,7 +40,7 @@ namespace JTLStudio.SDK.Editor.Build
             JTLSDKSettings settings = _settings.Find();
             SdkConfiguration configuration = settings == null ? null : settings.ActiveConfiguration;
             int buildNumber = SessionState.GetInt(TemplateService.BuildNumberKey, JTLSDKEditorSettings.instance.BuildNumber);
-            bool development = (report.summary.options & BuildOptions.Development) != 0;
+            bool development = JTLSDKEditorSettings.instance.DevelopmentBuild;
             _template.CopyImages(JTLSDKEditorSettings.instance, report.summary.outputPath);
             _template.Substitute(report.summary.outputPath, _template.Values(JTLSDKEditorSettings.instance, configuration, buildNumber, development));
         }

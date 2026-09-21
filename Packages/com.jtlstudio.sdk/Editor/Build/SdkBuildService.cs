@@ -98,7 +98,7 @@ namespace JTLStudio.SDK.Editor.Build
                 target = BuildTarget.WebGL,
                 targetGroup = BuildTargetGroup.WebGL,
                 locationPathName = folder,
-                options = settings.DevelopmentBuild ? BuildOptions.Development : BuildOptions.None
+                options = BuildOptions.None
             };
 
             Stopwatch stopwatch = Stopwatch.StartNew();
