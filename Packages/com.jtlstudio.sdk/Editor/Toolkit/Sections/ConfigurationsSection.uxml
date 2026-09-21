@@ -5,13 +5,13 @@
         </jtl:SectionHeader>
         <ui:VisualElement name="configuration-cards" class="jtl-configuration-grid" />
         <jtl:Card title-key="configurations.generalSettings" spacing="12">
-            <jtl:FieldRow label-key="configurations.initializationTimeout" label-width="190">
+            <jtl:FieldRow label-key="configurations.initializationTimeout">
                 <jtl:NumberFieldWithUnit name="initialization-timeout" unit-key="unit.seconds" width="110" />
             </jtl:FieldRow>
-            <jtl:FieldRow label-key="configurations.autosaveDelay" label-width="190">
+            <jtl:FieldRow label-key="configurations.autosaveDelay">
                 <jtl:NumberFieldWithUnit name="autosave-delay" unit-key="unit.seconds" width="110" />
             </jtl:FieldRow>
-            <jtl:FieldRow label-key="configurations.loggingLevel" label-width="190">
+            <jtl:FieldRow label-key="configurations.loggingLevel">
                 <jtl:Dropdown name="logging-level" width="220" />
             </jtl:FieldRow>
         </jtl:Card>

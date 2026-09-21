@@ -11,7 +11,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 {
     public class ProviderRow : VisualElement
     {
-        private const int DropdownWidth = 230;
+        private const int DropdownWidth = 240;
         private const int ChevronSize = 20;
 
         private readonly ToolkitContext _context;

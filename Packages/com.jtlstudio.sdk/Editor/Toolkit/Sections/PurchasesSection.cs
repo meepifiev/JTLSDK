@@ -65,11 +65,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             VisualElement left = Column(8);
             left.AddToClassList("jtl-basis");
-            FieldRow idRow = new FieldRow("purchases.productId", 120);
+            FieldRow idRow = new FieldRow("purchases.productId", 130);
             idRow.Add(TextInput(id, true, 0));
             left.Add(idRow);
-            FieldRow typeRow = new FieldRow("purchases.type", 120);
-            typeRow.Add(EnumInput<ProductType>(product.FindPropertyRelative("_type"), "purchases.types", 200));
+            FieldRow typeRow = new FieldRow("purchases.type", 130);
+            typeRow.Add(EnumInput<ProductType>(product.FindPropertyRelative("_type"), "purchases.types", 0));
             left.Add(typeRow);
             columns.Add(left);
 
@@ -80,7 +80,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             right.Add(yandexRow);
             FieldRow priceRow = new FieldRow("purchases.testPrice", 130);
             priceRow.Add(FloatInput(product.FindPropertyRelative("_testPrice"), 90));
-            TextField currency = TextInput(product.FindPropertyRelative("_testCurrency"), false, 80);
+            TextField currency = TextInput(product.FindPropertyRelative("_testCurrency"), false, 0);
             currency.style.marginLeft = 8;
             priceRow.Add(currency);
             right.Add(priceRow);

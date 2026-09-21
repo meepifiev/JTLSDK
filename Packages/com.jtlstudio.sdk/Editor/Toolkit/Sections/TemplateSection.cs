@@ -10,7 +10,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 {
     public class TemplateSection : ToolkitSection
     {
-        private const int LabelWidth = 170;
+        private const int LabelWidth = FieldRow.DefaultLabelWidth;
         private const int PreviewWidth = 400;
         private const int DesktopPreviewHeight = 250;
         private const int MobilePreviewHeight = 520;
@@ -210,7 +210,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreatePreviewCard()
         {
-            Card card = new Card { TitleKey = "template.preview", Spacing = 10 };
+            Card card = new Card { TitleKey = "template.preview" };
             card.style.width = PreviewWidth + 34;
             card.style.flexShrink = 0;
             card.style.marginLeft = ColumnGap;
@@ -332,7 +332,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             ObjectField field = new ObjectField { objectType = typeof(Texture2D), allowSceneObjects = false, value = value };
             field.AddToClassList("jtl-object-field");
-            field.style.maxWidth = 260;
+            field.style.maxWidth = 240;
             field.style.flexGrow = 1;
             field.style.flexShrink = 1;
             field.style.minWidth = 0;

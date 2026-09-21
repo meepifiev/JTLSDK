@@ -63,8 +63,16 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         protected Dropdown EnumInput<T>(SerializedProperty property, string choicesKey, int width) where T : Enum
         {
             Dropdown dropdown = new Dropdown();
-            dropdown.style.width = width;
-            dropdown.style.minWidth = width;
+            if (width > 0)
+            {
+                dropdown.style.width = width;
+                dropdown.style.minWidth = width;
+            }
+            else
+            {
+                dropdown.style.flexGrow = 1;
+                dropdown.style.minWidth = 0;
+            }
             dropdown.choices = new System.Collections.Generic.List<string>(Context.Localization.GetList(choicesKey));
             dropdown.index = property.enumValueIndex;
             dropdown.RegisterValueChangedCallback(_ =>

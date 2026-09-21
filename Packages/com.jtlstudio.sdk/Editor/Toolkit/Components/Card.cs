@@ -5,7 +5,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 {
     public class Card : VisualElement, ILocalizedElement
     {
-        public const int DefaultSpacing = 10;
+        public const int DefaultSpacing = 12;
+        private const int HeaderGap = 12;
         private const string ClassName = "jtl-card";
         private const string ActiveClass = "jtl-card--active";
         private const string DimmedClass = "jtl-card--dimmed";
@@ -66,6 +67,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
             _caption.style.display = DisplayStyle.None;
             _badge.style.display = DisplayStyle.None;
             _description.style.display = DisplayStyle.None;
+            _header.style.marginBottom = HeaderGap;
+            _description.style.marginBottom = HeaderGap;
             _header.Add(_title);
             _header.Add(_spacer);
             _header.Add(_caption);
@@ -119,8 +122,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
                 _body.RemoveFromClassList(StackPrefix + _spacing);
                 _spacing = value;
                 _body.AddToClassList(StackPrefix + _spacing);
-                _header.style.marginBottom = _spacing;
-                _description.style.marginBottom = _spacing;
             }
         }
 

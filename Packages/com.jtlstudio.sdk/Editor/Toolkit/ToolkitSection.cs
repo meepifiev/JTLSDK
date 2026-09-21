@@ -146,7 +146,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         protected VisualElement ProvidersCard(string propertyName)
         {
             ModuleSlot slot = _context.Modules.Find(propertyName);
-            Card card = new Card { TitleKey = "module.providers", Spacing = 8 };
+            Card card = new Card { TitleKey = "module.providers", Spacing = 0 };
 
             if (slot == null)
             {

@@ -15,7 +15,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
     public class ConfigurationDetailsSection : ToolkitSection
     {
         private const string PresetProperty = "_playerSettings";
-        private const int ValueWidth = 230;
+        private const int ValueWidth = 240;
         private const int MinimumMemory = 32;
 
         private readonly ConfigurationValidator _validator = new ConfigurationValidator();
@@ -109,7 +109,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreatePresetCard()
         {
-            Card card = new Card { TitleKey = "details.projectSettings", Spacing = 8 };
+            Card card = new Card { TitleKey = "details.projectSettings" };
             SerializedProperty preset = _serialized.FindProperty(PresetProperty);
             VisualElement table = new VisualElement();
             table.AddToClassList("jtl-column");
@@ -142,7 +142,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateModulesCard()
         {
-            Card card = new Card { TitleKey = "details.modules", Spacing = 8 };
+            Card card = new Card { TitleKey = "details.modules", Spacing = 0 };
             VisualElement list = new VisualElement();
             list.AddToClassList("jtl-column");
 
@@ -157,11 +157,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreatePauseCard()
         {
-            Card card = new Card { TitleKey = "details.pause", Spacing = 10 };
-            FieldRow focus = new FieldRow("details.pauseOnFocusLoss", 190);
+            Card card = new Card { TitleKey = "details.pause" };
+            FieldRow focus = new FieldRow("details.pauseOnFocusLoss", FieldRow.DefaultLabelWidth);
             focus.Add(SwitchControl(_serialized.FindProperty("_pauseOnFocusLoss")));
             card.Add(focus);
-            FieldRow overlay = new FieldRow("details.showOverlayOnPause", 190);
+            FieldRow overlay = new FieldRow("details.showOverlayOnPause", FieldRow.DefaultLabelWidth);
             overlay.Add(SwitchControl(_serialized.FindProperty("_showOverlayOnPause")));
             card.Add(overlay);
             return card;
@@ -169,7 +169,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateLanguagesCard()
         {
-            Card card = new Card { TitleKey = "details.languages", Spacing = 10 };
+            Card card = new Card { TitleKey = "details.languages" };
             List<Language> projectLanguages = Context.Project.Settings.SupportedLanguages;
 
             if (projectLanguages.Count == 0)

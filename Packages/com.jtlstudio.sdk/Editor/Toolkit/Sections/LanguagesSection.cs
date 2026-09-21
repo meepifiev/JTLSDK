@@ -75,9 +75,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             card.Add(grid);
 
-            FieldRow defaultRow = new FieldRow("languages.default", 150);
+            FieldRow defaultRow = new FieldRow("languages.default", FieldRow.DefaultLabelWidth);
             Dropdown defaultLanguage = new Dropdown();
-            defaultLanguage.style.width = 220;
+            defaultLanguage.style.width = 240;
             List<Language> supported = new List<Language>(Settings.SupportedLanguages);
             defaultLanguage.choices = LanguageNames(supported);
             defaultLanguage.index = supported.IndexOf(Settings.DefaultLanguage);
@@ -171,9 +171,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private VisualElement CreatePlayModeCard()
         {
             Card card = new Card { TitleKey = "languages.playMode" };
-            FieldRow row = new FieldRow("languages.startLanguage", 150);
+            FieldRow row = new FieldRow("languages.startLanguage", FieldRow.DefaultLabelWidth);
             Dropdown start = new Dropdown();
-            start.style.width = 220;
+            start.style.width = 240;
             List<Language> supported = new List<Language>(Settings.SupportedLanguages);
             start.choices = LanguageNames(supported);
             start.index = supported.IndexOf(_simulation.StartLanguage);

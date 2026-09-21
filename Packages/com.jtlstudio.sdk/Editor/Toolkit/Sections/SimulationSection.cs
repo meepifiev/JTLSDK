@@ -9,7 +9,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 {
     public class SimulationSection : ToolkitSection
     {
-        private const int LabelWidth = 180;
+        private const int LabelWidth = FieldRow.DefaultLabelWidth;
 
         private readonly PrototypeSimulationSettings _settings = new PrototypeSimulationSettings();
         private readonly DeviceType[] _devices = { DeviceType.Desktop, DeviceType.Mobile, DeviceType.Tablet, DeviceType.TV };
@@ -58,7 +58,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             VisualElement box = Row(6);
             box.AddToClassList("jtl-field-box");
             box.AddToClassList("jtl-read-only");
-            box.style.width = 260;
+            box.style.width = 240;
 
             if (active != null)
             {

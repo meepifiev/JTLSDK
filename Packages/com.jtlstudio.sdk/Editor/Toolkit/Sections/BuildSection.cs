@@ -12,7 +12,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 {
     public class BuildSection : ToolkitSection
     {
-        private const int LabelWidth = 170;
+        private const int LabelWidth = FieldRow.DefaultLabelWidth;
 
         private readonly SdkBuildService _builds = new SdkBuildService();
         private BuildResult _lastResult;
@@ -82,13 +82,13 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateSettingsCard(SdkConfiguration active)
         {
-            Card card = new Card { TitleKey = "build.settings", Spacing = 10 };
+            Card card = new Card { TitleKey = "build.settings" };
 
             FieldRow configuration = new FieldRow("build.configuration", LabelWidth);
             VisualElement box = Row(6);
             box.AddToClassList("jtl-field-box");
             box.AddToClassList("jtl-read-only");
-            box.style.maxWidth = 260;
+            box.style.maxWidth = 240;
             box.style.flexGrow = 1;
             box.style.flexShrink = 1;
             box.style.minWidth = 0;

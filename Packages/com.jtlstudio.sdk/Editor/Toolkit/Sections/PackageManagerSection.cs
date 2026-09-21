@@ -68,7 +68,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateSdkCard()
         {
-            Card card = new Card { Spacing = 10 };
+            Card card = new Card();
             VisualElement header = Row(14);
             VisualElement logo = new VisualElement();
             logo.AddToClassList("jtl-brand__logo");

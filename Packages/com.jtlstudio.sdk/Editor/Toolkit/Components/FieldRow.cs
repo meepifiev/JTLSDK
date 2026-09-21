@@ -5,7 +5,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 {
     public class FieldRow : VisualElement, ILocalizedElement
     {
-        public const int DefaultLabelWidth = 190;
+        public const int DefaultLabelWidth = 180;
         public const int CardLabelWidth = 150;
         private const int LabelGap = 12;
         private const int HelpIconSize = 13;

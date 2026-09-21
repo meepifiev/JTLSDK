@@ -7,8 +7,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 {
     public class PauseSection : ToolkitSection
     {
-        private const int NameWidth = 230;
-        private const int SwitchColumnWidth = 190;
+        private const int LeadingWidth = 28;
+        private const int NameWidth = 152;
+        private const int NameGap = 12;
+        private const int SwitchColumnWidth = 240;
         private const string PlatformProperty = "_platformProvider";
         private const string FocusProperty = "_pauseOnFocusLoss";
         private const string OverlayProperty = "_showOverlayOnPause";
@@ -33,7 +35,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateSettingsCard()
         {
-            Card card = new Card { TitleKey = "simulation.behaviour", Spacing = 8 };
+            Card card = new Card { TitleKey = "simulation.behaviour", Spacing = 0 };
             IReadOnlyList<SdkConfiguration> configurations = Context.Project.Configurations;
 
             if (configurations.Count == 0)
@@ -43,7 +45,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             }
 
             VisualElement header = Row(0);
-            header.Add(Spacer(NameWidth));
+            header.Add(Spacer(LeadingWidth + NameWidth + NameGap));
             header.Add(Column(Localized("details.pauseOnFocusLoss", "jtl-text--caption")));
             header.Add(Column(Localized("details.showOverlayOnPause", "jtl-text--caption")));
             card.Add(header);
@@ -53,9 +55,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 SerializedObject serialized = new SerializedObject(configuration);
                 VisualElement row = Row(0);
                 row.AddToClassList("jtl-module-row");
+                row.Add(Spacer(LeadingWidth));
                 VisualElement name = Row(8);
                 name.style.width = NameWidth;
                 name.style.flexShrink = 0;
+                name.style.marginRight = NameGap;
                 name.Add(new PortalMark(Context.Platforms.PortalMark(configuration.Platform), 16));
                 name.Add(TextLabel(configuration.DisplayName, "jtl-text"));
                 row.Add(name);
