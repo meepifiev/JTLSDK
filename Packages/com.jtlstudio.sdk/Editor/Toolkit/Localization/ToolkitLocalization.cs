@@ -70,7 +70,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.template", "Template", "Шаблон");
             Add("nav.build", "Build", "Сборка");
             Add("nav.packageManager", "Package Manager", "Менеджер пакетов");
-            Add("nav.analyzer", "Analyzer Code", "Анализатор кода");
+            Add("nav.analyzer", "Code Analyzer", "Анализатор кода");
             Add("nav.modules", "MODULES", "МОДУЛИ");
             Add("nav.languages", "Languages", "Языки");
             Add("nav.purchases", "Purchases", "Покупки");
@@ -86,6 +86,68 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.review", "Review", "Отзыв");
             Add("nav.shortcut", "Shortcut", "Ярлык");
             Add("module.providers", "Providers", "Провайдеры");
+            Add("build.title", "Build", "Сборка");
+            Add("build.settings", "Build settings", "Настройки сборки");
+            Add("build.configuration", "Configuration", "Конфигурация");
+            Add("build.development", "Development build", "Development-сборка");
+            Add("build.output", "Output", "Вывод");
+            Add("build.outputs", "Folder|ZIP", "Папка|ZIP");
+            Add("build.path", "Path", "Путь");
+            Add("build.browse", "Browse", "Выбрать");
+            Add("build.namePattern", "Name", "Имя");
+            Add("build.number", "Build number", "Номер сборки");
+            Add("build.after", "After build", "После сборки");
+            Add("build.openFolder", "Open folder", "Открыть папку");
+            Add("build.preChecks", "Pre-build checks", "Проверки перед сборкой");
+            Add("build.postChecks", "Post-build checks", "Проверки после сборки");
+            Add("build.build", "Build", "Собрать");
+            Add("build.check.configuration", "Active configuration is set", "Активная конфигурация выбрана");
+            Add("build.check.webgl", "WebGL module is installed", "Модуль WebGL установлен");
+            Add("build.check.scenes", "Build Settings have an enabled scene", "В Build Settings есть включённая сцена");
+            Add("build.check.settings", "JTLSDKSettings exists in Resources", "JTLSDKSettings лежит в Resources");
+            Add("build.check.define", "Define {0} is applied", "Дефайн {0} применён");
+            Add("build.check.issue", "{0}", "{0}");
+            Add("build.check.compression", "Compression is disabled", "Сжатие выключено");
+            Add("build.check.fileSize", "Each file is under 30 MiB · largest {0} MiB", "Каждый файл меньше 30 МиБ · самый большой {0} МиБ");
+            Add("build.check.fileCount", "At most 8000 files · {0}", "Не больше 8000 файлов · {0}");
+            Add("build.check.scripts", "No external scripts in index.html", "В index.html нет внешних скриптов");
+            Add("build.done", "Build {0} · {1} MB · {2}", "Сборка {0} · {1} МБ · {2}");
+            Add("build.failed", "Build failed: {0}", "Сборка не удалась: {0}");
+            Add("template.title", "Template", "Шаблон");
+            Add("template.installed", "Installed", "Установлен");
+            Add("template.install", "Install template", "Установить шаблон");
+            Add("template.reinstall", "Reinstall", "Переустановить");
+            Add("template.installedTo", "Template installed to {0}.", "Шаблон установлен в {0}.");
+            Add("template.logo", "Logo", "Логотип");
+            Add("template.logoFile", "Image", "Картинка");
+            Add("template.logoSize", "Width", "Ширина");
+            Add("template.loadingScreen", "Loading screen", "Экран загрузки");
+            Add("template.background", "Background", "Фон");
+            Add("template.backgroundKinds", "Color|Gradient|Image", "Цвет|Градиент|Картинка");
+            Add("template.backgroundColor", "Color", "Цвет");
+            Add("template.gradientFrom", "From", "От");
+            Add("template.gradientTo", "To", "До");
+            Add("template.radial", "Radial", "Радиальный");
+            Add("template.angle", "Angle", "Угол");
+            Add("template.image", "Image", "Картинка");
+            Add("template.progressFill", "Progress fill", "Заполнение");
+            Add("template.progressTrack", "Progress track", "Фон полосы");
+            Add("template.progressSize", "Width · height · radius", "Ширина · высота · скругление");
+            Add("template.progressPosition", "Progress position", "Позиция полосы");
+            Add("template.positions", "Below logo|Bottom", "Под логотипом|Внизу");
+            Add("template.loadingText", "Loading text", "Текст загрузки");
+            Add("template.pageBackground", "Page background", "Фон страницы");
+            Add("template.canvas", "Canvas", "Канвас");
+            Add("template.fixedAspect", "Fixed aspect ratio", "Фиксированные пропорции");
+            Add("template.aspectRatio", "Aspect ratio", "Пропорции");
+            Add("template.freeOnMobile", "Free on mobile", "Свободно на мобильных");
+            Add("template.pixelRatioDesktop", "Pixel ratio · desktop", "Pixel ratio · десктоп");
+            Add("template.pixelRatioMobile", "Pixel ratio · mobile", "Pixel ratio · мобильные");
+            Add("template.pixelRatioModes", "Auto|Fixed|Auto, limited", "Авто|Фиксированный|Авто с лимитом");
+            Add("template.fullscreenButton", "Fullscreen button", "Кнопка полного экрана");
+            Add("template.preview", "Preview", "Превью");
+            Add("template.previewDevices", "Desktop|Mobile", "Десктоп|Мобильный");
+            Add("template.progress", "Progress", "Прогресс");
             Add("topbar.activeConfiguration", "Active configuration", "Активная конфигурация");
             Add("topbar.package", "Package 1.0.0 · 1.1.0 available", "Пакет 1.0.0 · доступна 1.1.0");
         }
@@ -273,42 +335,20 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
 
         private void RegisterTemplate()
         {
-            Add("template.title", "Template", "Шаблон");
             Add("template.description", "The loading page that wraps the build: logo, progress bar, page background and canvas rules.", "Страница загрузки вокруг сборки: логотип, прогресс-бар, фон страницы и правила канваса.");
-            Add("template.logo", "Logo", "Логотип");
-            Add("template.logoFile", "Logo file", "Файл логотипа");
-            Add("template.logoSize", "Logo size", "Размер логотипа");
-            Add("template.loadingScreen", "Loading screen", "Экран загрузки");
-            Add("template.background", "Background", "Фон");
             Add("template.backgroundTypes", "Color|Gradient|Image", "Цвет|Градиент|Картинка");
-            Add("template.backgroundColor", "Background color", "Цвет фона");
-            Add("template.progressFill", "Progress fill", "Заполнение прогресса");
-            Add("template.progressTrack", "Progress track", "Дорожка прогресса");
-            Add("template.progressSize", "Progress size", "Размер прогресса");
             Add("template.progressSizeNote", "Width, height, corner radius.", "Ширина, высота, скругление.");
-            Add("template.progressPosition", "Progress position", "Положение прогресса");
             Add("template.progressPositions", "Below logo|Bottom of screen", "Под логотипом|Внизу экрана");
-            Add("template.loadingText", "Loading text", "Текст загрузки");
-            Add("template.pageBackground", "Page background", "Фон страницы");
             Add("template.type", "Type", "Тип");
-            Add("template.radial", "Radial", "Радиальный");
-            Add("template.angle", "Angle", "Угол");
             Add("template.colors", "Colors", "Цвета");
-            Add("template.canvas", "Canvas", "Канвас");
-            Add("template.aspectRatio", "Aspect ratio", "Соотношение сторон");
             Add("template.aspectRatios", "Free|Fixed 16 / 9", "Свободное|Фиксированное 16 / 9");
             Add("template.disableOnMobile", "Disable on mobile", "Выключить на мобильных");
             Add("template.letterboxFill", "Letterbox fill", "Заливка полей");
             Add("template.letterboxFills", "Page background|Custom color", "Фон страницы|Свой цвет");
-            Add("template.pixelRatioDesktop", "Pixel ratio, desktop", "Pixel ratio, десктоп");
-            Add("template.pixelRatioMobile", "Pixel ratio, mobile", "Pixel ratio, мобильные");
             Add("template.pixelRatios", "Auto|Fixed 1.0|Auto up to 2.0", "Авто|Фиксированный 1.0|Авто, не выше 2.0");
-            Add("template.fullscreenButton", "Fullscreen button", "Кнопка полного экрана");
             Add("template.overriddenNote", "Overridden in YouTube Playables: aspect ratio, pixel ratio.", "Переопределено в YouTube Playables: соотношение сторон, pixel ratio.");
-            Add("template.preview", "Preview", "Превью");
             Add("template.previewModes", "Desktop|Mobile", "Десктоп|Мобильный");
             Add("template.previewLogo", "LOGO 160px", "ЛОГО 160px");
-            Add("template.progress", "Progress", "Прогресс");
             Add("template.status", "Template written to Assets/WebGLTemplates/JTLSDK.", "Шаблон записан в Assets/WebGLTemplates/JTLSDK.");
         }
 
@@ -397,25 +437,17 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
 
         private void RegisterBuild()
         {
-            Add("build.title", "Build", "Сборка");
             Add("build.description", "Builds the active configuration and runs the portal checks for it.", "Собирает активную конфигурацию и выполняет проверки площадки.");
             Add("build.showBlocked", "Show blocked state", "Показать заблокированное состояние");
             Add("build.showReady", "Show ready state", "Показать готовое состояние");
-            Add("build.settings", "Build settings", "Настройки сборки");
-            Add("build.configuration", "Configuration", "Конфигурация");
             Add("build.developmentBuild", "Development build", "Development build");
             Add("build.developmentNote", "Build number badge is shown only in development builds.", "Плашка номера сборки видна только в development-сборках.");
-            Add("build.output", "Output", "Вывод");
             Add("build.outputTypes", "Folder|ZIP archive", "Папка|ZIP-архив");
-            Add("build.path", "Path", "Путь");
-            Add("build.browse", "Browse", "Выбрать");
-            Add("build.namePattern", "Name pattern", "Шаблон имени");
             Add("build.nameResolves", "Resolves to SmashAndHit_YandexGames_b43", "Получится SmashAndHit_YandexGames_b43");
             Add("build.buildNumber", "Build number", "Номер сборки");
             Add("build.next", "next 43", "следующая 43");
             Add("build.edit", "Edit", "Изменить");
             Add("build.afterBuild", "After build", "После сборки");
-            Add("build.openFolder", "Open output folder", "Открыть папку");
             Add("build.writeLog", "Write log line", "Строка в консоль");
             Add("build.preBuildChecks", "Pre-build checks", "Проверки перед сборкой");
             Add("build.checkTarget", "WebGL is the active build target", "Активная платформа сборки — WebGL");
@@ -432,7 +464,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("build.postBuildNote", "Run after a YouTube Playables build.", "Выполняются после сборки YouTube Playables.");
             Add("build.outputPath", "Output: Builds/YandexGames/SmashAndHit_YandexGames_b43", "Вывод: Builds/YandexGames/SmashAndHit_YandexGames_b43");
             Add("build.cleanOutput", "Clean output", "Очистить вывод");
-            Add("build.build", "Build", "Собрать");
             Add("build.status", "Ready to build. Last build b42 finished in 2 m 14 s.", "Готово к сборке. Последняя сборка b42 заняла 2 мин 14 с.");
             Add("build.statusBlocked", "Build blocked: compression format does not match the configuration.", "Сборка заблокирована: формат сжатия не соответствует конфигурации.");
         }

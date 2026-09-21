@@ -344,3 +344,30 @@
 .jtl-root--collapsed .jtl-status-bar {
     padding: 0 16px;
 }
+
+.jtl-template-preview {
+    align-items: center;
+    justify-content: center;
+    border-width: 1px;
+    border-color: var(--jtl-border-strong);
+    border-top-left-radius: var(--jtl-radius-card);
+    border-top-right-radius: var(--jtl-radius-card);
+    border-bottom-left-radius: var(--jtl-radius-card);
+    border-bottom-right-radius: var(--jtl-radius-card);
+    overflow: hidden;
+}
+
+.jtl-template-preview__logo-placeholder {
+    border-width: 1px;
+    border-color: var(--jtl-border-hover);
+    border-top-left-radius: var(--jtl-radius-field);
+    border-top-right-radius: var(--jtl-radius-field);
+    border-bottom-left-radius: var(--jtl-radius-field);
+    border-bottom-right-radius: var(--jtl-radius-field);
+}
+
+.jtl-object-field,
+.jtl-color-field {
+    margin: 0;
+    height: 28px;
+}
