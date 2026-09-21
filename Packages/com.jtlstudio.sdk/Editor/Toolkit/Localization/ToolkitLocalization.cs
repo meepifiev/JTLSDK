@@ -105,7 +105,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("build.heroAccent", "Publish Across Platforms.", "Публикуй везде.");
             Add("build.heroDescription", "Export your Unity game to Yandex Games, YouTube Playables and more — with one streamlined workflow.", "Выгружай Unity-игру в Яндекс Игры, YouTube Playables и не только — в одном простом процессе.");
             Add("build.start", "Get Started", "Начать");
-            Add("build.tagline", "SAME GAME|MORE PLAYERS|BIGGER OPPORTUNITIES", "ОДНА ИГРА|БОЛЬШЕ ИГРОКОВ|БОЛЬШЕ ВОЗМОЖНОСТЕЙ");
             Add("build.recentBuilds", "Recent Builds", "Последние сборки");
             Add("build.noBuilds", "No builds yet.", "Сборок пока нет.");
             Add("build.clearHistory", "Clear", "Очистить");

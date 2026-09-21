@@ -14,20 +14,18 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
     {
         private const int RecentBuildCount = 5;
         private const int BuildSettingsTab = 0;
-        private const int PortalSize = 40;
         private const int RowPortalSize = 22;
         private const int ActionSize = 26;
         private const float AsideWidth = 306f;
         private const float ColumnGap = 12f;
         private const float MinimumMainWidth = 460f;
-        private const float MinimumHeroWidthForPlatforms = 560f;
+        private const float MinimumHeroWidthForDecoration = 560f;
         private const float CompactBuildsWidth = 640f;
         private const string TargetName = "WebGL";
         private const string CellPrefix = "jtl-build-history__cell--";
 
         private readonly SdkBuildService _builds = new SdkBuildService();
         private readonly PlayerSettingsPresetService _presets = new PlayerSettingsPresetService();
-        private readonly PlatformId[] _platforms = { PlatformId.YandexGames, PlatformId.YouTubePlayables };
         private int _tab = BuildSettingsTab;
         private bool _advanced;
         private BuildResult _lastResult;
@@ -104,33 +102,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             start.AddToClassList("jtl-build-hero__start");
             copy.Add(start);
             content.Add(copy);
-
-            VisualElement platforms = new VisualElement();
-            platforms.AddToClassList("jtl-build-hero__platforms");
-            VisualElement tiles = Row(10);
-            tiles.AddToClassList("jtl-row--start");
-
-            foreach (PlatformId platform in _platforms)
-            {
-                tiles.Add(PlatformTile(platform));
-            }
-
-            platforms.Add(tiles);
-            VisualElement tagline = new VisualElement();
-            tagline.AddToClassList("jtl-build-hero__tagline");
-
-            foreach (string line in Context.Localization.GetList("build.tagline"))
-            {
-                tagline.Add(TextLabel(line, "jtl-build-hero__tagline-line"));
-            }
-
-            platforms.Add(tagline);
-            content.Add(platforms);
             hero.Add(content);
             hero.RegisterCallback<GeometryChangedEvent>(geometryEvent =>
             {
-                DisplayStyle display = geometryEvent.newRect.width < MinimumHeroWidthForPlatforms ? DisplayStyle.None : DisplayStyle.Flex;
-                platforms.style.display = display;
+                DisplayStyle display = geometryEvent.newRect.width < MinimumHeroWidthForDecoration ? DisplayStyle.None : DisplayStyle.Flex;
                 back.style.display = display;
                 front.style.display = display;
             });
@@ -149,29 +124,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return element;
         }
 
-        private VisualElement PlatformTile(PlatformId platform)
-        {
-            VisualElement tile = new VisualElement();
-            tile.AddToClassList("jtl-build-tile");
-            tile.Add(new PortalMark(Context.Platforms.PortalMark(platform), PortalSize));
-            tile.Add(TextLabel(Context.Platforms.DisplayName(platform), "jtl-build-tile__name"));
-            tile.AddManipulator(new Clickable(() => OpenPlatform(platform)));
-            return tile;
-        }
-
-        private void OpenPlatform(PlatformId platform)
-        {
-            SdkConfiguration configuration = Context.Project.Find(platform);
-
-            if (configuration == null)
-            {
-                NavigateTo(ToolkitSectionId.Configurations);
-                return;
-            }
-
-            Context.SelectedConfiguration = configuration;
-            NavigateTo(ToolkitSectionId.ConfigurationDetails);
-        }
 
         private VisualElement CreateRecentBuilds()
         {
