@@ -1,0 +1,95 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
+    <ui:VisualElement class="jtl-column jtl-vstack-16">
+        <jtl:SectionHeader title-key="template.title" description-key="template.description" />
+        <ui:VisualElement class="jtl-row jtl-row--stretch jtl-hstack-12">
+            <ui:VisualElement class="jtl-column jtl-vstack-12" style="width: 620px; flex-shrink: 0;">
+                <jtl:Card title-key="template.logo">
+                    <jtl:FieldRow label-key="template.logoFile" label-width="150">
+                        <jtl:FilePickerField value="Assets/Art/logo.png" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.logoSize" label-width="150">
+                        <jtl:NumberFieldWithUnit value="160" unit-key="unit.px" />
+                    </jtl:FieldRow>
+                </jtl:Card>
+                <jtl:Card title-key="template.loadingScreen">
+                    <jtl:FieldRow label-key="template.background" label-width="150">
+                        <jtl:RadioGroup choices-key="template.backgroundTypes" index="0" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.backgroundColor" label-width="150">
+                        <jtl:ColorSwatchField color="#0E0E10" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.progressFill" label-width="150">
+                        <jtl:ColorSwatchField color="#5C8CC2" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.progressTrack" label-width="150">
+                        <jtl:ColorSwatchField color="#26262B" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.progressSize" label-width="150" note-key="template.progressSizeNote">
+                        <jtl:NumberFieldWithUnit value="40" unit-key="unit.percent" width="96" />
+                        <jtl:NumberFieldWithUnit value="8" unit-key="unit.px" width="96" />
+                        <jtl:NumberFieldWithUnit value="0" unit-key="unit.px" width="96" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.progressPosition" label-width="150">
+                        <jtl:RadioGroup choices-key="template.progressPositions" index="0" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.loadingText" label-width="150">
+                        <ui:TextField value="Loading…" class="jtl-field jtl-grow" />
+                        <jtl:SwitchToggle value="true" />
+                    </jtl:FieldRow>
+                </jtl:Card>
+                <jtl:Card title-key="template.pageBackground">
+                    <jtl:FieldRow label-key="template.type" label-width="150">
+                        <jtl:RadioGroup choices-key="template.backgroundTypes" index="1" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.radial" label-width="150">
+                        <jtl:SwitchToggle value="false" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.angle" label-width="150">
+                        <jtl:NumberFieldWithUnit value="140" unit-key="unit.deg" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.colors" label-width="150">
+                        <jtl:ColorSwatchField color="#151518" />
+                        <jtl:ColorSwatchField color="#0E0E10" />
+                    </jtl:FieldRow>
+                </jtl:Card>
+                <jtl:Card title-key="template.canvas">
+                    <jtl:FieldRow label-key="template.aspectRatio" label-width="150">
+                        <jtl:RadioGroup choices-key="template.aspectRatios" index="1" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.disableOnMobile" label-width="150">
+                        <jtl:SwitchToggle value="true" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.letterboxFill" label-width="150">
+                        <jtl:RadioGroup choices-key="template.letterboxFills" index="0" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.pixelRatioDesktop" label-width="150">
+                        <jtl:RadioGroup choices-key="template.pixelRatios" index="0" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.pixelRatioMobile" label-width="150">
+                        <jtl:RadioGroup choices-key="template.pixelRatios" index="2" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="template.fullscreenButton" label-width="150">
+                        <jtl:SwitchToggle value="true" />
+                    </jtl:FieldRow>
+                    <jtl:InlineMessage text-key="template.overriddenNote" variant="info" />
+                </jtl:Card>
+            </ui:VisualElement>
+            <jtl:Card name="preview-card" title-key="template.preview" spacing="12" class="jtl-basis">
+                <ui:VisualElement class="jtl-preview">
+                    <ui:VisualElement class="jtl-preview__logo">
+                        <jtl:LocalizedLabel key="template.previewLogo" class="jtl-preview__logo-text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="jtl-preview__track">
+                        <ui:VisualElement class="jtl-preview__fill" />
+                    </ui:VisualElement>
+                    <ui:Label text="Loading…" class="jtl-preview__text" />
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-row jtl-hstack-10">
+                    <jtl:LocalizedLabel key="template.progress" class="jtl-text--caption" />
+                    <ui:Slider low-value="0" high-value="100" value="55" class="jtl-slider" />
+                    <ui:Label text="55 %" class="jtl-text--secondary" />
+                </ui:VisualElement>
+            </jtl:Card>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

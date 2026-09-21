@@ -1,0 +1,65 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
+    <ui:VisualElement class="jtl-column jtl-vstack-16">
+        <jtl:SectionHeader title-key="purchases.title" description-key="purchases.description">
+            <jtl:ToolkitButton text-key="purchases.addProduct" icon="plus" />
+        </jtl:SectionHeader>
+        <jtl:Card spacing="12">
+            <ui:VisualElement class="jtl-row jtl-hstack-10">
+                <ui:Label text="remove_ads" class="jtl-text jtl-text--title" />
+                <ui:VisualElement class="jtl-spacer" />
+                <jtl:IconButton icon="delete" size="26" />
+            </ui:VisualElement>
+            <ui:VisualElement class="jtl-row jtl-row--start jtl-hstack-16">
+                <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
+                    <jtl:FieldRow label-key="purchases.productId" label-width="120">
+                        <ui:TextField value="remove_ads" class="jtl-field jtl-grow" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="purchases.type" label-width="120">
+                        <jtl:Dropdown choices-key="purchases.types" selected="0" width="200" />
+                    </jtl:FieldRow>
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
+                    <jtl:FieldRow label-key="purchases.yandexId" label-width="130">
+                        <ui:TextField value="remove_ads" class="jtl-field jtl-grow" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="purchases.testPrice" label-width="130">
+                        <jtl:NumberFieldWithUnit value="49" width="90" />
+                        <jtl:Dropdown choices-key="purchases.currencies" selected="0" width="90" />
+                    </jtl:FieldRow>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </jtl:Card>
+        <jtl:Card spacing="12">
+            <ui:VisualElement class="jtl-row jtl-hstack-10">
+                <ui:Label text="coins_1000" class="jtl-text jtl-text--title" />
+                <ui:VisualElement class="jtl-spacer" />
+                <jtl:IconButton icon="delete" size="26" />
+            </ui:VisualElement>
+            <ui:VisualElement class="jtl-row jtl-row--start jtl-hstack-16">
+                <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
+                    <jtl:FieldRow label-key="purchases.productId" label-width="120">
+                        <ui:TextField value="coins_1000" class="jtl-field jtl-grow" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="purchases.type" label-width="120">
+                        <jtl:Dropdown choices-key="purchases.types" selected="1" width="200" />
+                    </jtl:FieldRow>
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
+                    <jtl:FieldRow label-key="purchases.yandexId" label-width="130">
+                        <ui:TextField value="coins_1000" class="jtl-field jtl-grow" />
+                    </jtl:FieldRow>
+                    <jtl:FieldRow label-key="purchases.testPrice" label-width="130">
+                        <jtl:NumberFieldWithUnit value="15" width="90" />
+                        <jtl:Dropdown choices-key="purchases.currencies" selected="0" width="90" />
+                    </jtl:FieldRow>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </jtl:Card>
+        <jtl:InlineMessage text-key="purchases.youtubeWarning" variant="warning" />
+        <ui:VisualElement class="jtl-row jtl-hstack-12">
+            <ui:VisualElement class="jtl-spacer" />
+            <jtl:ToolkitButton text-key="common.generateConstants" icon="refresh" />
+            <ui:Label text="Assets/Scripts/Generated/JTLSDKIds.cs" class="jtl-text--caption" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
