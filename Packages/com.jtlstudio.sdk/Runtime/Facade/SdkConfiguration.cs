@@ -12,6 +12,7 @@ namespace JTLStudio.SDK
         [SerializeField] private bool _pauseOnFocusLoss = true;
         [SerializeField] private bool _showOverlayOnPause;
         [SerializeField] private List<Language> _languages = new List<Language> { Language.English };
+        [SerializeField] private PlayerSettingsPreset _playerSettings = new PlayerSettingsPreset();
         [SerializeReference] private IPlatformProvider _platformProvider;
         [SerializeReference] private IAdsProvider _ads;
         [SerializeReference] private IDataProvider _data;
@@ -56,6 +57,7 @@ namespace JTLStudio.SDK
         }
 
         public List<Language> Languages => _languages;
+        public PlayerSettingsPreset PlayerSettings => _playerSettings;
 
         public IPlatformProvider PlatformProvider
         {

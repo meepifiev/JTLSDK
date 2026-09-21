@@ -14,9 +14,10 @@ namespace JTLStudio.SDK
         {
         }
 
-        public LeaderboardDefinition(string id)
+        public LeaderboardDefinition(string id, params PlatformIdentifier[] platformIds)
         {
             _id = id;
+            _platformIds.AddRange(platformIds);
         }
 
         public string Id => _id;

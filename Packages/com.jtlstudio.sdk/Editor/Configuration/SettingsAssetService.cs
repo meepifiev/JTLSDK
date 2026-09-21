@@ -11,6 +11,8 @@ namespace JTLStudio.SDK.Editor.Configuration
 
         private readonly ProviderDefaults _defaults = new ProviderDefaults();
         private readonly DefineSymbolService _defineSymbols = new DefineSymbolService();
+        private readonly PresetDefaults _presetDefaults = new PresetDefaults();
+        private readonly PlayerSettingsPresetService _presets = new PlayerSettingsPresetService();
 
         public JTLSDKSettings Find()
         {
@@ -40,6 +42,7 @@ namespace JTLStudio.SDK.Editor.Configuration
             configuration.DisplayName = displayName;
             configuration.Platform = platform;
             _defaults.Apply(configuration, platform);
+            _presetDefaults.Apply(configuration.PlayerSettings, platform);
 
             string assetPath = AssetDatabase.GenerateUniqueAssetPath(ConfigurationsFolder + "/" + SanitizeFileName(displayName) + ".asset");
             AssetDatabase.CreateAsset(configuration, assetPath);
@@ -53,6 +56,11 @@ namespace JTLStudio.SDK.Editor.Configuration
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             _defineSymbols.Apply(configuration == null ? "" : configuration.DefineSymbol);
+
+            if (configuration != null)
+            {
+                _presets.Apply(configuration.PlayerSettings);
+            }
         }
 
         private void EnsureFolder(string folder)

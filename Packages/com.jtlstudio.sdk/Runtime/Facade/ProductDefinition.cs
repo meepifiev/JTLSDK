@@ -17,10 +17,11 @@ namespace JTLStudio.SDK
         {
         }
 
-        public ProductDefinition(string id, ProductType type)
+        public ProductDefinition(string id, ProductType type, params PlatformIdentifier[] platformIds)
         {
             _id = id;
             _type = type;
+            _platformIds.AddRange(platformIds);
         }
 
         public string Id => _id;

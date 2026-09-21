@@ -13,6 +13,14 @@ namespace JTLStudio.SDK.Tests.Fakes
         public IDataProvider Data { get; set; }
         public IPaymentsProvider Payments { get; set; }
         public IPlayerProvider Player { get; set; }
+        public ILanguageProvider LanguageProvider { get; set; }
+        public ILeaderboardsProvider Leaderboards { get; set; }
+        public IFlagsProvider Flags { get; set; }
+        public IGameplayProvider Gameplay { get; set; }
+        public Language DefaultLanguage { get; set; } = Language.English;
+        public List<LanguageReplacement> Replacements { get; } = new List<LanguageReplacement>();
+        public List<LeaderboardDefinition> LeaderboardDefinitions { get; } = new List<LeaderboardDefinition>();
+        public List<FlagDefinition> FlagDefinitions { get; } = new List<FlagDefinition>();
         public float InitializationTimeoutSeconds { get; set; } = 15f;
         public float AutosaveDelaySeconds { get; set; } = 2f;
         public List<ProductDefinition> Products { get; } = new List<ProductDefinition>();
@@ -32,6 +40,10 @@ namespace JTLStudio.SDK.Tests.Fakes
             configuration.Data = Data;
             configuration.Payments = Payments;
             configuration.Player = Player;
+            configuration.LanguageProvider = LanguageProvider;
+            configuration.Leaderboards = Leaderboards;
+            configuration.Flags = Flags;
+            configuration.Gameplay = Gameplay;
             configuration.Languages.Clear();
             configuration.Languages.AddRange(SupportedLanguages);
 
@@ -43,6 +55,10 @@ namespace JTLStudio.SDK.Tests.Fakes
             settings.SupportedLanguages.Clear();
             settings.SupportedLanguages.AddRange(SupportedLanguages);
             settings.Products.AddRange(Products);
+            settings.DefaultLanguage = DefaultLanguage;
+            settings.LanguageReplacements.AddRange(Replacements);
+            settings.Leaderboards.AddRange(LeaderboardDefinitions);
+            settings.Flags.AddRange(FlagDefinitions);
 
             return settings;
         }
