@@ -1088,7 +1088,7 @@ C# регистрирует его при `Create()`. Ответы на запр
 
 **Замены при вёрстке.** USS не знает `gap`, `line-height`, `text-transform` и пунктирных рамок: промежутки делаются отступами, заголовки групп пишутся заглавными в тексте, пустые состояния получают сплошную рамку `border-strong`, чекбоксы и переключатели стилизуются свои.
 
-**Меню** в две группы, как на макете: основная (Configurations, Simulation, Template, Build, Package, Analyzer) и Modules (Languages, Purchases, Leaderboards, Flags, Saves). Названия разделов в сводке ниже остаются прежними.
+**Меню** в две группы, как на макете: основная (Configurations, Simulation, Template, Build, Package Manager, Analyzer) и Modules (Languages, Purchases, Leaderboards, Flags, Saves). Раздел «Пакет» в сводке ниже соответствует Package Manager.
 
 ### 9.2. Каркас и раздел «Конфигурации»
 
