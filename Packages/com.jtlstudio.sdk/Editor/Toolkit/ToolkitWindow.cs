@@ -25,12 +25,16 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private const string TokensStyleSheet = "Styles/Tokens.uss";
         private const string ToolkitStyleSheet = "Styles/Toolkit.uss";
         private const string ComponentsStyleSheet = "Styles/Components.uss";
+        private const int MaximumBuildAttempts = 100;
 
         private readonly ToolkitAssets _assets = new ToolkitAssets();
         private readonly ToolkitProject _project = new ToolkitProject();
         private readonly ToolkitLocalization _localization = new ToolkitLocalization();
         private readonly Dictionary<ToolkitSectionId, ToolkitSection> _sections = new Dictionary<ToolkitSectionId, ToolkitSection>();
         private readonly List<NavigationItem> _navigationItems = new List<NavigationItem>();
+        [SerializeField] private ToolkitLanguage _language = ToolkitLanguage.English;
+        [SerializeField] private ToolkitSectionId _section = ToolkitSectionId.Configurations;
+        private int _buildAttempts;
         private ToolkitContext _context;
         private VisualElement _root;
         private VisualElement _sidebar;
@@ -100,6 +104,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
             }
 
             _currentSection = section;
+            _section = sectionId;
             section.Render();
             _content.Clear();
             _content.Add(section.Root);
@@ -118,6 +123,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
             }
 
             _localization.Language = language;
+            _language = language;
             _languageSwitch.Index = (int)language;
             LocalizeShell();
 
@@ -130,14 +136,27 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
         private void Build()
         {
+            StyleSheet tokens = _assets.FindStyleSheet(TokensStyleSheet);
+            StyleSheet components = _assets.FindStyleSheet(ComponentsStyleSheet);
+            StyleSheet toolkit = _assets.FindStyleSheet(ToolkitStyleSheet);
+            VisualTreeAsset template = _assets.FindTemplate(WindowTemplate);
+
+            if (tokens == null || components == null || toolkit == null || template == null)
+            {
+                ScheduleBuild();
+                return;
+            }
+
+            _buildAttempts = 0;
+            _localization.Language = _language;
             _context = new ToolkitContext(_localization, _assets, _project);
             _project.Changed += OnProjectChanged;
             _context.NavigationRequested += OnNavigationRequested;
             _context.StatusRequested += OnStatusRequested;
-            rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(TokensStyleSheet));
-            rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(ComponentsStyleSheet));
-            rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(ToolkitStyleSheet));
-            _assets.LoadTemplate(WindowTemplate).CloneTree(rootVisualElement);
+            rootVisualElement.styleSheets.Add(tokens);
+            rootVisualElement.styleSheets.Add(components);
+            rootVisualElement.styleSheets.Add(toolkit);
+            template.CloneTree(rootVisualElement);
             _root = rootVisualElement.Q<VisualElement>("root");
             _sidebar = rootVisualElement.Q<VisualElement>("sidebar");
             _topBar = rootVisualElement.Q<VisualElement>("top-bar");
@@ -160,7 +179,30 @@ namespace JTLStudio.SDK.Editor.Toolkit
             CreateSections();
             _root.RegisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
             LocalizeShell();
-            Navigate(ToolkitSectionId.Configurations);
+            Navigate(_sections.ContainsKey(_section) ? _section : ToolkitSectionId.Configurations);
+        }
+
+        private void ScheduleBuild()
+        {
+            _buildAttempts++;
+
+            if (_buildAttempts > MaximumBuildAttempts)
+            {
+                throw new InvalidOperationException(WindowTemplate);
+            }
+
+            EditorApplication.delayCall -= BuildWhenAssetsReady;
+            EditorApplication.delayCall += BuildWhenAssetsReady;
+        }
+
+        private void BuildWhenAssetsReady()
+        {
+            if (this == null)
+            {
+                return;
+            }
+
+            EnsureBuilt();
         }
 
         private void CreateSections()

@@ -8,9 +8,19 @@ namespace JTLStudio.SDK.Editor.Toolkit
     {
         public const string Root = "Packages/com.jtlstudio.sdk/Editor/Toolkit/";
 
+        public VisualTreeAsset FindTemplate(string relativePath)
+        {
+            return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Root + relativePath);
+        }
+
+        public StyleSheet FindStyleSheet(string relativePath)
+        {
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Root + relativePath);
+        }
+
         public VisualTreeAsset LoadTemplate(string relativePath)
         {
-            VisualTreeAsset template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Root + relativePath);
+            VisualTreeAsset template = FindTemplate(relativePath);
 
             if (template == null)
             {
@@ -22,7 +32,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
         public StyleSheet LoadStyleSheet(string relativePath)
         {
-            StyleSheet styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(Root + relativePath);
+            StyleSheet styleSheet = FindStyleSheet(relativePath);
 
             if (styleSheet == null)
             {

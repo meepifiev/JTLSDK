@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using JTLStudio.SDK.Editor.Toolkit;
 using JTLStudio.SDK.Editor.Toolkit.Localization;
 using NUnit.Framework;
-using UnityEditor;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace JTLStudio.SDK.Tests.Toolkit
@@ -23,7 +23,7 @@ namespace JTLStudio.SDK.Tests.Toolkit
         public void SetUp()
         {
             LogAssert.ignoreFailingMessages = true;
-            _window = EditorWindow.GetWindow<ToolkitWindow>();
+            _window = ScriptableObject.CreateInstance<ToolkitWindow>();
             _window.EnsureBuilt();
             LogAssert.ignoreFailingMessages = false;
         }
@@ -35,7 +35,7 @@ namespace JTLStudio.SDK.Tests.Toolkit
 
             if (_window != null)
             {
-                _window.Close();
+                UnityEngine.Object.DestroyImmediate(_window);
             }
 
             LogAssert.ignoreFailingMessages = false;
