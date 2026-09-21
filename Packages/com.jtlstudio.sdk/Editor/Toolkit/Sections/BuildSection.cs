@@ -19,7 +19,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private const float AsideWidth = 306f;
         private const float ColumnGap = 12f;
         private const float MinimumMainWidth = 460f;
-        private const float MinimumHeroWidthForDecoration = 560f;
         private const float CompactBuildsWidth = 640f;
         private const string TargetName = "WebGL";
         private const string CellPrefix = "jtl-build-history__cell--";
@@ -85,10 +84,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             VisualElement hero = new VisualElement();
             hero.AddToClassList("jtl-build-hero");
-            VisualElement back = Decoration("jtl-build-hero__glass", "jtl-build-hero__glass--back");
-            VisualElement front = Decoration("jtl-build-hero__glass", "jtl-build-hero__glass--front");
-            hero.Add(back);
-            hero.Add(front);
 
             VisualElement content = new VisualElement();
             content.AddToClassList("jtl-build-hero__content");
@@ -103,26 +98,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             copy.Add(start);
             content.Add(copy);
             hero.Add(content);
-            hero.RegisterCallback<GeometryChangedEvent>(geometryEvent =>
-            {
-                DisplayStyle display = geometryEvent.newRect.width < MinimumHeroWidthForDecoration ? DisplayStyle.None : DisplayStyle.Flex;
-                back.style.display = display;
-                front.style.display = display;
-            });
             return hero;
         }
 
-        private VisualElement Decoration(params string[] classNames)
-        {
-            VisualElement element = new VisualElement { pickingMode = PickingMode.Ignore };
-
-            foreach (string className in classNames)
-            {
-                element.AddToClassList(className);
-            }
-
-            return element;
-        }
 
 
         private VisualElement CreateRecentBuilds()

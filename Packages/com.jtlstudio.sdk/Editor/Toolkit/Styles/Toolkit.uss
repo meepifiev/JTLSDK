@@ -448,7 +448,6 @@
 }
 
 .jtl-root .jtl-build-hero {
-    height: 282px;
     flex-shrink: 0;
     overflow: hidden;
     border-width: 1px;
@@ -459,34 +458,11 @@
     -unity-background-scale-mode: scale-and-crop;
 }
 
-.jtl-root .jtl-build-hero__glass {
-    position: absolute;
-    width: 120px;
-    border-width: 1px;
-    border-radius: 16px;
-}
-
-.jtl-root .jtl-build-hero__glass--back {
-    right: 78px;
-    top: 36px;
-    height: 150px;
-    border-color: rgba(140, 185, 255, 0.16);
-    background-color: rgba(20, 52, 110, 0.16);
-}
-
-.jtl-root .jtl-build-hero__glass--front {
-    right: 52px;
-    top: 26px;
-    height: 158px;
-    border-color: rgba(140, 185, 255, 0.1);
-    background-color: rgba(20, 52, 110, 0.1);
-}
-
 .jtl-root .jtl-build-hero__content {
     flex-grow: 1;
     flex-direction: row;
     align-items: center;
-    padding: 20px 22px;
+    padding: 22px 24px;
 }
 
 .jtl-root .jtl-build-hero__copy {
