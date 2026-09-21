@@ -12,7 +12,7 @@ namespace JTLStudio.SDK.Tests.Toolkit
 {
     public class ToolkitWindowTests
     {
-        private const int NavigationItemCount = 11;
+        private const int NavigationItemCount = 17;
         private const string RussianConfigurations = "Конфигурации";
         private const string EnglishConfigurations = "Configurations";
         private const string KeyAttributePattern = "(?:^|\\s)(?:[a-z]+-)?key=\"([^\"]+)\"";
@@ -42,7 +42,7 @@ namespace JTLStudio.SDK.Tests.Toolkit
         }
 
         [Test]
-        public void SidebarContainsElevenNavigationItems()
+        public void SidebarContainsEveryNavigationItem()
         {
             Assert.AreEqual(NavigationItemCount, _window.NavigationItems.Count);
         }

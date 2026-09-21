@@ -16,7 +16,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Flags;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "flags.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "FlagsSection";
 
@@ -24,7 +24,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             VisualElement root = Require<VisualElement>("flags");
             SerializedProperty flags = Serialized.FindProperty(FlagsProperty);
-            Card card = new Card { TitleKey = "flags.cardTitle", CaptionKey = "flags.caption", Spacing = 8 };
+            Card card = new Card { TitleKey = "flags.cardTitle", Spacing = 8 };
 
             VisualElement table = new VisualElement();
             table.AddToClassList("jtl-table");
@@ -59,6 +59,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             card.Add(actions);
             card.Add(GenerateConstantsRow());
             root.Add(card);
+            root.Add(ProvidersCard("_flags"));
         }
 
         private VisualElement CreateRow(SerializedProperty flags, int index)

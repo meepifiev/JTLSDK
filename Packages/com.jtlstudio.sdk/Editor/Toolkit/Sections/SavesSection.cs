@@ -33,7 +33,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Saves;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "saves.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "SavesSection";
 
@@ -45,7 +45,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             if (_values.Count == 0)
             {
-                EmptyState empty = new EmptyState { TitleKey = "saves.emptyTitle", DescriptionKey = "saves.emptyDescription", IconName = "saves" };
+                EmptyState empty = new EmptyState { TitleKey = "saves.emptyTitle", IconName = "saves" };
                 empty.Add(Button("saves.addKey", ToolkitButton.SecondaryVariant, "plus", AddKey));
                 body.Add(empty);
             }
@@ -55,6 +55,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             }
 
             body.Add(CreateFooter());
+            body.Add(ProvidersCard("_data"));
         }
 
         private VisualElement CreateToolbar()

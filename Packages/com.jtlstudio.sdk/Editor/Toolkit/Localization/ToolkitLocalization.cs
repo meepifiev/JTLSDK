@@ -72,7 +72,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.packageManager", "Package Manager", "Менеджер пакетов");
             Add("nav.analyzer", "Analyzer Code", "Анализатор кода");
             Add("nav.modules", "MODULES", "МОДУЛИ");
-            Add("nav.packageVersion", "Package version", "Версия пакета");
             Add("nav.languages", "Languages", "Языки");
             Add("nav.purchases", "Purchases", "Покупки");
             Add("nav.leaderboards", "Leaderboards", "Лидерборды");
@@ -80,6 +79,13 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.saves", "Saves", "Сохранения");
             Add("nav.documentation", "Documentation", "Документация");
             Add("nav.support", "Support", "Поддержка");
+            Add("nav.ads", "Ads", "Реклама");
+            Add("nav.player", "Player", "Игрок");
+            Add("nav.time", "Time", "Время");
+            Add("nav.gameplay", "Gameplay", "Геймплей");
+            Add("nav.review", "Review", "Отзыв");
+            Add("nav.shortcut", "Shortcut", "Ярлык");
+            Add("module.providers", "Providers", "Провайдеры");
             Add("topbar.activeConfiguration", "Active configuration", "Активная конфигурация");
             Add("topbar.package", "Package 1.0.0 · 1.1.0 available", "Пакет 1.0.0 · доступна 1.1.0");
         }
@@ -108,7 +114,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("configurations.notApplied", "Not applied", "Не применяется");
             Add("configurations.languagesCount", "{0} of {1}", "{0} из {1}");
             Add("configurations.created", "{0} configuration created.", "Конфигурация {0} создана.");
-            Add("configurations.activated", "{0} is active. Unity recompiles the project.", "{0} активна. Unity перекомпилирует проект.");
+            Add("configurations.activated", "{0} is active.", "{0} активна.");
             Add("configurations.copied", "Copied {0}.", "Скопировано: {0}.");
             Add("details.ready", "Changes are saved to the configuration asset immediately.", "Изменения сразу сохраняются в ассет конфигурации.");
             Add("details.noConfigurationTitle", "No configuration selected", "Конфигурация не выбрана");
@@ -147,7 +153,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("flags.ready", "Flag defaults are stored in JTLSDKSettings.", "Значения флагов по умолчанию хранятся в JTLSDKSettings.");
             Add("flags.empty", "No flags yet.", "Флагов пока нет.");
             Add("simulation.ready", "Simulation settings are stored per user in UserSettings.", "Настройки симуляции хранятся у каждого пользователя в UserSettings.");
-            Add("simulation.saved", "Simulation settings saved. They apply on the next Play Mode start.", "Настройки симуляции сохранены. Применятся при следующем запуске Play Mode.");
+            Add("simulation.saved", "Saved.", "Сохранено.");
             Add("simulation.loadFailure", "Simulate load failure", "Имитировать ошибку загрузки");
             Add("saves.ready", "Editor save data lives in PlayerPrefs under JTLSDK.Data.", "Сейв редактора хранится в PlayerPrefs под ключом JTLSDK.Data.");
             Add("saves.sizeWithLimit", "{0} KB of {1} KB", "{0} КБ из {1} КБ");
@@ -156,12 +162,40 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("saves.valueSaved", "{0} saved.", "{0} сохранён.");
             Add("saves.keyDeleted", "{0} deleted.", "{0} удалён.");
             Add("saves.resetTitle", "Reset all save data?", "Сбросить весь сейв?");
-            Add("saves.resetMessage", "Every key in the editor save is deleted. Builds are not affected.", "Все ключи сейва редактора будут удалены. Билды это не затронет.");
+            Add("saves.resetMessage", "All editor save keys will be deleted.", "Все ключи сейва редактора будут удалены.");
             Add("saves.resetDone", "Editor save data cleared.", "Сейв редактора очищен.");
             Add("saves.exported", "Saved to {0}.", "Сохранено в {0}.");
             Add("saves.imported", "Imported from {0}.", "Импортировано из {0}.");
             Add("saves.copyJson", "Copy JSON", "Скопировать JSON");
             Add("saves.copied", "Save JSON copied.", "JSON сейва скопирован.");
+            Add("analyzer.ready", "Scan a folder to find engine calls that the SDK replaces.", "Просканируй папку, чтобы найти вызовы движка, которые заменяет SDK.");
+            Add("analyzer.foundCount", "{0} places found", "Найдено мест: {0}");
+            Add("analyzer.scannedFormat", "Scanned {0} files in {1} s", "Проверено файлов: {0} за {1} с");
+            Add("analyzer.nothingFound", "Nothing to replace.", "Заменять нечего.");
+            Add("analyzer.manual", "Review manually", "Проверить вручную");
+            Add("analyzer.scanDone", "{0} places found in {1}.", "Найдено мест: {0} в {1}.");
+            Add("analyzer.replaced", "{0}:{1} replaced.", "{0}:{1} заменено.");
+            Add("analyzer.replaceFailed", "{0}:{1} changed since the scan. Scan again.", "{0}:{1} изменился после сканирования. Просканируй заново.");
+            Add("analyzer.replaceAllConfirm", "Replace {0} places in {1} files?", "Заменить {0} мест в {1} файлах?");
+            Add("analyzer.replacedCount", "{0} places replaced.", "Заменено мест: {0}.");
+            Add("package.ready", "Versions come from GitHub Releases.", "Версии берутся из GitHub Releases.");
+            Add("package.checking", "checking GitHub…", "проверка GitHub…");
+            Add("package.checkedAtFormat", "Checked at {0}", "Проверено в {0}");
+            Add("package.installedFormat", "Installed {0}", "Установлено {0}");
+            Add("package.availableFormat", "available {0}", "доступно {0}");
+            Add("package.upToDate", "up to date", "актуально");
+            Add("package.noReleases", "no releases published yet", "релизов пока нет");
+            Add("package.repositoryMissing", "repository not found", "репозиторий не найден");
+            Add("package.checkFailed", "check failed", "проверка не удалась");
+            Add("package.updateToFormat", "Update to {0}", "Обновить до {0}");
+            Add("package.updateTitle", "Update JTL SDK?", "Обновить JTL SDK?");
+            Add("package.updateMessage", "Switch JTL SDK to {0}?", "Переключить JTL SDK на {0}?");
+            Add("package.updating", "Updating to {0}…", "Обновление до {0}…");
+            Add("package.webglTemplate", "WebGL Template", "WebGL-шаблон");
+            Add("package.templateInstalled", "Installed in {0}", "Установлен в {0}");
+            Add("package.templateMissing", "Not installed", "Не установлен");
+            Add("package.templateNotPublished", "Template repository is not published yet", "Репозиторий шаблона ещё не опубликован");
+            Add("package.noModules", "No modules published yet.", "Модули пока не опубликованы.");
         }
 
         private void RegisterCommon()

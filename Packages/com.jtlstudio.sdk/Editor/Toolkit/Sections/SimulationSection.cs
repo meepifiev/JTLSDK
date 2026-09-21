@@ -23,7 +23,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Simulation;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "simulation.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "SimulationSection";
 

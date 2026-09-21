@@ -15,7 +15,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Leaderboards;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "leaderboards.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "LeaderboardsSection";
 
@@ -54,7 +54,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             card.Add(actions);
             card.Add(GenerateConstantsRow());
             root.Add(card);
-            root.Add(new InlineMessage("leaderboards.youtubeNote", InlineMessage.InfoVariant));
+            root.Add(ProvidersCard("_leaderboards"));
         }
 
         private VisualElement CreateRow(SerializedProperty leaderboards, int index)
@@ -65,7 +65,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             TextField id = TextInput(leaderboard.FindPropertyRelative("_id"), true, 210);
             id.style.marginRight = 10;
             row.Add(id);
-            TextField yandex = TextInput(PlatformIdProperty(leaderboard.FindPropertyRelative("_platformIds"), PlatformId.YandexGames), true, 0);
+            TextField yandex = PlatformIdInput(leaderboard.FindPropertyRelative("_platformIds"), PlatformId.YandexGames);
             yandex.style.marginRight = 10;
             yandex.style.minWidth = 0;
             yandex.style.flexShrink = 1;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using JTLStudio.SDK.Editor.Toolkit.Data;
 using JTLStudio.SDK.Editor.Toolkit.Localization;
 
@@ -32,6 +33,8 @@ namespace JTLStudio.SDK.Editor.Toolkit
         public PlatformPresentation Platforms { get; } = new PlatformPresentation();
 
         public SdkConfiguration SelectedConfiguration { get; set; }
+
+        public HashSet<string> ExpandedProviders { get; } = new HashSet<string>();
 
         public void Navigate(ToolkitSectionId sectionId)
         {

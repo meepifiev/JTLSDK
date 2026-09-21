@@ -19,7 +19,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private const int MinimumMemory = 32;
 
         private readonly ConfigurationValidator _validator = new ConfigurationValidator();
-        private readonly HashSet<string> _expandedModules = new HashSet<string>();
         private SdkConfiguration _configuration;
         private SerializedObject _serialized;
 
@@ -31,7 +30,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId NavigationId => ToolkitSectionId.Configurations;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "details.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "ConfigurationDetailsSection";
 
@@ -42,7 +41,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             if (_configuration == null)
             {
-                EmptyState empty = new EmptyState { TitleKey = "details.noConfigurationTitle", DescriptionKey = "details.noConfigurationDescription", IconName = "configurations" };
+                EmptyState empty = new EmptyState { TitleKey = "details.noConfigurationTitle", IconName = "configurations" };
                 ToolkitButton back = new ToolkitButton("details.backToList", ToolkitButton.SecondaryVariant);
                 back.clicked += OnBackClicked;
                 empty.Add(back);
@@ -52,7 +51,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             _serialized = new SerializedObject(_configuration);
             root.Add(CreateHeader());
-            root.Add(CreateGeneralCard());
             root.Add(CreatePresetCard());
             root.Add(CreateModulesCard());
             root.Add(CreatePauseCard());
@@ -109,22 +107,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return header;
         }
 
-        private VisualElement CreateGeneralCard()
-        {
-            Card card = new Card { TitleKey = "details.general", Spacing = 12 };
-            FieldRow nameRow = new FieldRow("details.name", 190);
-            TextField name = new TextField { value = _configuration.DisplayName };
-            name.AddToClassList("jtl-field");
-            name.style.width = 320;
-            name.RegisterCallback<FocusOutEvent>(_ => ApplyName(name.value));
-            nameRow.Add(name);
-            card.Add(nameRow);
-            return card;
-        }
-
         private VisualElement CreatePresetCard()
         {
-            Card card = new Card { TitleKey = "details.projectSettings", CaptionKey = "details.projectSettingsCaption", Spacing = 8 };
+            Card card = new Card { TitleKey = "details.projectSettings", Spacing = 8 };
             SerializedProperty preset = _serialized.FindProperty(PresetProperty);
             VisualElement table = new VisualElement();
             table.AddToClassList("jtl-column");
@@ -137,7 +122,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             head.Add(Heading("details.columnApply", "jtl-setting-head__apply"));
             table.Add(head);
 
-            table.Add(SettingRow("WebGL Template", TemplateControl(preset.FindPropertyRelative("_template")), preset.FindPropertyRelative("_applyTemplate")));
             table.Add(SettingRow("Compression Format", EnumControl<WebCompression>(preset.FindPropertyRelative("_compression"), IsCompressionInvalid()), preset.FindPropertyRelative("_applyCompression")));
 
             foreach (string issue in _validator.Validate(_configuration))
@@ -164,98 +148,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             foreach (ModuleSlot slot in Context.Modules.All)
             {
-                AddModule(list, slot);
+                list.Add(new ProviderRow(Context, _configuration, slot, Localized(slot.NameKey), Render));
             }
 
             card.Add(list);
             return card;
-        }
-
-        private void AddModule(VisualElement list, ModuleSlot slot)
-        {
-            SerializedProperty property = _serialized.FindProperty(slot.PropertyName);
-            Type currentType = CurrentProviderType(slot);
-            IReadOnlyList<Type> providers = Context.Providers.ProvidersFor(slot.ProviderInterface);
-            bool unsupported = Context.Providers.IsUnsupported(currentType);
-            List<SerializedProperty> fields = ProviderFields(property);
-            bool expanded = _expandedModules.Contains(slot.PropertyName) && fields.Count > 0;
-
-            VisualElement row = new VisualElement();
-            row.AddToClassList("jtl-module-row");
-            row.EnableInClassList("jtl-module-row--dimmed", unsupported);
-
-            VisualElement chevronCell = new VisualElement();
-            chevronCell.AddToClassList("jtl-module-row__chevron");
-
-            if (fields.Count > 0)
-            {
-                IconButton chevron = new IconButton(expanded ? "chevron-up" : "chevron-right", 20);
-                chevron.clicked += () => ToggleModule(slot.PropertyName);
-                chevronCell.Add(chevron);
-            }
-
-            row.Add(chevronCell);
-            LocalizedLabel name = new LocalizedLabel(slot.NameKey);
-            name.AddToClassList("jtl-module-row__name");
-            row.Add(name);
-
-            VisualElement providerCell = new VisualElement();
-            providerCell.AddToClassList("jtl-module-row__provider");
-            Dropdown dropdown = new Dropdown();
-            dropdown.style.width = ValueWidth;
-            dropdown.style.minWidth = ValueWidth;
-            List<string> choices = new List<string>();
-
-            foreach (Type provider in providers)
-            {
-                choices.Add(Context.Providers.DisplayName(provider));
-            }
-
-            int selected = -1;
-
-            for (int index = 0; index < providers.Count; index++)
-            {
-                if (providers[index] == currentType)
-                {
-                    selected = index;
-                }
-            }
-
-            if (selected < 0)
-            {
-                choices.Insert(0, Context.Providers.DisplayName(currentType));
-                selected = 0;
-            }
-
-            dropdown.choices = choices;
-            dropdown.index = selected;
-            dropdown.RegisterValueChangedCallback(_ => ChangeProvider(slot, property, providers, dropdown.index, choices.Count > providers.Count));
-            providerCell.Add(dropdown);
-            row.Add(providerCell);
-
-            LocalizedLabel note = new LocalizedLabel(unsupported ? "details.unsupportedNote" : fields.Count > 0 ? "details.hasSettings" : "details.noSettings");
-            note.AddToClassList("jtl-module-row__note");
-            row.Add(note);
-            list.Add(row);
-
-            if (expanded == false)
-            {
-                return;
-            }
-
-            VisualElement settings = new VisualElement();
-            settings.AddToClassList("jtl-module-fields");
-            settings.AddToClassList("jtl-provider-fields");
-
-            foreach (SerializedProperty field in fields)
-            {
-                PropertyField propertyField = new PropertyField(field);
-                propertyField.RegisterValueChangeCallback(_ => SaveConfiguration());
-                settings.Add(propertyField);
-            }
-
-            settings.Bind(_serialized);
-            list.Add(settings);
         }
 
         private VisualElement CreatePauseCard()
@@ -272,7 +169,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateLanguagesCard()
         {
-            Card card = new Card { TitleKey = "details.languages", DescriptionKey = "details.languagesDescription", Spacing = 10 };
+            Card card = new Card { TitleKey = "details.languages", Spacing = 10 };
             List<Language> projectLanguages = Context.Project.Settings.SupportedLanguages;
 
             if (projectLanguages.Count == 0)
@@ -319,16 +216,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return row;
         }
 
-        private VisualElement TemplateControl(SerializedProperty property)
-        {
-            TextField field = new TextField { value = property.stringValue };
-            field.AddToClassList("jtl-field");
-            field.AddToClassList(MonospaceFont.ClassName);
-            field.style.width = ValueWidth;
-            field.RegisterCallback<FocusOutEvent>(_ => ApplyString(property, field.value));
-            return field;
-        }
-
         private VisualElement EnumControl<T>(SerializedProperty property, bool error) where T : Enum
         {
             Dropdown dropdown = new Dropdown { Error = error };
@@ -365,35 +252,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return field;
         }
 
-        private Type CurrentProviderType(ModuleSlot slot)
-        {
-            FieldInfo field = typeof(SdkConfiguration).GetField(slot.PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
-            object provider = field == null ? null : field.GetValue(_configuration);
-            return provider == null ? null : provider.GetType();
-        }
-
-        private List<SerializedProperty> ProviderFields(SerializedProperty property)
-        {
-            List<SerializedProperty> fields = new List<SerializedProperty>();
-
-            if (property == null || property.hasVisibleChildren == false)
-            {
-                return fields;
-            }
-
-            SerializedProperty iterator = property.Copy();
-            SerializedProperty end = property.GetEndProperty();
-            bool enterChildren = true;
-
-            while (iterator.NextVisible(enterChildren) && SerializedProperty.EqualContents(iterator, end) == false)
-            {
-                enterChildren = false;
-                fields.Add(iterator.Copy());
-            }
-
-            return fields;
-        }
-
         private bool IsCompressionInvalid()
         {
             PlayerSettingsPreset preset = _configuration.PlayerSettings;
@@ -406,29 +264,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             label.AddToClassList("jtl-table__heading");
             label.AddToClassList(className);
             return label;
-        }
-
-        private void ChangeProvider(ModuleSlot slot, SerializedProperty property, IReadOnlyList<Type> providers, int choiceIndex, bool hasPlaceholder)
-        {
-            int providerIndex = hasPlaceholder ? choiceIndex - 1 : choiceIndex;
-
-            if (providerIndex < 0 || providerIndex >= providers.Count || providers[providerIndex] == CurrentProviderType(slot))
-            {
-                return;
-            }
-
-            property.managedReferenceValue = Activator.CreateInstance(providers[providerIndex]);
-            ApplySerialized(true);
-        }
-
-        private void ToggleModule(string propertyName)
-        {
-            if (_expandedModules.Remove(propertyName) == false)
-            {
-                _expandedModules.Add(propertyName);
-            }
-
-            Render();
         }
 
         private void ToggleLanguage(Language language, bool enabled)
@@ -444,19 +279,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                     _configuration.Languages.Remove(language);
                 }
             });
-        }
-
-        private void ApplyName(string name)
-        {
-            string trimmed = string.IsNullOrWhiteSpace(name) ? _configuration.DisplayName : name.Trim();
-
-            if (trimmed == _configuration.DisplayName)
-            {
-                return;
-            }
-
-            Context.Project.Modify(_configuration, "Rename configuration", () => _configuration.DisplayName = trimmed);
-            Render();
         }
 
         private void ApplyBool(SerializedProperty property, bool value)

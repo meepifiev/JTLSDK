@@ -22,5 +22,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
         };
 
         public IReadOnlyList<ModuleSlot> All => _slots;
+
+        public ModuleSlot Find(string propertyName)
+        {
+            return _slots.Find(slot => slot.PropertyName == propertyName);
+        }
     }
 }

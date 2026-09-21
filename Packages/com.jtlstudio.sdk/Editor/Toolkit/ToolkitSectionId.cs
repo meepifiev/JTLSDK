@@ -13,6 +13,12 @@ namespace JTLStudio.SDK.Editor.Toolkit
         Purchases = 8,
         Leaderboards = 9,
         Flags = 10,
-        Saves = 11
+        Saves = 11,
+        Ads = 12,
+        Player = 13,
+        Time = 14,
+        Gameplay = 15,
+        Review = 16,
+        Shortcut = 17
     }
 }

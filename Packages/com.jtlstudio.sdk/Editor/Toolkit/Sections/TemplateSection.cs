@@ -12,7 +12,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Template;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Success, "template.status", StatusTime);
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "TemplateSection";
 

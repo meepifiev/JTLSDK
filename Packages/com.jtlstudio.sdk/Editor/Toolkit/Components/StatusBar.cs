@@ -43,6 +43,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
             _status = status;
             _time.text = status.Time ?? string.Empty;
             ApplyIcon(status.Kind);
+            bool empty = string.IsNullOrEmpty(status.Text) && string.IsNullOrEmpty(status.MessageKey);
+            _icon.style.display = empty ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         public void ApplyLocalization(ToolkitLocalization localization)

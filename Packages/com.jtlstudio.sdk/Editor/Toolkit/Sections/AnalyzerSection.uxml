@@ -1,26 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
-        <jtl:SectionHeader title-key="analyzer.title" description-key="analyzer.description" />
-        <jtl:Card>
-            <ui:VisualElement class="jtl-row jtl-row--end jtl-hstack-12">
-                <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-4">
-                    <jtl:LocalizedLabel key="analyzer.folder" class="jtl-text--secondary" />
-                    <jtl:FilePickerField value="Assets/Game/Scripts" />
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-4">
-                    <jtl:LocalizedLabel key="analyzer.exclude" class="jtl-text--secondary" />
-                    <jtl:FilePickerField value="Assets/Plugins" />
-                </ui:VisualElement>
-                <jtl:ToolkitButton text-key="analyzer.scan" icon="search" variant="primary" />
-            </ui:VisualElement>
-        </jtl:Card>
-        <jtl:Card title-key="analyzer.found" caption-key="analyzer.scanned" spacing="8">
-            <ui:VisualElement name="findings" class="jtl-table" />
-        </jtl:Card>
-        <ui:VisualElement class="jtl-row jtl-hstack-12">
-            <ui:VisualElement class="jtl-spacer" />
-            <jtl:ToolkitButton text-key="analyzer.replaceAll" icon="refresh" />
-            <jtl:LocalizedLabel key="analyzer.replaceAllNote" class="jtl-text--caption" />
-        </ui:VisualElement>
+        <jtl:SectionHeader title-key="analyzer.title" />
+        <ui:VisualElement name="analyzer-body" class="jtl-column jtl-vstack-16" />
     </ui:VisualElement>
 </ui:UXML>

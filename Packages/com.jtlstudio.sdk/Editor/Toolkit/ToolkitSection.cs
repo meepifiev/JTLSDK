@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using JTLStudio.SDK.Editor.Toolkit.Components;
+using JTLStudio.SDK.Editor.Toolkit.Data;
+using JTLStudio.SDK.Editor.Toolkit.Sections;
 using UnityEngine.UIElements;
 
 namespace JTLStudio.SDK.Editor.Toolkit
@@ -139,6 +141,35 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
             button.clicked += onClick;
             return button;
+        }
+
+        protected VisualElement ProvidersCard(string propertyName)
+        {
+            ModuleSlot slot = _context.Modules.Find(propertyName);
+            Card card = new Card { TitleKey = "module.providers", Spacing = 8 };
+
+            if (slot == null)
+            {
+                return card;
+            }
+
+            System.Collections.Generic.IReadOnlyList<SdkConfiguration> configurations = _context.Project.Configurations;
+
+            if (configurations.Count == 0)
+            {
+                card.Add(Localized("languages.noConfigurations", "jtl-text--secondary"));
+                return card;
+            }
+
+            foreach (SdkConfiguration configuration in configurations)
+            {
+                VisualElement leading = Row(8);
+                leading.Add(new PortalMark(_context.Platforms.PortalMark(configuration.Platform), 16));
+                leading.Add(TextLabel(configuration.DisplayName, "jtl-text"));
+                card.Add(new ProviderRow(_context, configuration, slot, leading, Render));
+            }
+
+            return card;
         }
 
         protected void NavigateTo(ToolkitSectionId sectionId)

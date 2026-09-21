@@ -1,25 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using JTLStudio.SDK.Editor.Analyzer;
 using JTLStudio.SDK.Editor.Toolkit.Components;
+using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace JTLStudio.SDK.Editor.Toolkit.Sections
 {
     public class AnalyzerSection : ToolkitSection
     {
-        private const string StatusTime = "14:12";
-        private const int FileIconSize = 16;
-        private const int ArrowIconSize = 14;
-        private const int CompactButtonGap = 6;
+        private const string FolderPreference = "JTLSDK.Analyzer.Folder";
+        private const string ExcludePreference = "JTLSDK.Analyzer.Exclude";
+        private const string DefaultFolder = "Assets";
+        private const string DefaultExclude = "Assets/Plugins";
 
-        private readonly string[][] _findings =
-        {
-            new[] { "GlobalTimeScaler.cs:23", "Time.timeScale = 0.3f", "JTLSDK.Time.Scale = 0.3f" },
-            new[] { "PauseMenu.cs:64", "Time.timeScale = 0f", "JTLSDK.Time.Scale = 0f" },
-            new[] { "SettingHandler.cs:41", "AudioListener.volume = v", "JTLSDK.Audio.Volume = v" },
-            new[] { "MusicPlayer.cs:18", "AudioListener.pause = true", "JTLSDK.Pause.Set(\"Music\", true)" },
-            new[] { "SavesService.cs:88", "PlayerPrefs.GetInt(\"Level\")", "JTLSDK.Data.GetInt(\"Level\")" },
-            new[] { "SavesService.cs:96", "PlayerPrefs.SetInt(\"Level\", n)", "JTLSDK.Data.SetInt(\"Level\", n)" },
-            new[] { "CursorLock.cs:12", "Cursor.lockState = CursorLockMode.Locked", "JTLSDK.Device.CursorLock = CursorLockMode.Locked" }
-        };
+        private readonly ApiAnalyzer _analyzer = new ApiAnalyzer();
+        private List<AnalyzerFinding> _findings;
+        private double _scanSeconds;
 
         public AnalyzerSection(ToolkitContext context) : base(context)
         {
@@ -27,60 +26,187 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Analyzer;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Warning, "analyzer.status", StatusTime);
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "AnalyzerSection";
 
         protected override void OnRendered()
         {
-            VisualElement findings = Require<VisualElement>("findings");
+            VisualElement body = Require<VisualElement>("analyzer-body");
+            body.Add(CreateScanCard());
 
-            for (int index = 0; index < _findings.Length; index++)
+            if (_findings == null)
             {
-                findings.Add(CreateFindingRow(_findings[index], index == 0));
+                return;
+            }
+
+            body.Add(CreateResultsCard());
+
+            if (_findings.Exists(finding => finding.IsSimple))
+            {
+                VisualElement actions = Row(12);
+                actions.Add(Spacer());
+                actions.Add(Button("analyzer.replaceAll", ToolkitButton.SecondaryVariant, "refresh", ReplaceAllSimple));
+                actions.Add(Localized("analyzer.replaceAllNote", "jtl-text--caption"));
+                body.Add(actions);
             }
         }
 
-        private VisualElement CreateFindingRow(string[] finding, bool first)
+        private VisualElement CreateScanCard()
+        {
+            Card card = new Card();
+            VisualElement row = Row(12);
+            row.AddToClassList("jtl-row--end");
+
+            TextField folder = PathField("analyzer.folder", EditorPrefs.GetString(FolderPreference, DefaultFolder), FolderPreference, row);
+            TextField exclude = PathField("analyzer.exclude", EditorPrefs.GetString(ExcludePreference, DefaultExclude), ExcludePreference, row);
+            row.Add(Button("analyzer.scan", ToolkitButton.PrimaryVariant, "search", () => Scan(folder.value, exclude.value)));
+            card.Add(row);
+            return card;
+        }
+
+        private TextField PathField(string labelKey, string value, string preference, VisualElement row)
+        {
+            VisualElement column = Column(4);
+            column.AddToClassList("jtl-basis");
+            column.Add(Localized(labelKey, "jtl-text--secondary"));
+            TextField field = new TextField { value = value };
+            field.AddToClassList("jtl-field");
+            field.AddToClassList(MonospaceFont.ClassName);
+            field.RegisterCallback<FocusOutEvent>(_ => EditorPrefs.SetString(preference, field.value.Trim()));
+            column.Add(field);
+            row.Add(column);
+            return field;
+        }
+
+        private VisualElement CreateResultsCard()
+        {
+            Card card = new Card { Title = Context.Text("analyzer.foundCount", _findings.Count), Spacing = 8 };
+            card.Header.Add(TextLabel(Context.Text("analyzer.scannedFormat", _analyzer.ScannedFiles, _scanSeconds.ToString("0.0", CultureInfo.InvariantCulture)), "jtl-card__caption"));
+
+            if (_findings.Count == 0)
+            {
+                card.Add(Localized("analyzer.nothingFound", "jtl-text--secondary"));
+                return card;
+            }
+
+            VisualElement table = new VisualElement();
+            table.AddToClassList("jtl-table");
+
+            foreach (AnalyzerFinding finding in _findings)
+            {
+                table.Add(CreateFindingRow(finding));
+            }
+
+            card.Add(table);
+            return card;
+        }
+
+        private VisualElement CreateFindingRow(AnalyzerFinding finding)
         {
             VisualElement row = new VisualElement();
             row.AddToClassList("jtl-finding-row");
-            row.EnableInClassList("jtl-finding-row--first", first);
 
-            VisualElement file = new VisualElement();
+            VisualElement file = Row(6);
             file.AddToClassList("jtl-finding-row__file");
-            file.Add(new Icon("analyzer", FileIconSize, "muted"));
-            Label fileName = new Label(finding[0]);
-            fileName.AddToClassList("jtl-text--small");
-            file.Add(fileName);
+            file.Add(new Icon("search", 14, "muted"));
+            file.Add(TextLabel(System.IO.Path.GetFileName(finding.Path) + ":" + finding.Line, "jtl-text--small"));
+            file.tooltip = finding.Path;
             row.Add(file);
 
-            Label call = new Label(finding[1]);
-            call.AddToClassList("jtl-finding-row__call");
-            call.AddToClassList("jtl-mono");
+            Label call = TextLabel(finding.Code, "jtl-finding-row__call", MonospaceFont.ClassName);
             row.Add(call);
-
-            VisualElement arrow = new VisualElement();
-            arrow.AddToClassList("jtl-finding-row__arrow");
-            arrow.Add(new Icon("arrow-right", ArrowIconSize, "muted"));
-            row.Add(arrow);
-
-            Label replacement = new Label(finding[2]);
-            replacement.AddToClassList("jtl-finding-row__replacement");
-            replacement.AddToClassList("jtl-mono");
+            row.Add(TextLabel("→", "jtl-finding-row__arrow"));
+            Label replacement = TextLabel(finding.HasReplacement ? finding.Replacement : Context.Text("analyzer.manual"), "jtl-finding-row__replacement", MonospaceFont.ClassName);
             row.Add(replacement);
 
-            VisualElement actions = new VisualElement();
+            VisualElement actions = Row(6);
             actions.AddToClassList("jtl-finding-row__actions");
-            ToolkitButton open = new ToolkitButton("analyzer.open", ToolkitButton.GhostVariant);
+            ToolkitButton open = Button("analyzer.open", ToolkitButton.GhostVariant, "", () => Open(finding));
             open.Compact = true;
-            open.style.marginRight = CompactButtonGap;
-            ToolkitButton replace = new ToolkitButton("analyzer.replace", ToolkitButton.SecondaryVariant);
-            replace.Compact = true;
             actions.Add(open);
-            actions.Add(replace);
+
+            if (finding.HasReplacement)
+            {
+                ToolkitButton replace = Button("analyzer.replace", ToolkitButton.SecondaryVariant, "", () => ReplaceOne(finding));
+                replace.Compact = true;
+                actions.Add(replace);
+            }
+
             row.Add(actions);
             return row;
+        }
+
+        private void Scan(string folder, string exclude)
+        {
+            EditorPrefs.SetString(FolderPreference, folder.Trim());
+            EditorPrefs.SetString(ExcludePreference, exclude.Trim());
+            List<string> excluded = new List<string>(exclude.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries));
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            _findings = _analyzer.Scan(folder.Trim(), excluded);
+            stopwatch.Stop();
+            _scanSeconds = stopwatch.Elapsed.TotalSeconds;
+            Context.Report(StatusKind.Info, "analyzer.scanDone", _findings.Count, folder.Trim());
+            Render();
+        }
+
+        private void Open(AnalyzerFinding finding)
+        {
+            UnityEngine.Object asset = AssetDatabase.LoadAssetAtPath<MonoScript>(finding.Path);
+
+            if (asset != null)
+            {
+                AssetDatabase.OpenAsset(asset, finding.Line);
+            }
+        }
+
+        private void ReplaceOne(AnalyzerFinding finding)
+        {
+            if (_analyzer.Replace(finding))
+            {
+                _findings.Remove(finding);
+                AssetDatabase.ImportAsset(finding.Path);
+                Context.Report(StatusKind.Success, "analyzer.replaced", System.IO.Path.GetFileName(finding.Path), finding.Line);
+            }
+            else
+            {
+                Context.Report(StatusKind.Error, "analyzer.replaceFailed", System.IO.Path.GetFileName(finding.Path), finding.Line);
+            }
+
+            Render();
+        }
+
+        private void ReplaceAllSimple()
+        {
+            List<AnalyzerFinding> simple = _findings.FindAll(finding => finding.IsSimple);
+            HashSet<string> files = new HashSet<string>();
+
+            foreach (AnalyzerFinding finding in simple)
+            {
+                files.Add(finding.Path);
+            }
+
+            bool confirmed = EditorUtility.DisplayDialog(Context.Text("analyzer.replaceAll"), Context.Text("analyzer.replaceAllConfirm", simple.Count, files.Count), Context.Text("analyzer.replace"), Context.Text("details.cancel"));
+
+            if (confirmed == false)
+            {
+                return;
+            }
+
+            int replaced = 0;
+
+            foreach (AnalyzerFinding finding in simple)
+            {
+                if (_analyzer.Replace(finding))
+                {
+                    replaced++;
+                    _findings.Remove(finding);
+                }
+            }
+
+            AssetDatabase.Refresh();
+            Context.Report(StatusKind.Success, "analyzer.replacedCount", replaced);
+            Render();
         }
     }
 }

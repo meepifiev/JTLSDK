@@ -15,7 +15,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Purchases;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "purchases.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "PurchasesSection";
 
@@ -27,7 +27,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             if (products.arraySize == 0)
             {
-                EmptyState empty = new EmptyState { TitleKey = "purchases.emptyTitle", DescriptionKey = "purchases.emptyDescription", IconName = "purchases" };
+                EmptyState empty = new EmptyState { TitleKey = "purchases.emptyTitle", IconName = "purchases" };
                 empty.Add(Button("purchases.addProduct", ToolkitButton.SecondaryVariant, "plus", AddProduct));
                 list.Add(empty);
             }
@@ -43,6 +43,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             }
 
             list.Add(GenerateConstantsRow());
+            list.Add(ProvidersCard("_payments"));
         }
 
         private VisualElement CreateProductCard(SerializedProperty products, int index)
@@ -74,8 +75,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             VisualElement right = Column(8);
             right.AddToClassList("jtl-basis");
-            FieldRow yandexRow = new FieldRow("purchases.yandexId", 130) { NoteKey = "purchases.yandexIdNote" };
-            yandexRow.Add(TextInput(PlatformIdProperty(product.FindPropertyRelative("_platformIds"), PlatformId.YandexGames), true, 0));
+            FieldRow yandexRow = new FieldRow("purchases.yandexId", 130);
+            yandexRow.Add(PlatformIdInput(product.FindPropertyRelative("_platformIds"), PlatformId.YandexGames));
             right.Add(yandexRow);
             FieldRow priceRow = new FieldRow("purchases.testPrice", 130);
             priceRow.Add(FloatInput(product.FindPropertyRelative("_testPrice"), 90));

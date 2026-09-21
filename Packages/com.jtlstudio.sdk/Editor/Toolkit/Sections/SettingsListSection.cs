@@ -96,24 +96,17 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return field;
         }
 
-        protected SerializedProperty PlatformIdProperty(SerializedProperty platformIds, PlatformId platform)
+        protected TextField PlatformIdInput(SerializedProperty platformIds, PlatformId platform)
         {
-            for (int index = 0; index < platformIds.arraySize; index++)
-            {
-                SerializedProperty element = platformIds.GetArrayElementAtIndex(index);
-
-                if (element.FindPropertyRelative("_platform").enumValueIndex == (int)platform)
-                {
-                    return element.FindPropertyRelative("_id");
-                }
-            }
-
-            platformIds.arraySize++;
-            SerializedProperty added = platformIds.GetArrayElementAtIndex(platformIds.arraySize - 1);
-            added.FindPropertyRelative("_platform").enumValueIndex = (int)platform;
-            added.FindPropertyRelative("_id").stringValue = "";
-            _serialized.ApplyModifiedPropertiesWithoutUndo();
-            return added.FindPropertyRelative("_id");
+            SerializedProperty existing = FindPlatformId(platformIds, platform);
+            TextField field = new TextField { value = existing == null ? "" : existing.stringValue };
+            field.AddToClassList("jtl-field");
+            field.AddToClassList(MonospaceFont.ClassName);
+            field.AddToClassList("jtl-grow");
+            field.style.minWidth = 0;
+            field.style.flexShrink = 1;
+            field.RegisterCallback<FocusOutEvent>(_ => CommitPlatformId(platformIds, platform, field.value));
+            return field;
         }
 
         protected string UniqueId(SerializedProperty array, string relativeName, string prefix)
@@ -164,6 +157,49 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             row.Add(Button("common.generateConstants", ToolkitButton.SecondaryVariant, "refresh", GenerateConstants));
             row.Add(TextLabel(ConstantsGenerator.DefaultPath, "jtl-text--caption", MonospaceFont.ClassName));
             return row;
+        }
+
+        private SerializedProperty FindPlatformId(SerializedProperty platformIds, PlatformId platform)
+        {
+            for (int index = 0; index < platformIds.arraySize; index++)
+            {
+                SerializedProperty element = platformIds.GetArrayElementAtIndex(index);
+
+                if (element.FindPropertyRelative("_platform").enumValueIndex == (int)platform)
+                {
+                    return element.FindPropertyRelative("_id");
+                }
+            }
+
+            return null;
+        }
+
+        private void CommitPlatformId(SerializedProperty platformIds, PlatformId platform, string value)
+        {
+            string trimmed = value == null ? "" : value.Trim();
+            SerializedProperty existing = FindPlatformId(platformIds, platform);
+
+            if (existing == null && trimmed.Length == 0)
+            {
+                return;
+            }
+
+            if (existing == null)
+            {
+                platformIds.arraySize++;
+                SerializedProperty added = platformIds.GetArrayElementAtIndex(platformIds.arraySize - 1);
+                added.FindPropertyRelative("_platform").enumValueIndex = (int)platform;
+                existing = added.FindPropertyRelative("_id");
+                existing.stringValue = "";
+            }
+
+            if (existing.stringValue == trimmed)
+            {
+                return;
+            }
+
+            existing.stringValue = trimmed;
+            Apply(false);
         }
 
         private void CommitString(SerializedProperty property, string value)

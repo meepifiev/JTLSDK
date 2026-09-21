@@ -22,7 +22,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Configurations;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "configurations.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "ConfigurationsSection";
 
@@ -42,7 +42,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 EmptyState empty = new EmptyState
                 {
                     TitleKey = "configurations.emptyTitle",
-                    DescriptionKey = "configurations.emptyDescription",
                     IconName = "configurations"
                 };
                 empty.Add(CreateButton("configurations.createYandex", ToolkitButton.SecondaryVariant, () => CreateConfiguration(PlatformId.YandexGames)));
@@ -79,48 +78,26 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private Card CreateCard(SdkConfiguration configuration)
         {
             bool active = Context.Project.Active == configuration;
-            PlatformPresentation platforms = Context.Platforms;
             Card card = new Card { Active = active };
             card.AddToClassList("jtl-basis");
 
-            VisualElement header = new VisualElement();
-            header.AddToClassList("jtl-row");
-            header.AddToClassList("jtl-hstack-10");
-            header.Add(new PortalMark(platforms.PortalMark(configuration.Platform), 24));
-            Label name = new Label(configuration.DisplayName);
-            name.AddToClassList("jtl-text");
-            name.AddToClassList("jtl-text--title");
-            header.Add(name);
-            header.Add(new Badge(active ? "badge.active" : "badge.inactive", active ? Badge.SuccessVariant : Badge.NeutralVariant));
+            VisualElement header = Row(10);
+            header.AddToClassList("jtl-clickable-row");
+            header.Add(new PortalMark(Context.Platforms.PortalMark(configuration.Platform), 24));
+            header.Add(TextLabel(configuration.DisplayName, "jtl-text", "jtl-text--title"));
+            header.RegisterCallback<ClickEvent>(_ => OpenConfiguration(configuration));
             card.Add(header);
-
-            LocalizedLabel description = new LocalizedLabel(platforms.DescriptionKey(configuration.Platform));
-            description.AddToClassList("jtl-text--secondary");
-            description.AddToClassList("jtl-text--wrap");
-            card.Add(description);
 
             VisualElement table = new VisualElement();
             table.AddToClassList("jtl-table");
             table.Add(CreateDefineRow(configuration));
-            table.Add(CreateValueRow("configurations.compressionFormat", CompressionText(configuration)));
-            table.Add(CreateValueRow("configurations.languages", Context.Text("configurations.languagesCount", configuration.Languages.Count, Context.Project.Settings.SupportedLanguages.Count)));
             card.Add(table);
 
-            VisualElement actions = new VisualElement();
-            actions.AddToClassList("jtl-row");
-            actions.AddToClassList("jtl-hstack-8");
-            ToolkitButton open = CreateButton("configurations.openConfiguration", ToolkitButton.SecondaryVariant, () => OpenConfiguration(configuration));
-            open.Block = true;
-            actions.Add(open);
-
-            if (active == false)
-            {
-                ToolkitButton activate = CreateButton("configurations.makeActive", ToolkitButton.PrimaryVariant, () => ActivateConfiguration(configuration));
-                activate.Block = true;
-                actions.Add(activate);
-            }
-
-            card.Add(actions);
+            ToolkitButton action = active
+                ? CreateButton("configurations.openConfiguration", ToolkitButton.SecondaryVariant, () => OpenConfiguration(configuration))
+                : CreateButton("configurations.makeActive", ToolkitButton.PrimaryVariant, () => ActivateConfiguration(configuration));
+            action.Block = true;
+            card.Add(action);
             return card;
         }
 
@@ -142,26 +119,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             copy.clicked += () => CopyDefineSymbol(configuration.DefineSymbol);
             row.Add(copy);
             return row;
-        }
-
-        private VisualElement CreateValueRow(string labelKey, string valueText)
-        {
-            VisualElement row = new VisualElement();
-            row.AddToClassList("jtl-table__row");
-            LocalizedLabel label = new LocalizedLabel(labelKey);
-            label.AddToClassList("jtl-text--secondary");
-            label.AddToClassList("jtl-grow");
-            row.Add(label);
-            Label value = new Label(valueText);
-            value.AddToClassList("jtl-text");
-            row.Add(value);
-            return row;
-        }
-
-        private string CompressionText(SdkConfiguration configuration)
-        {
-            PlayerSettingsPreset preset = configuration.PlayerSettings;
-            return preset.ApplyCompression ? preset.Compression.ToString() : Context.Text("configurations.notApplied");
         }
 
         private ToolkitButton CreateButton(string textKey, string variant, Action onClick)

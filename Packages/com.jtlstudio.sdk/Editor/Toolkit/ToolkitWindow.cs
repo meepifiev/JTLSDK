@@ -20,7 +20,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private const string CollapsedClass = "jtl-root--collapsed";
         private const string PackageManifestPath = "Packages/com.jtlstudio.sdk/package.json";
         private const string FallbackVersion = "0.1.0";
-        private const string VersionPrefix = " v";
+        private const string SupportUrl = "https://t.me/jtlstudio";
         private const string WindowTemplate = "ToolkitWindow.uxml";
         private const string TokensStyleSheet = "Styles/Tokens.uss";
         private const string ToolkitStyleSheet = "Styles/Toolkit.uss";
@@ -155,6 +155,8 @@ namespace JTLStudio.SDK.Editor.Toolkit
             }
 
             rootVisualElement.Q<Button>("configuration-button").clicked += OnConfigurationButtonClicked;
+            rootVisualElement.Q<VisualElement>("documentation-link").AddManipulator(new Clickable(OpenSupport));
+            rootVisualElement.Q<VisualElement>("support-link").AddManipulator(new Clickable(OpenSupport));
             CreateSections();
             _root.RegisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
             LocalizeShell();
@@ -176,6 +178,12 @@ namespace JTLStudio.SDK.Editor.Toolkit
             Register(new LeaderboardsSection(_context));
             Register(new FlagsSection(_context));
             Register(new SavesSection(_context));
+            Register(new ModuleSection(_context, ToolkitSectionId.Ads, "nav.ads", "_ads"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Player, "nav.player", "_player"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Time, "nav.time", "_timeProvider"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Gameplay, "nav.gameplay", "_gameplay"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Review, "nav.review", "_review"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Shortcut, "nav.shortcut", "_shortcut"));
         }
 
         private void Register(ToolkitSection section)
@@ -185,7 +193,6 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
         private void LocalizeShell()
         {
-            rootVisualElement.Q<Label>("version").text = _localization.Get("nav.packageVersion") + VersionPrefix + ReadPackageVersion();
             RefreshTopBar();
             Localize(_sidebar);
             Localize(_topBar);
@@ -271,6 +278,11 @@ namespace JTLStudio.SDK.Editor.Toolkit
             {
                 Navigate(_currentSection.Id);
             }
+        }
+
+        private void OpenSupport()
+        {
+            Application.OpenURL(SupportUrl);
         }
 
         private void OnProjectChanged()

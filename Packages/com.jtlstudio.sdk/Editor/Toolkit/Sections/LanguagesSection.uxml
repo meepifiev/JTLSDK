@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
-        <jtl:SectionHeader title-key="languages.title" description-key="languages.description" />
+        <jtl:SectionHeader title-key="languages.title" />
         <ui:VisualElement name="languages-body" class="jtl-row jtl-row--start jtl-hstack-12" />
     </ui:VisualElement>
 </ui:UXML>

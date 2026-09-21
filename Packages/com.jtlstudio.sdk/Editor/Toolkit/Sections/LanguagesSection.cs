@@ -21,7 +21,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         public override ToolkitSectionId Id => ToolkitSectionId.Languages;
 
-        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "languages.ready", DateTime.Now.ToString("HH:mm"));
+        public override ToolkitStatus Status => new ToolkitStatus(StatusKind.Info, "", "");
 
         protected override string TemplateName => "LanguagesSection";
 
@@ -31,7 +31,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             _simulation.Load();
             VisualElement body = Require<VisualElement>("languages-body");
-            body.Add(CreateProjectCard());
+            VisualElement main = Column(12);
+            main.AddToClassList("jtl-basis");
+            main.Add(CreateProjectCard());
+            main.Add(ProvidersCard("_languageProvider"));
+            body.Add(main);
 
             VisualElement side = Column(12);
             side.style.width = SideColumnWidth;
@@ -86,7 +90,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         private VisualElement CreateReplacementsCard()
         {
-            Card card = new Card { TitleKey = "languages.replacements", DescriptionKey = "languages.replacementsNote" };
+            Card card = new Card { TitleKey = "languages.replacements" };
             VisualElement table = new VisualElement();
             table.AddToClassList("jtl-table");
             List<LanguageReplacement> replacements = Settings.LanguageReplacements;
@@ -168,7 +172,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private VisualElement CreatePlayModeCard()
         {
             Card card = new Card { TitleKey = "languages.playMode" };
-            FieldRow row = new FieldRow("languages.startLanguage", 150) { NoteKey = "languages.startLanguageNote" };
+            FieldRow row = new FieldRow("languages.startLanguage", 150);
             Dropdown start = new Dropdown();
             start.style.width = 220;
             List<Language> supported = new List<Language>(Settings.SupportedLanguages);

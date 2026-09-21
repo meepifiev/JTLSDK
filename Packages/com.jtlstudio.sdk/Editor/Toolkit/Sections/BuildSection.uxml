@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
-        <jtl:SectionHeader title-key="build.title" description-key="build.description">
+        <jtl:SectionHeader title-key="build.title">
             <jtl:ToolkitButton name="toggle-state" text-key="build.showBlocked" variant="ghost" compact="true" />
         </jtl:SectionHeader>
         <ui:VisualElement class="jtl-row jtl-row--stretch jtl-hstack-12">
@@ -12,7 +12,7 @@
                         <jtl:Badge text-key="badge.active" variant="success" />
                     </ui:VisualElement>
                 </jtl:FieldRow>
-                <jtl:FieldRow label-key="build.developmentBuild" label-width="190" note-key="build.developmentNote">
+                <jtl:FieldRow label-key="build.developmentBuild" label-width="190">
                     <jtl:SwitchToggle value="true" />
                 </jtl:FieldRow>
                 <jtl:FieldRow label-key="build.output" label-width="190">
@@ -22,7 +22,7 @@
                     <ui:TextField value="Builds/YandexGames" class="jtl-field jtl-grow" />
                     <jtl:ToolkitButton text-key="build.browse" icon="folder" />
                 </jtl:FieldRow>
-                <jtl:FieldRow label-key="build.namePattern" label-width="190" note-key="build.nameResolves">
+                <jtl:FieldRow label-key="build.namePattern" label-width="190">
                     <ui:TextField value="{product}_{configuration}_b{build}" class="jtl-field jtl-grow jtl-mono" />
                 </jtl:FieldRow>
                 <jtl:FieldRow label-key="build.buildNumber" label-width="190">
@@ -47,7 +47,7 @@
                     </ui:VisualElement>
                     <jtl:InlineMessage name="blocked-message" text-key="build.blockedHint" variant="error" class="jtl-pt-2" />
                 </jtl:Card>
-                <jtl:Card title-key="build.postBuildChecks" caption-key="build.postBuildCaption" spacing="8">
+                <jtl:Card title-key="build.postBuildChecks" spacing="8">
                     <ui:VisualElement class="jtl-column">
                         <jtl:CheckRow text-key="build.checkFileSize" state="pending" />
                         <jtl:CheckRow text-key="build.checkFileCount" state="pending" />

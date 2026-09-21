@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
-        <jtl:SectionHeader title-key="leaderboards.title" description-key="leaderboards.description" />
+        <jtl:SectionHeader title-key="leaderboards.title" />
         <ui:VisualElement name="leaderboards" class="jtl-column jtl-vstack-12" />
     </ui:VisualElement>
 </ui:UXML>
