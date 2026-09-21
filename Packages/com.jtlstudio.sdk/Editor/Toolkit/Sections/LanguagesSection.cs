@@ -50,7 +50,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             Language[] all = (Language[])Enum.GetValues(typeof(Language));
             Card card = new Card { TitleKey = "languages.projectLanguages", Spacing = 12 };
-            card.AddToClassList("jtl-basis");
             card.Header.Add(TextLabel(Context.Text("languages.selectedCountFormat", Settings.SupportedLanguages.Count, all.Length), "jtl-card__caption"));
 
             VisualElement grid = new VisualElement();

@@ -32,6 +32,12 @@
     height: 56px;
 }
 
+.jtl-root .jtl-sidebar__brand,
+.jtl-root .jtl-sidebar__brand-spacer,
+.jtl-root .jtl-sidebar__footer {
+    flex-shrink: 0;
+}
+
 .jtl-root .jtl-sidebar__nav {
     flex-grow: 1;
     flex-shrink: 1;

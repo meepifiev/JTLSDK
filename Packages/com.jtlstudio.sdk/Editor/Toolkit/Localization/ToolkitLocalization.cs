@@ -86,6 +86,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.review", "Review", "Отзыв");
             Add("nav.shortcut", "Shortcut", "Ярлык");
             Add("nav.analytics", "Analytics", "Аналитика");
+            Add("nav.pause", "Pause", "Пауза");
+            Add("nav.audio", "Audio", "Звук");
+            Add("nav.platform", "Platform", "Площадка");
             Add("module.providers", "Providers", "Провайдеры");
             Add("package.notInstalled", "Not installed", "Не установлен");
             Add("package.requiresFormat", "requires JTL SDK {0}", "нужен JTL SDK {0}");

@@ -28,6 +28,11 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
             foreach (VisualElement element in elements)
             {
+                if (element is TextField field && field.multiline == false)
+                {
+                    continue;
+                }
+
                 foreach (VisualElement target in element.Query<VisualElement>().ToList())
                 {
                     target.style.unityFont = _font;

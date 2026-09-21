@@ -58,9 +58,18 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             VisualElement footer = Row(12);
             int next = Settings.BuildNumber + 1;
-            footer.Add(TextLabel(Path.Combine(Settings.BuildPath, _builds.ResolveName(Settings, active, next)) + (Settings.BuildOutput == BuildOutput.Zip ? ".zip" : ""), "jtl-text--caption", MonospaceFont.ClassName));
+            string output = Path.Combine(Settings.BuildPath, _builds.ResolveName(Settings, active, next)) + (Settings.BuildOutput == BuildOutput.Zip ? ".zip" : "");
+            Label outputLabel = TextLabel(output, "jtl-text--caption", MonospaceFont.ClassName);
+            outputLabel.tooltip = output;
+            outputLabel.style.flexShrink = 1;
+            outputLabel.style.minWidth = 0;
+            outputLabel.style.overflow = Overflow.Hidden;
+            outputLabel.style.whiteSpace = WhiteSpace.NoWrap;
+            outputLabel.style.textOverflow = TextOverflow.Ellipsis;
+            footer.Add(outputLabel);
             footer.Add(Spacer());
             ToolkitButton build = Button("build.build", ToolkitButton.PrimaryVariant, "build", () => RunBuild(active));
+            build.style.flexShrink = 0;
             build.SetEnabled(blocked == false);
             footer.Add(build);
             body.Add(footer);
@@ -79,7 +88,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             VisualElement box = Row(6);
             box.AddToClassList("jtl-field-box");
             box.AddToClassList("jtl-read-only");
-            box.style.width = 260;
+            box.style.maxWidth = 260;
+            box.style.flexGrow = 1;
+            box.style.flexShrink = 1;
+            box.style.minWidth = 0;
 
             if (active != null)
             {
@@ -106,10 +118,17 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             FieldRow path = new FieldRow("build.path", LabelWidth);
             VisualElement pathLine = Row(8);
-            pathLine.AddToClassList("jtl-grow");
+            pathLine.style.flexGrow = 1;
+            pathLine.style.flexShrink = 1;
+            pathLine.style.minWidth = 0;
             pathLine.style.flexWrap = Wrap.NoWrap;
-            pathLine.Add(TextInput(Settings.BuildPath, value => Settings.BuildPath = value));
-            pathLine.Add(Button("build.browse", ToolkitButton.SecondaryVariant, "folder", Browse));
+            TextField pathField = TextInput(Settings.BuildPath, value => Settings.BuildPath = value);
+            pathField.style.flexBasis = 0;
+            pathField.style.flexShrink = 1;
+            pathLine.Add(pathField);
+            ToolkitButton browse = Button("build.browse", ToolkitButton.SecondaryVariant, "folder", Browse);
+            browse.style.flexShrink = 0;
+            pathLine.Add(browse);
             path.Add(pathLine);
             card.Add(path);
 

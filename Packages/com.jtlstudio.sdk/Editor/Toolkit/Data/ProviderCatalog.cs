@@ -133,7 +133,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
                 builder.Append(current);
             }
 
-            return builder.ToString();
+            return builder.ToString().Replace("You Tube", "YouTube");
         }
     }
 }

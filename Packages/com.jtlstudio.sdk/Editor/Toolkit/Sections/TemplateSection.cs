@@ -14,6 +14,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private const int PreviewWidth = 400;
         private const int DesktopPreviewHeight = 250;
         private const int MobilePreviewHeight = 520;
+        private const int ColumnGap = 12;
+        private const int NumberWidth = 90;
+        private const int CompactNumberWidth = 72;
+        private const int MinimumSettingsWidth = 440;
 
         private readonly TemplateService _template = new TemplateService();
         private bool _mobilePreview;
@@ -48,12 +52,34 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             VisualElement body = Require<VisualElement>("template-body");
             VisualElement left = Column(12);
             left.AddToClassList("jtl-basis");
+            left.style.minWidth = 0;
             left.Add(CreateLogoCard());
             left.Add(CreateLoaderCard());
             left.Add(CreateBackgroundCard("template.pageBackground", Settings.PageBackground));
             left.Add(CreateCanvasCard());
             body.Add(left);
-            body.Add(CreatePreviewCard());
+            VisualElement preview = CreatePreviewCard();
+            body.Add(preview);
+            body.RegisterCallback<GeometryChangedEvent>(geometryEvent => ArrangeColumns(body, left, preview));
+        }
+
+        private void ArrangeColumns(VisualElement body, VisualElement settings, VisualElement preview)
+        {
+            bool stacked = body.resolvedStyle.width < MinimumSettingsWidth + ColumnGap + PreviewWidth + 34;
+            FlexDirection direction = stacked ? FlexDirection.Column : FlexDirection.Row;
+
+            if (body.resolvedStyle.flexDirection == direction)
+            {
+                return;
+            }
+
+            body.style.flexDirection = direction;
+            settings.style.flexBasis = stacked ? new StyleLength(StyleKeyword.Auto) : new StyleLength(0f);
+            settings.style.flexGrow = stacked ? 0 : 1;
+            settings.style.alignSelf = stacked ? Align.Stretch : Align.Auto;
+            preview.style.marginLeft = stacked ? 0 : ColumnGap;
+            preview.style.marginTop = stacked ? ColumnGap : 0;
+            preview.style.alignSelf = Align.FlexStart;
         }
 
         private VisualElement CreateLogoCard()
@@ -72,9 +98,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             card.Add(Field("template.progressTrack", ColorInput(Settings.ProgressTrack, color => Settings.ProgressTrack = color)));
 
             VisualElement size = Row(8);
-            size.Add(IntegerInput(Settings.ProgressWidthPercent, "unit.percent", value => Settings.ProgressWidthPercent = value));
-            size.Add(IntegerInput(Settings.ProgressHeight, "unit.px", value => Settings.ProgressHeight = value));
-            size.Add(IntegerInput(Settings.ProgressRadius, "unit.px", value => Settings.ProgressRadius = value));
+            size.style.flexWrap = Wrap.Wrap;
+            size.Add(IntegerInput(Settings.ProgressWidthPercent, "unit.percent", value => Settings.ProgressWidthPercent = value, CompactNumberWidth));
+            size.Add(IntegerInput(Settings.ProgressHeight, "unit.px", value => Settings.ProgressHeight = value, CompactNumberWidth));
+            size.Add(IntegerInput(Settings.ProgressRadius, "unit.px", value => Settings.ProgressRadius = value, CompactNumberWidth));
             card.Add(Field("template.progressSize", size));
 
             RadioGroup position = new RadioGroup();
@@ -186,6 +213,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             Card card = new Card { TitleKey = "template.preview", Spacing = 10 };
             card.style.width = PreviewWidth + 34;
             card.style.flexShrink = 0;
+            card.style.marginLeft = ColumnGap;
 
             SegmentedControl device = new SegmentedControl();
             device.SetChoices(Context.Localization.GetList("template.previewDevices"));
@@ -304,7 +332,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             ObjectField field = new ObjectField { objectType = typeof(Texture2D), allowSceneObjects = false, value = value };
             field.AddToClassList("jtl-object-field");
-            field.style.width = 260;
+            field.style.maxWidth = 260;
+            field.style.flexGrow = 1;
+            field.style.flexShrink = 1;
+            field.style.minWidth = 0;
             field.RegisterValueChangedCallback(changeEvent => Change(() => assign(changeEvent.newValue as Texture2D)));
             return field;
         }
@@ -313,7 +344,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             ColorField field = new ColorField { value = value, showAlpha = false };
             field.AddToClassList("jtl-color-field");
-            field.style.width = 160;
+            field.style.maxWidth = 160;
+            field.style.flexGrow = 1;
+            field.style.flexShrink = 1;
+            field.style.minWidth = 0;
             field.RegisterCallback<FocusOutEvent>(focusEvent => Change(() => assign(field.value)));
             field.RegisterValueChangedCallback(changeEvent =>
             {
@@ -323,9 +357,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return field;
         }
 
-        private NumberFieldWithUnit IntegerInput(int value, string unitKey, Action<int> assign)
+        private NumberFieldWithUnit IntegerInput(int value, string unitKey, Action<int> assign, int width = NumberWidth)
         {
-            NumberFieldWithUnit field = new NumberFieldWithUnit { UnitKey = unitKey, Width = 90 };
+            NumberFieldWithUnit field = new NumberFieldWithUnit { UnitKey = unitKey, Width = width };
             field.Value = value.ToString(CultureInfo.InvariantCulture);
             field.Input.RegisterCallback<FocusOutEvent>(focusEvent =>
             {

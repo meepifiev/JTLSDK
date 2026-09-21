@@ -227,6 +227,9 @@ namespace JTLStudio.SDK.Editor.Toolkit
             Register(new ModuleSection(_context, ToolkitSectionId.Review, "nav.review", "_review"));
             Register(new ModuleSection(_context, ToolkitSectionId.Shortcut, "nav.shortcut", "_shortcut"));
             Register(new ModuleSection(_context, ToolkitSectionId.Analytics, "nav.analytics", "_analytics"));
+            Register(new PauseSection(_context));
+            Register(new ModuleSection(_context, ToolkitSectionId.Audio, "nav.audio", "_platformProvider"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Platform, "nav.platform", "_platformProvider"));
         }
 
         private void Register(ToolkitSection section)

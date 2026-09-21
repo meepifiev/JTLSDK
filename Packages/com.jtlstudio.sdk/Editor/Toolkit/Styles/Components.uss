@@ -558,6 +558,8 @@
 
 .jtl-root .jtl-field > .unity-base-text-field__input {
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
     height: 28px;
     min-height: 28px;
     padding: 0 8px;
@@ -1428,6 +1430,8 @@
     flex-direction: row;
     align-items: center;
     min-height: 32px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     border-top-width: 1px;
     border-top-color: var(--jtl-border);
 }

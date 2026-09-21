@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
         <jtl:SectionHeader name="template-header" title-key="template.title" />
-        <ui:VisualElement name="template-body" class="jtl-row jtl-row--start jtl-hstack-12" />
+        <ui:VisualElement name="template-body" class="jtl-row jtl-row--start" />
     </ui:VisualElement>
 </ui:UXML>
