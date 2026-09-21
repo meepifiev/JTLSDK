@@ -1,4 +1,11 @@
 var JTLSDKLibrary = {
+    JTLSDK_Select: function (platformPointer) {
+        var bridges = Module.JTLSDKBridges || {};
+        var bridge = bridges[UTF8ToString(platformPointer)];
+        Module.JTLSDK = typeof bridge !== 'undefined' ? bridge : null;
+        return Module.JTLSDK !== null ? 1 : 0;
+    },
+
     JTLSDK_IsAvailable: function () {
         return typeof Module.JTLSDK !== 'undefined' && Module.JTLSDK !== null ? 1 : 0;
     },

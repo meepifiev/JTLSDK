@@ -1,5 +1,6 @@
 declare const Module: {
   JTLSDK?: unknown;
+  JTLSDKBridges?: Record<string, unknown>;
   [key: string]: unknown;
 };
 

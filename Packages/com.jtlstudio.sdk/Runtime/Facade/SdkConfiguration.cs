@@ -10,7 +10,6 @@ namespace JTLStudio.SDK
         [SerializeField] private PlatformId _platform = PlatformId.Editor;
         [SerializeField] private string _defineSymbol = "";
         [SerializeField] private bool _pauseOnFocusLoss = true;
-        [SerializeField] private bool _showOverlayOnPause;
         [SerializeField] private List<Language> _languages = new List<Language> { Language.English };
         [SerializeField] private PlayerSettingsPreset _playerSettings = new PlayerSettingsPreset();
         [SerializeReference] private IPlatformProvider _platformProvider;
@@ -48,12 +47,6 @@ namespace JTLStudio.SDK
         {
             get => _pauseOnFocusLoss;
             internal set => _pauseOnFocusLoss = value;
-        }
-
-        public bool ShowOverlayOnPause
-        {
-            get => _showOverlayOnPause;
-            internal set => _showOverlayOnPause = value;
         }
 
         public List<Language> Languages => _languages;

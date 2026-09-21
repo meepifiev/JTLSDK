@@ -13,7 +13,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private const int SwitchColumnWidth = 240;
         private const string PlatformProperty = "_platformProvider";
         private const string FocusProperty = "_pauseOnFocusLoss";
-        private const string OverlayProperty = "_showOverlayOnPause";
 
         public PauseSection(ToolkitContext context) : base(context)
         {
@@ -47,7 +46,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             VisualElement header = Row(0);
             header.Add(Spacer(LeadingWidth + NameWidth + NameGap));
             header.Add(Column(Localized("details.pauseOnFocusLoss", "jtl-text--caption")));
-            header.Add(Column(Localized("details.showOverlayOnPause", "jtl-text--caption")));
             card.Add(header);
 
             foreach (SdkConfiguration configuration in configurations)
@@ -64,7 +62,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 name.Add(TextLabel(configuration.DisplayName, "jtl-text"));
                 row.Add(name);
                 row.Add(Column(Switch(configuration, serialized, FocusProperty)));
-                row.Add(Column(Switch(configuration, serialized, OverlayProperty)));
                 card.Add(row);
             }
 

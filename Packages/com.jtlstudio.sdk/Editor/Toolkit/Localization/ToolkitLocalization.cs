@@ -220,7 +220,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("details.noSettings", "No settings", "Без настроек");
             Add("details.pause", "Pause", "Пауза");
             Add("details.pauseOnFocusLoss", "Pause on focus loss", "Пауза при потере фокуса");
-            Add("details.showOverlayOnPause", "Show overlay on pause", "Оверлей на паузе");
             Add("details.languages", "Languages on this configuration", "Языки этой конфигурации");
             Add("details.languagesDescription", "Only languages enabled in the project are listed.", "В списке только языки, включённые в проекте.");
             Add("details.noProjectLanguages", "Enable languages in the Languages section first.", "Сначала включи языки в разделе «Языки».");

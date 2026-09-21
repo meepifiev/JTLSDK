@@ -6,45 +6,52 @@
     bottom: 0;
 }
 
-.jtl-overlay-panel {
+.jtl-overlay-backdrop {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 240px;
-    padding: 10px;
-    background-color: rgba(14, 14, 16, 0.92);
-    border-width: 1px;
-    border-color: #33333A;
-    border-radius: 8px;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
 }
 
-.jtl-overlay-collapsed {
+.jtl-overlay-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    height: 30px;
-    padding-left: 10px;
-    padding-right: 10px;
-    background-color: rgba(14, 14, 16, 0.92);
+    top: 1px;
+    right: 300px;
+    height: 18px;
+    margin: 0;
+    padding: 0 8px;
+    background-color: #1C1C20;
+    border-width: 1px;
+    border-color: #33333A;
+    border-radius: 4px;
+    color: #D2D2D6;
+    font-size: 11px;
+    -unity-text-align: middle-center;
+}
+
+.jtl-overlay-button:hover {
+    background-color: #26262B;
+    border-color: #43434C;
+}
+
+.jtl-overlay-button--open {
+    background-color: #1A2430;
+    border-color: #2E4A6B;
+    color: #F2F2F3;
+}
+
+.jtl-overlay-panel {
+    position: absolute;
+    top: 21px;
+    right: 300px;
+    width: 240px;
+    padding: 10px 10px 6px 10px;
+    background-color: rgba(14, 14, 16, 0.96);
     border-width: 1px;
     border-color: #33333A;
     border-radius: 6px;
-    color: #F2F2F3;
-    -unity-font-style: bold;
-    font-size: 12px;
-}
-
-.jtl-overlay-header {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
-.jtl-overlay-title {
-    flex-grow: 1;
-    color: #F2F2F3;
-    font-size: 12px;
-    -unity-font-style: bold;
 }
 
 .jtl-overlay-row {
@@ -80,14 +87,6 @@
 
 .jtl-overlay-row .unity-toggle {
     width: auto;
-}
-
-.jtl-overlay-caption {
-    color: #66666E;
-    font-size: 10px;
-    padding-top: 4px;
-    border-top-width: 1px;
-    border-top-color: #26262B;
 }
 
 .jtl-icon-button {

@@ -1,25 +1,33 @@
 using System;
 using System.Collections.Generic;
 using JTLStudio.SDK.Prototype;
-using UnityEditor.UIElements;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace JTLStudio.SDK.Editor.Simulation
 {
     public class GameViewOverlay : VisualElement
     {
+        private const float ToolbarHeight = 21f;
+        private const float LeftToolbarWidth = 430f;
+        private const float FallbackRightToolbarWidth = 300f;
+        private const float IconButtonWidth = 28f;
+        private const float ToolbarGap = 12f;
+        private const string Separator = " · ";
+
         private readonly SimulationSession _session;
+        private readonly LanguageCodes _codes = new LanguageCodes();
+        private readonly Button _button;
+        private readonly VisualElement _backdrop;
         private readonly VisualElement _panel;
-        private readonly Button _collapsedButton;
         private readonly DropdownField _languageField;
         private readonly DropdownField _deviceField;
-        private readonly VisualElement _pauseRow;
-        private readonly Toggle _pauseToggle;
         private readonly VisualElement _muteRow;
         private readonly Toggle _muteToggle;
-        private readonly Label _caption;
         private readonly List<Language> _languageChoices = new List<Language>();
-        private bool _collapsed;
+        private float _rightToolbarWidth = -1f;
+        private bool _open;
         private bool _refreshing;
 
         public GameViewOverlay(SimulationSession session)
@@ -32,19 +40,18 @@ namespace JTLStudio.SDK.Editor.Simulation
             style.right = 0;
             style.bottom = 0;
 
+            _backdrop = new VisualElement();
+            _backdrop.AddToClassList("jtl-overlay-backdrop");
+            _backdrop.RegisterCallback<PointerDownEvent>(pointerEvent => SetOpen(false));
+            Add(_backdrop);
+
+            _button = new Button(() => SetOpen(_open == false));
+            _button.AddToClassList("jtl-overlay-button");
+            Add(_button);
+
             _panel = new VisualElement();
             _panel.AddToClassList("jtl-overlay-panel");
             Add(_panel);
-
-            VisualElement header = new VisualElement();
-            header.AddToClassList("jtl-overlay-header");
-            Label title = new Label("JTL SDK");
-            title.AddToClassList("jtl-overlay-title");
-            Button collapse = new Button(OnCollapseClicked) { text = "–" };
-            collapse.AddToClassList("jtl-icon-button");
-            header.Add(title);
-            header.Add(collapse);
-            _panel.Add(header);
 
             _languageField = new DropdownField();
             _languageField.RegisterValueChangedCallback(OnLanguageChanged);
@@ -54,25 +61,13 @@ namespace JTLStudio.SDK.Editor.Simulation
             _deviceField.RegisterValueChangedCallback(OnDeviceChanged);
             _panel.Add(CreateRow("Device", _deviceField));
 
-            _pauseToggle = new Toggle();
-            _pauseToggle.RegisterValueChangedCallback(OnPauseChanged);
-            _pauseRow = CreateRow("Platform pause", _pauseToggle);
-            _panel.Add(_pauseRow);
-
             _muteToggle = new Toggle();
             _muteToggle.RegisterValueChangedCallback(OnMuteChanged);
             _muteRow = CreateRow("Platform audio muted", _muteToggle);
             _panel.Add(_muteRow);
 
-            _caption = new Label("");
-            _caption.AddToClassList("jtl-overlay-caption");
-            _panel.Add(_caption);
-
-            _collapsedButton = new Button(OnExpandClicked) { text = "JTL SDK" };
-            _collapsedButton.AddToClassList("jtl-overlay-collapsed");
-            _collapsedButton.style.display = DisplayStyle.None;
-            Add(_collapsedButton);
-
+            RegisterCallback<GeometryChangedEvent>(geometryEvent => Arrange());
+            SetOpen(false);
             Refresh();
         }
 
@@ -82,15 +77,65 @@ namespace JTLStudio.SDK.Editor.Simulation
 
             try
             {
-                RefreshLanguages();
+                Language language = RefreshLanguages();
                 RefreshDevice();
-                RefreshPlatform();
-                RefreshCaption();
+                RefreshMute();
+                _button.text = "JTL" + Separator + _codes.ToCode(language).ToUpperInvariant() + Separator + _session.Settings.DeviceType + "  ▾";
             }
             finally
             {
                 _refreshing = false;
             }
+        }
+
+        private void Arrange()
+        {
+            float width = resolvedStyle.width;
+
+            if (float.IsNaN(width) || width <= 0f)
+            {
+                return;
+            }
+
+            float right = RightToolbarWidth() + ToolbarGap;
+            float buttonWidth = _button.resolvedStyle.width;
+            bool fitsToolbar = float.IsNaN(buttonWidth) || width - right - buttonWidth > LeftToolbarWidth;
+
+            _button.style.right = fitsToolbar ? right : 6f;
+            _button.style.top = fitsToolbar ? 1f : ToolbarHeight + 4f;
+            _panel.style.right = fitsToolbar ? right : 6f;
+            _panel.style.top = fitsToolbar ? ToolbarHeight : ToolbarHeight + 28f;
+        }
+
+        private float RightToolbarWidth()
+        {
+            if (_rightToolbarWidth > 0f)
+            {
+                return _rightToolbarWidth;
+            }
+
+            try
+            {
+                float width = EditorStyles.toolbarDropDown.CalcSize(new GUIContent("Play Unfocused")).x;
+                width += IconButtonWidth * 2f;
+                width += EditorStyles.toolbarButton.CalcSize(new GUIContent("Stats")).x;
+                width += EditorStyles.toolbarDropDown.CalcSize(new GUIContent("Gizmos")).x;
+                _rightToolbarWidth = width > 0f ? width : FallbackRightToolbarWidth;
+            }
+            catch (Exception)
+            {
+                _rightToolbarWidth = FallbackRightToolbarWidth;
+            }
+
+            return _rightToolbarWidth;
+        }
+
+        private void SetOpen(bool open)
+        {
+            _open = open;
+            _panel.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            _backdrop.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            _button.EnableInClassList("jtl-overlay-button--open", open);
         }
 
         private VisualElement CreateRow(string labelText, VisualElement control)
@@ -104,7 +149,7 @@ namespace JTLStudio.SDK.Editor.Simulation
             return row;
         }
 
-        private void RefreshLanguages()
+        private Language RefreshLanguages()
         {
             _languageChoices.Clear();
             Language current = _session.Settings.StartLanguage;
@@ -128,6 +173,7 @@ namespace JTLStudio.SDK.Editor.Simulation
 
             _languageField.choices = names;
             _languageField.SetValueWithoutNotify(current.ToString());
+            return current;
         }
 
         private void RefreshDevice()
@@ -135,34 +181,16 @@ namespace JTLStudio.SDK.Editor.Simulation
             _deviceField.SetValueWithoutNotify(_session.Settings.DeviceType.ToString());
         }
 
-        private void RefreshPlatform()
+        private void RefreshMute()
         {
             PrototypePlatformProvider platform = PrototypeBridge.ActivePlatform;
-            bool hasPlatform = platform != null;
-            _pauseRow.style.display = hasPlatform ? DisplayStyle.Flex : DisplayStyle.None;
-            _muteRow.style.display = hasPlatform && platform.SupportsPlatformMute ? DisplayStyle.Flex : DisplayStyle.None;
+            bool visible = platform != null && platform.SupportsPlatformMute;
+            _muteRow.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
 
-            if (hasPlatform == false)
+            if (visible)
             {
-                return;
+                _muteToggle.SetValueWithoutNotify(platform.IsPlatformMuted);
             }
-
-            _pauseToggle.SetValueWithoutNotify(platform.IsPlatformPaused);
-            _muteToggle.SetValueWithoutNotify(platform.IsPlatformMuted);
-        }
-
-        private void RefreshCaption()
-        {
-            if (JTLSDK.IsCreated == false)
-            {
-                _caption.text = "JTLSDK.Create() not called";
-                return;
-            }
-
-            string platform = JTLSDK.Platform.Current.ToString();
-            string state = JTLSDK.IsReady ? "ready" : "initializing";
-            string data = JTLSDK.Data.LoadState.ToString().ToLowerInvariant();
-            _caption.text = platform + " · " + state + " · save " + data;
         }
 
         private void OnLanguageChanged(ChangeEvent<string> changeEvent)
@@ -187,6 +215,8 @@ namespace JTLStudio.SDK.Editor.Simulation
             {
                 JTLSDK.Language.Set(language);
             }
+
+            Refresh();
         }
 
         private bool IsSupported(Language language)
@@ -216,16 +246,7 @@ namespace JTLStudio.SDK.Editor.Simulation
 
             _session.Settings.DeviceType = deviceType;
             _session.Settings.Save();
-        }
-
-        private void OnPauseChanged(ChangeEvent<bool> changeEvent)
-        {
-            if (_refreshing)
-            {
-                return;
-            }
-
-            PrototypeBridge.ActivePlatform?.SetPlatformPaused(changeEvent.newValue);
+            Refresh();
         }
 
         private void OnMuteChanged(ChangeEvent<bool> changeEvent)
@@ -236,23 +257,6 @@ namespace JTLStudio.SDK.Editor.Simulation
             }
 
             PrototypeBridge.ActivePlatform?.SetPlatformMuted(changeEvent.newValue);
-        }
-
-        private void OnCollapseClicked()
-        {
-            SetCollapsed(true);
-        }
-
-        private void OnExpandClicked()
-        {
-            SetCollapsed(false);
-        }
-
-        private void SetCollapsed(bool collapsed)
-        {
-            _collapsed = collapsed;
-            _panel.style.display = _collapsed ? DisplayStyle.None : DisplayStyle.Flex;
-            _collapsedButton.style.display = _collapsed ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }

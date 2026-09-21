@@ -181,9 +181,11 @@
     }
   };
   function install(platform) {
+    var _a;
     const bridge = new Bridge(platform);
     platform.bind((code, payload) => bridge.event(code, payload));
-    Module.JTLSDK = bridge;
+    Module.JTLSDKBridges = (_a = Module.JTLSDKBridges) != null ? _a : {};
+    Module.JTLSDKBridges[platform.name] = bridge;
     return bridge;
   }
 

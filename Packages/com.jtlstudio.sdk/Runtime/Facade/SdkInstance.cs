@@ -60,11 +60,11 @@ namespace JTLStudio.SDK
             IReviewProvider reviewProvider = ResolveProvider(configuration?.Review, new UnsupportedReviewProvider());
             IShortcutProvider shortcutProvider = ResolveProvider(configuration?.Shortcut, new UnsupportedShortcutProvider());
 
-            _bridge = new WebBridge(_logger);
-            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameplayProvider, reviewProvider, shortcutProvider);
-
             bool pauseOnFocusLoss = configuration == null || configuration.PauseOnFocusLoss;
             PlatformId platformId = configuration == null ? PlatformId.Editor : configuration.Platform;
+
+            _bridge = new WebBridge(_logger, platformId);
+            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameplayProvider, reviewProvider, shortcutProvider);
 
 #if UNITY_EDITOR
             if (settings.UsePrototypesInEditor)

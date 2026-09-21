@@ -10,6 +10,7 @@ namespace JTLStudio.SDK.Bridge
         private delegate void MessageCallback(int requestId, int code, string payload);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
+        [DllImport("__Internal")] private static extern int JTLSDK_Select(string platform);
         [DllImport("__Internal")] private static extern int JTLSDK_IsAvailable();
         [DllImport("__Internal")] private static extern void JTLSDK_Register(MessageCallback callback);
         [DllImport("__Internal")] private static extern void JTLSDK_Call(string module, string action, string payload, int requestId);
@@ -20,12 +21,15 @@ namespace JTLStudio.SDK.Bridge
 
         private readonly Dictionary<int, Action<BridgeResponse>> _pending = new Dictionary<int, Action<BridgeResponse>>();
         private readonly SdkLogger _logger;
+        private readonly string _platform;
         private int _nextRequestId = 1;
         private bool _connected;
+        private bool _selected;
 
-        public WebBridge(SdkLogger logger)
+        public WebBridge(SdkLogger logger, PlatformId platform)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _platform = PlatformKey(platform);
         }
 
         public event Action<BridgeEventCode, BridgeResponse> EventReceived;
@@ -35,10 +39,39 @@ namespace JTLStudio.SDK.Bridge
             get
             {
 #if UNITY_WEBGL && !UNITY_EDITOR
+                Select();
                 return JTLSDK_IsAvailable() == 1;
 #else
                 return false;
 #endif
+            }
+        }
+
+        private void Select()
+        {
+            if (_selected || string.IsNullOrEmpty(_platform))
+            {
+                return;
+            }
+
+            _selected = true;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            JTLSDK_Select(_platform);
+#endif
+        }
+
+        private string PlatformKey(PlatformId platform)
+        {
+            switch (platform)
+            {
+                case PlatformId.YandexGames:
+                    return "yandex";
+
+                case PlatformId.YouTubePlayables:
+                    return "youtube";
+
+                default:
+                    return "";
             }
         }
 

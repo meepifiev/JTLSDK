@@ -161,9 +161,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             FieldRow focus = new FieldRow("details.pauseOnFocusLoss", FieldRow.DefaultLabelWidth);
             focus.Add(SwitchControl(_serialized.FindProperty("_pauseOnFocusLoss")));
             card.Add(focus);
-            FieldRow overlay = new FieldRow("details.showOverlayOnPause", FieldRow.DefaultLabelWidth);
-            overlay.Add(SwitchControl(_serialized.FindProperty("_showOverlayOnPause")));
-            card.Add(overlay);
             return card;
         }
 
