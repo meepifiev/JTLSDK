@@ -22,7 +22,6 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.TimeProvider = new YandexGamesTimeProvider();
                     configuration.Gameplay = new YandexGamesGameplayProvider();
                     configuration.Review = new YandexGamesReviewProvider();
-                    configuration.Analytics = new UnsupportedAnalyticsProvider();
                     configuration.Shortcut = new YandexGamesShortcutProvider();
                     configuration.DefineSymbol = "JTLSDK_YANDEX_GAMES";
                     break;
@@ -39,7 +38,6 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.TimeProvider = new FallbackTimeProvider();
                     configuration.Gameplay = new YouTubePlayablesGameplayProvider();
                     configuration.Review = new UnsupportedReviewProvider();
-                    configuration.Analytics = new UnsupportedAnalyticsProvider();
                     configuration.Shortcut = new UnsupportedShortcutProvider();
                     configuration.DefineSymbol = "JTLSDK_YOUTUBE_PLAYABLES";
                     break;
@@ -56,7 +54,6 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.TimeProvider = new FallbackTimeProvider();
                     configuration.Gameplay = new FallbackGameplayProvider();
                     configuration.Review = new UnsupportedReviewProvider();
-                    configuration.Analytics = new UnsupportedAnalyticsProvider();
                     configuration.Shortcut = new UnsupportedShortcutProvider();
                     configuration.DefineSymbol = "";
                     break;

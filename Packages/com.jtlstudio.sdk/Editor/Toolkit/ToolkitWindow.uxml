@@ -34,7 +34,6 @@
                     <jtl:NavigationItem section="Platform" icon="platform" text-key="nav.platform" />
                     <jtl:NavigationItem section="Review" icon="review" text-key="nav.review" />
                     <jtl:NavigationItem section="Shortcut" icon="shortcut" text-key="nav.shortcut" />
-                    <jtl:NavigationItem section="Analytics" icon="analytics" text-key="nav.analytics" />
                 </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement class="jtl-sidebar__footer">

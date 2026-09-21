@@ -7,7 +7,7 @@ namespace JTLStudio.SDK.Tests.Build
 {
     public class ModuleCatalogTests
     {
-        private const string Catalog = "{\"modules\":[{\"id\":\"yandex-metrica\",\"name\":\"Yandex Metrica\",\"package\":\"com.jtlstudio.sdk.yandexmetrica\",\"repository\":\"meepifiev/JTLSDK\",\"path\":\"Modules/com.jtlstudio.sdk.yandexmetrica\",\"requires\":\"0.1.0\",\"platforms\":[\"YandexGames\"]},{\"name\":\"No package\"}]}";
+        private const string Catalog = "{\"modules\":[{\"id\":\"example\",\"name\":\"Example\",\"package\":\"com.jtlstudio.sdk.example\",\"repository\":\"meepifiev/JTLSDK\",\"path\":\"Modules/com.jtlstudio.sdk.example\",\"requires\":\"0.1.0\",\"platforms\":[\"YandexGames\"]},{\"name\":\"No package\"}]}";
 
         private readonly ModuleCatalog _catalog = new ModuleCatalog();
 
@@ -18,7 +18,7 @@ namespace JTLStudio.SDK.Tests.Build
 
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(1, result.Modules.Count);
-            Assert.AreEqual("com.jtlstudio.sdk.yandexmetrica", result.Modules[0].Package);
+            Assert.AreEqual("com.jtlstudio.sdk.example", result.Modules[0].Package);
             CollectionAssert.AreEqual(new[] { "YandexGames" }, result.Modules[0].Platforms);
         }
 
@@ -27,8 +27,8 @@ namespace JTLStudio.SDK.Tests.Build
         {
             ModuleDefinition module = _catalog.Parse(Catalog).Modules[0];
 
-            Assert.AreEqual("https://github.com/meepifiev/JTLSDK.git?path=Modules/com.jtlstudio.sdk.yandexmetrica#v1.0.0", _catalog.GitUrl(module, "v1.0.0"));
-            Assert.AreEqual("https://github.com/meepifiev/JTLSDK.git?path=Modules/com.jtlstudio.sdk.yandexmetrica", _catalog.GitUrl(module, ""));
+            Assert.AreEqual("https://github.com/meepifiev/JTLSDK.git?path=Modules/com.jtlstudio.sdk.example#v1.0.0", _catalog.GitUrl(module, "v1.0.0"));
+            Assert.AreEqual("https://github.com/meepifiev/JTLSDK.git?path=Modules/com.jtlstudio.sdk.example", _catalog.GitUrl(module, ""));
         }
 
         [Test]

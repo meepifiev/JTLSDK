@@ -33,7 +33,6 @@ namespace JTLStudio.SDK
         private readonly FlagsService _flags;
         private readonly ReviewService _review;
         private readonly ShortcutService _shortcut;
-        private readonly AnalyticsService _analytics;
 
         private readonly WebBridge _bridge;
         private SdkRuntimeBehaviour _behaviour;
@@ -60,10 +59,9 @@ namespace JTLStudio.SDK
             IGameplayProvider gameplayProvider = ResolveProvider(configuration?.Gameplay, new FallbackGameplayProvider());
             IReviewProvider reviewProvider = ResolveProvider(configuration?.Review, new UnsupportedReviewProvider());
             IShortcutProvider shortcutProvider = ResolveProvider(configuration?.Shortcut, new UnsupportedShortcutProvider());
-            IAnalyticsProvider analyticsProvider = ResolveProvider(configuration?.Analytics, new UnsupportedAnalyticsProvider());
 
             _bridge = new WebBridge(_logger);
-            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameplayProvider, reviewProvider, shortcutProvider, analyticsProvider);
+            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameplayProvider, reviewProvider, shortcutProvider);
 
             bool pauseOnFocusLoss = configuration == null || configuration.PauseOnFocusLoss;
             PlatformId platformId = configuration == null ? PlatformId.Editor : configuration.Platform;
@@ -84,7 +82,6 @@ namespace JTLStudio.SDK
                 gameplayProvider = prototypes.Gameplay(gameplayProvider);
                 reviewProvider = prototypes.Review(reviewProvider);
                 shortcutProvider = prototypes.Shortcut(shortcutProvider);
-                analyticsProvider = prototypes.Analytics(analyticsProvider);
             }
 #endif
 
@@ -102,7 +99,6 @@ namespace JTLStudio.SDK
             _flags = new FlagsService(flagsProvider, settings.Flags, _logger);
             _review = new ReviewService(reviewProvider, _logger);
             _shortcut = new ShortcutService(shortcutProvider, _logger);
-            _analytics = new AnalyticsService(analyticsProvider, _logger);
             _platform = new PlatformService(platformProvider, _ads, _payments, _leaderboards, _player, _flags, _time, _review, _shortcut, _logger);
 
             _modules.Add(_platform);
@@ -120,7 +116,6 @@ namespace JTLStudio.SDK
             _modules.Add(_flags);
             _modules.Add(_review);
             _modules.Add(_shortcut);
-            _modules.Add(_analytics);
 
             foreach (ModuleBase module in _modules)
             {
@@ -145,7 +140,6 @@ namespace JTLStudio.SDK
         public IDevice Device => _device;
         public IReview Review => _review;
         public IShortcut Shortcut => _shortcut;
-        public IAnalytics Analytics => _analytics;
 
         internal IReadOnlyList<ModuleBase> Modules => _modules;
 

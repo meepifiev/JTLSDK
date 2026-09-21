@@ -57,7 +57,6 @@ namespace JTLStudio.SDK.Editor.Configuration
             yield return configuration.Gameplay;
             yield return configuration.Review;
             yield return configuration.Shortcut;
-            yield return configuration.Analytics;
         }
     }
 }

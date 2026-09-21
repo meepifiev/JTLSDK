@@ -114,12 +114,6 @@ JTLSDK.Review.Request(sent => { });
 JTLSDK.Shortcut.Request(created => { });
 ```
 
-**Analytics.** Without a module, events are ignored.
-
-```csharp
-JTLSDK.Analytics.Report("level_complete", new Dictionary<string, object> { { "level", 3 } });
-```
-
 **Platform and device.**
 
 ```csharp
@@ -137,11 +131,7 @@ In Play Mode the configuration's providers are replaced with prototypes. Ads and
 
 ## Package modules
 
-The toolkit's Package Manager lists modules from `modules.json`. A module adds a provider, which you pick in a configuration.
-
-| Module | Portals | Provides |
-|---|---|---|
-| Yandex Metrica | Yandex Games | `JTLSDK.Analytics` through `reachGoal` |
+The toolkit's Package Manager lists modules from `modules.json` and installs them from git. No modules are published yet.
 
 ## Support
 

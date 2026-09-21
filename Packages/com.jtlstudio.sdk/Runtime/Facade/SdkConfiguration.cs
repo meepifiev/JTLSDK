@@ -25,7 +25,6 @@ namespace JTLStudio.SDK
         [SerializeReference] private IGameplayProvider _gameplay;
         [SerializeReference] private IReviewProvider _review;
         [SerializeReference] private IShortcutProvider _shortcut;
-        [SerializeReference] private IAnalyticsProvider _analytics;
 
         public string DisplayName
         {
@@ -118,12 +117,6 @@ namespace JTLStudio.SDK
         {
             get => _gameplay;
             internal set => _gameplay = value;
-        }
-
-        public IAnalyticsProvider Analytics
-        {
-            get => _analytics;
-            internal set => _analytics = value;
         }
 
         public IReviewProvider Review

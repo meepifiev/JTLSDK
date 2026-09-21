@@ -20,9 +20,8 @@ namespace JTLStudio.SDK.Editor.Toolkit
         Gameplay = 15,
         Review = 16,
         Shortcut = 17,
-        Analytics = 18,
-        Pause = 19,
-        Audio = 20,
-        Platform = 21
+        Pause = 18,
+        Audio = 19,
+        Platform = 20
     }
 }

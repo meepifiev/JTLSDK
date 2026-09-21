@@ -114,12 +114,6 @@ JTLSDK.Review.Request(sent => { });
 JTLSDK.Shortcut.Request(created => { });
 ```
 
-**Аналитика.** Без модуля события игнорируются.
-
-```csharp
-JTLSDK.Analytics.Report("level_complete", new Dictionary<string, object> { { "level", 3 } });
-```
-
 **Площадка и устройство.**
 
 ```csharp
@@ -137,11 +131,7 @@ bool mobile = JTLSDK.Device.IsMobile;
 
 ## Модули пакета
 
-Package Manager в тулките показывает модули из `modules.json`. Модуль добавляет провайдер, и его выбирают в конфигурации.
-
-| Модуль | Площадки | Что даёт |
-|---|---|---|
-| Yandex Metrica | Yandex Games | `JTLSDK.Analytics` через `reachGoal` |
+Package Manager в тулките показывает модули из `modules.json` и ставит их по git-ссылке. Опубликованных модулей пока нет.
 
 ## Поддержка
 

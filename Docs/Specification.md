@@ -46,7 +46,7 @@ JTL SDK - собственный платформенный слой студи�
 | Namespace | `JTLStudio.SDK` |
 | Пакет | `com.jtlstudio.sdk` |
 | Репозиторий | `github.com/meepifiev/JTLSDK` (публичный, MIT) |
-| Скачиваемые модули | `github.com/meepifiev/JTLSDK-<Module>`, например `JTLSDK-YandexMetrica` |
+| Скачиваемые модули | `github.com/meepifiev/JTLSDK-<Module>`, например `JTLSDK-Analytics` |
 | Папка проекта | `~/repos/JTLSDK` |
 | Unity | минимум 2021.3.18f1; разработка на 2021.3.45f2; проверка на 2022.3 LTS и Unity 6 |
 
@@ -1353,7 +1353,7 @@ public static class FlagKeys
 │ Шаблон WebGL      1.0.0   установлен 1.0.0   [Обновить]                         │
 │                                                                                 │
 │ Модули                                                                          │
-│  Yandex Metrica   1.0.0   не установлен      [Установить]                       │
+│  Analytics        1.0.0   не установлен      [Установить]                       │
 │  CrazyGames       0.9.0   не установлен      [Установить]   пре-релиз           │
 │                                                                                 │
 │ Проверено 14:02   [Проверить сейчас]                                            │
@@ -1510,11 +1510,11 @@ Assets/WebGLTemplates/JTLSDK/
 {
   "modules": [
     {
-      "id": "yandex-metrica",
-      "name": "Yandex Metrica",
-      "package": "com.jtlstudio.sdk.yandexmetrica",
+      "id": "example",
+      "name": "Example",
+      "package": "com.jtlstudio.sdk.example",
       "repository": "meepifiev/JTLSDK",
-      "path": "Modules/com.jtlstudio.sdk.yandexmetrica",
+      "path": "Modules/com.jtlstudio.sdk.example",
       "requires": "0.1.0",
       "platforms": ["YandexGames"]
     }
@@ -1526,7 +1526,7 @@ Assets/WebGLTemplates/JTLSDK/
 
 Модуль ничего не регистрирует в рантайме. Он добавляет провайдер для слота ядра, и провайдер выбирают в конфигурации, как любой другой. Атрибут `[ProviderPlatforms(...)]` ограничивает площадки: тулкит не предлагает такой провайдер в чужой конфигурации, а валидатор сборки считает его ошибкой.
 
-**Аналитика** - слот ядра `JTLSDK.Analytics`: `Report(string eventName)` и `Report(string eventName, IReadOnlyDictionary<string, object> parameters)`. Без модуля слот `Unsupported` и события молча игнорируются. В редакторе прототип пишет события в консоль. Первый провайдер - модуль Yandex Metrica: `reachGoal` с параметрами, счётчик и флаги `webvisor`, `clickmap`, `trackLinks`, `accurateTrackBounce` в конфигурации. Скрипт Метрики подгружается при инициализации, а на YouTube Playables провайдер недоступен и в рантайме не запускается.
+**Аналитика** будет отдельным скачиваемым модулем со своим API. В ядре её нет.
 
 ---
 
@@ -1578,7 +1578,7 @@ Assets/WebGLTemplates/JTLSDK/
 | 3 | Мост на TypeScript, шаблон, провайдеры Яндекса | черновик на Яндексе проходит модерацию |
 | 4 | Провайдеры YouTube, проверки лимитов, `firstFrameReady` | McPlay проходит |
 | 5 | Раздел «Сборка», плашка, zip, нумерация | сборка одной кнопкой |
-| 6 | Обновления, `modules.json`, модуль Yandex Metrica, анализатор API | пакет обновляется из тулкита |
+| 6 | Обновления, `modules.json`, модуль аналитики, анализатор API | пакет обновляется из тулкита |
 | 7 | CI, тесты, документация RU/EN, релиз 1.0.0 | тег `v1.0.0` |
 
 ---
@@ -1613,6 +1613,7 @@ Assets/WebGLTemplates/JTLSDK/
 | 21.09.2026 | Модули можно держать в папке `Modules/` репозитория JTLSDK и ставить по git-ссылке с `path`. Отдельный репозиторий для модуля не обязателен. |
 | 21.09.2026 | Атрибут `[ProviderPlatforms]` ограничивает провайдер площадками. Провайдеры Яндекса и YouTube помечены им. |
 | 21.09.2026 | IJ-SmashAndHit на JTL SDK не переводится. Пункт убран из плана. |
+| 21.09.2026 | Аналитика убрана из ядра вместе с модулем Yandex Metrica. Она появится позже отдельным модулем. Механизм `modules.json` остаётся, список модулей пуст. |
 | 21.09.2026 | В меню `JTL SDK` только пункт Toolkit. Настройки создаёт тулкит сам, демо ставится из вкладки Samples в Package Manager. Пункты «Create Settings» и Development удалены. |
 | 21.09.2026 | Восстановление расходуемых покупок ждёт первого обработчика `Granted`, а покупка без обработчика не списывается. Раньше покупка, восстановленная до подписки игры, списывалась без выдачи. |
 | 21.09.2026 | EditMode-тесты проходят на 2021.3.45f2, 2022.3.62f2 и 6000.3.8f1. Настройки площадки пишутся через `NamedBuildTarget`, фон превью - через `BackgroundPropertyHelper` на 2022.2+. На Unity 6 остаются предупреждения об устаревших `UxmlFactory`/`UxmlTraits`: переход на `[UxmlElement]` ломает 2021.3, поэтому он отложен до поднятия минимальной версии. |

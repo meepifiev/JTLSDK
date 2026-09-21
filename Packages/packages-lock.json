@@ -23,14 +23,6 @@
       "source": "embedded",
       "dependencies": {}
     },
-    "com.jtlstudio.sdk.yandexmetrica": {
-      "version": "file:../Modules/com.jtlstudio.sdk.yandexmetrica",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.jtlstudio.sdk": "0.1.0"
-      }
-    },
     "com.unity.collab-proxy": {
       "version": "2.5.2",
       "depth": 0,
