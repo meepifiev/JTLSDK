@@ -52,6 +52,11 @@ namespace JTLStudio.SDK.Editor.Toolkit
             StatusRequested?.Invoke(new ToolkitStatus(kind, messageKey, DateTime.Now.ToString(TimeFormat), text));
         }
 
+        public bool Confirm(string titleKey, string messageKey, string confirmKey)
+        {
+            return UnityEditor.EditorUtility.DisplayDialog(Text(titleKey), Text(messageKey), Text(confirmKey), Text("details.cancel"));
+        }
+
         public string Text(string key, params object[] arguments)
         {
             return arguments.Length == 0 ? Localization.Get(key) : string.Format(Localization.Get(key), arguments);

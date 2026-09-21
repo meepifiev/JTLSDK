@@ -16,6 +16,8 @@ namespace JTLStudio.SDK.Editor.Configuration
         public const string TemplateSetting = "PROJECT:JTLSDK";
 
         private const string PackagePath = "Packages/com.jtlstudio.sdk";
+        private const string TemplatesRoot = "Assets/WebGLTemplates";
+        private const string UnityDefaultTemplate = "APPLICATION:Default";
         private const string PackageTemplateFolder = "Editor/Template~/JTLSDK";
         public const string DefaultLogoPath = "Packages/com.jtlstudio.sdk/Editor/Toolkit/Icons/Brand/jtlsdk-template-logo.png";
 
@@ -47,11 +49,31 @@ namespace JTLStudio.SDK.Editor.Configuration
             PlayerSettings.WebGL.template = TemplateSetting;
         }
 
+        public void Uninstall()
+        {
+            if (AssetDatabase.IsValidFolder(TemplateFolder))
+            {
+                AssetDatabase.DeleteAsset(TemplateFolder);
+            }
+
+            if (AssetDatabase.IsValidFolder(TemplatesRoot) && AssetDatabase.FindAssets("", new[] { TemplatesRoot }).Length == 0)
+            {
+                AssetDatabase.DeleteAsset(TemplatesRoot);
+            }
+
+            if (PlayerSettings.WebGL.template == TemplateSetting)
+            {
+                PlayerSettings.WebGL.template = UnityDefaultTemplate;
+            }
+
+            AssetDatabase.Refresh();
+        }
+
         public void Apply(JTLSDKEditorSettings settings, SdkConfiguration configuration, int buildNumber, bool development)
         {
             if (IsInstalled == false)
             {
-                Install();
+                throw new InvalidOperationException("The JTL SDK WebGL template is not installed.");
             }
 
             PlayerSettings.WebGL.template = TemplateSetting;

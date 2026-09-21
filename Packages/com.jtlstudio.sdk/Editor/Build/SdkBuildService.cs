@@ -29,7 +29,8 @@ namespace JTLStudio.SDK.Editor.Build
                 new BuildCheck("build.check.configuration", configuration != null),
                 new BuildCheck("build.check.webgl", BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL)),
                 new BuildCheck("build.check.scenes", EnabledScenes().Length > 0),
-                new BuildCheck("build.check.settings", AssetDatabase.LoadAssetAtPath<JTLSDKSettings>(SettingsAssetService.SettingsAssetPath) != null)
+                new BuildCheck("build.check.settings", AssetDatabase.LoadAssetAtPath<JTLSDKSettings>(SettingsAssetService.SettingsAssetPath) != null),
+                new BuildCheck("build.check.template", _template.IsInstalled)
             };
 
             if (configuration == null)

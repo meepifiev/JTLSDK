@@ -131,6 +131,12 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("template.installedTo", "Template installed to {0}.", "Шаблон установлен в {0}.");
             Add("template.logo", "Logo", "Логотип");
             Add("template.logoSource", "Source", "Источник");
+            Add("template.notInstalled", "Template is not installed", "Шаблон не установлен");
+            Add("template.remove", "Remove", "Удалить");
+            Add("template.removeTitle", "Remove template", "Удалить шаблон");
+            Add("template.removeMessage", "Delete Assets/WebGLTemplates/JTLSDK? Player Settings switch to the Unity default template.", "Удалить Assets/WebGLTemplates/JTLSDK? В Player Settings включится стандартный шаблон Unity.");
+            Add("template.removed", "Template removed.", "Шаблон удалён.");
+            Add("build.check.template", "WebGL template is installed", "WebGL-шаблон установлен");
             Add("template.logoModes", "JTL SDK|Custom|None", "JTL SDK|Свой|Без логотипа");
             Add("template.gradientShape", "Shape", "Форма");
             Add("template.gradientShapes", "Linear|Radial", "Линейный|Радиальный");

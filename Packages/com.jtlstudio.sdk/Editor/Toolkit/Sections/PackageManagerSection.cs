@@ -171,6 +171,23 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 Render();
             };
             row.Add(install);
+
+            if (installed)
+            {
+                ToolkitButton remove = new ToolkitButton { Label = Context.Text("template.remove"), Variant = ToolkitButton.GhostVariant };
+                remove.clicked += () =>
+                {
+                    if (Context.Confirm("template.removeTitle", "template.removeMessage", "template.remove") == false)
+                    {
+                        return;
+                    }
+
+                    _template.Uninstall();
+                    Context.Report(StatusKind.Info, "template.removed");
+                    Render();
+                };
+                row.Add(remove);
+            }
             card.Add(row);
             return card;
         }

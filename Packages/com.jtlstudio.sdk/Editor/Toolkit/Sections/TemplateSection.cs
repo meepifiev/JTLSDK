@@ -54,18 +54,22 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         protected override void OnRendered()
         {
             SectionHeader header = Require<SectionHeader>("template-header");
-
-            if (_template.IsInstalled)
-            {
-                header.Add(new Badge("template.installed", Badge.SuccessVariant));
-                header.Add(Button("template.reinstall", ToolkitButton.GhostVariant, "refresh", Install));
-            }
-            else
-            {
-                header.Add(Button("template.install", ToolkitButton.PrimaryVariant, "plus", Install));
-            }
-
             VisualElement body = Require<VisualElement>("template-body");
+            _frame = null;
+
+            if (_template.IsInstalled == false)
+            {
+                EmptyState empty = new EmptyState { TitleKey = "template.notInstalled", IconName = "template" };
+                empty.style.flexGrow = 1;
+                empty.Add(Button("template.install", ToolkitButton.PrimaryVariant, "plus", Install));
+                body.Add(empty);
+                return;
+            }
+
+            header.Add(new Badge("template.installed", Badge.SuccessVariant));
+            header.Add(Button("template.reinstall", ToolkitButton.GhostVariant, "refresh", Install));
+            header.Add(Button("template.remove", ToolkitButton.GhostVariant, "delete", Uninstall));
+
             VisualElement settings = Column(12);
             settings.AddToClassList("jtl-basis");
             settings.style.minWidth = 0;
@@ -457,6 +461,18 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             _template.Install();
             Context.Report(StatusKind.Success, "template.installedTo", TemplateService.TemplateFolder);
+            Render();
+        }
+
+        private void Uninstall()
+        {
+            if (Context.Confirm("template.removeTitle", "template.removeMessage", "template.remove") == false)
+            {
+                return;
+            }
+
+            _template.Uninstall();
+            Context.Report(StatusKind.Info, "template.removed");
             Render();
         }
 
