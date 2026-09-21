@@ -11,6 +11,8 @@ namespace JTLStudio.SDK.Editor.Build
         private readonly SettingsAssetService _settings = new SettingsAssetService();
         private readonly PlatformBridgeFilter _bridges = new PlatformBridgeFilter();
 
+        private const string OutdatedMessage = "JTL SDK: the WebGL template is outdated. Open JTL SDK › Toolkit › Template and press Reinstall.";
+
         public int callbackOrder => 0;
 
         public void OnPreprocessBuild(BuildReport report)
@@ -22,17 +24,10 @@ namespace JTLStudio.SDK.Editor.Build
 
             _bridges.Register();
 
-            if (_template.IsSelected == false)
+            if (_template.IsSelected && _template.IsOutdated)
             {
-                return;
+                throw new BuildFailedException(OutdatedMessage);
             }
-
-            if (_template.IsOutdated)
-            {
-                _template.Update();
-            }
-
-            _template.PrepareAssets(JTLSDKEditorSettings.instance);
         }
 
         public void OnPostprocessBuild(BuildReport report)
@@ -46,6 +41,7 @@ namespace JTLStudio.SDK.Editor.Build
             SdkConfiguration configuration = settings == null ? null : settings.ActiveConfiguration;
             int buildNumber = SessionState.GetInt(TemplateService.BuildNumberKey, JTLSDKEditorSettings.instance.BuildNumber);
             bool development = (report.summary.options & BuildOptions.Development) != 0;
+            _template.CopyImages(JTLSDKEditorSettings.instance, report.summary.outputPath);
             _template.Substitute(report.summary.outputPath, _template.Values(JTLSDKEditorSettings.instance, configuration, buildNumber, development));
         }
     }

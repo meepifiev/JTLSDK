@@ -67,13 +67,23 @@ namespace JTLStudio.SDK.Editor.Configuration
                     }
                 }
 
-                return false;
+                return StaleImages(source).Count > 0;
             }
         }
 
         public void Update()
         {
             string source = PackageTemplatePath();
+
+            foreach (string stale in StaleImages(source))
+            {
+                File.Delete(stale);
+
+                if (File.Exists(stale + MetaExtension))
+                {
+                    File.Delete(stale + MetaExtension);
+                }
+            }
 
             foreach (string file in PackageFiles(source))
             {
@@ -83,6 +93,7 @@ namespace JTLStudio.SDK.Editor.Configuration
             }
 
             RemoveLegacyVariables();
+            AssetDatabase.Refresh();
         }
 
         public void Uninstall()
@@ -107,9 +118,10 @@ namespace JTLStudio.SDK.Editor.Configuration
 
         public bool IsSelected => IsInstalled && PlayerSettings.WebGL.template == TemplateSetting;
 
-        public void PrepareAssets(JTLSDKEditorSettings settings)
+        public void CopyImages(JTLSDKEditorSettings settings, string outputFolder)
         {
-            string dataFolder = Path.Combine(TemplateFolder, DataFolder);
+            string dataFolder = Path.Combine(outputFolder, DataFolder);
+            Directory.CreateDirectory(dataFolder);
             PrepareImage(LogoTexture(settings), dataFolder, LogoName);
             PrepareImage(ImageOf(settings.LoaderBackground), dataFolder, LoaderBackgroundName);
             PrepareImage(ImageOf(settings.PageBackground), dataFolder, PageBackgroundName);
@@ -181,11 +193,6 @@ namespace JTLStudio.SDK.Editor.Configuration
                 if (File.Exists(stale))
                 {
                     File.Delete(stale);
-                }
-
-                if (File.Exists(stale + MetaExtension))
-                {
-                    File.Delete(stale + MetaExtension);
                 }
             }
 
@@ -377,16 +384,37 @@ namespace JTLStudio.SDK.Editor.Configuration
 
             foreach (string file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
             {
-                string name = Path.GetFileNameWithoutExtension(file);
-                bool prepared = Path.GetFileName(Path.GetDirectoryName(file)) == DataFolder && (name == LogoName || name == LoaderBackgroundName || name == PageBackgroundName);
-
-                if (file.EndsWith(MetaExtension, StringComparison.OrdinalIgnoreCase) == false && prepared == false)
+                if (file.EndsWith(MetaExtension, StringComparison.OrdinalIgnoreCase) == false)
                 {
                     files.Add(file);
                 }
             }
 
             return files;
+        }
+
+        private List<string> StaleImages(string source)
+        {
+            List<string> stale = new List<string>();
+            string installedData = Path.Combine(TemplateFolder, DataFolder);
+
+            if (Directory.Exists(installedData) == false)
+            {
+                return stale;
+            }
+
+            foreach (string file in Directory.GetFiles(installedData))
+            {
+                string name = Path.GetFileNameWithoutExtension(file);
+                bool image = name == LogoName || name == LoaderBackgroundName || name == PageBackgroundName;
+
+                if (image && file.EndsWith(MetaExtension, StringComparison.OrdinalIgnoreCase) == false && File.Exists(Path.Combine(source, DataFolder, Path.GetFileName(file))) == false)
+                {
+                    stale.Add(file);
+                }
+            }
+
+            return stale;
         }
 
         private bool SameContent(string first, string second)

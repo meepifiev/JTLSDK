@@ -83,6 +83,11 @@ namespace JTLStudio.SDK.Editor.Build
             string configurationName = configuration == null ? "Editor" : configuration.DisplayName;
             string folder = Path.Combine(settings.BuildPath, ResolveName(settings, configuration, buildNumber));
 
+            if (_template.IsOutdated)
+            {
+                _template.Update();
+            }
+
             PlayerSettings.WebGL.template = TemplateService.TemplateSetting;
             _bridges.Register();
             SessionState.SetInt(TemplateService.BuildNumberKey, buildNumber);
