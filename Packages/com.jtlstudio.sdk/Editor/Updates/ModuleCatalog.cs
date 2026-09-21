@@ -8,7 +8,10 @@ namespace JTLStudio.SDK.Editor.Updates
 {
     public class ModuleCatalog
     {
-        public const string CatalogUrl = "https://raw.githubusercontent.com/meepifiev/JTLSDK/main/modules.json";
+        public const string CatalogUrl = "https://api.github.com/repos/meepifiev/JTLSDK/contents/modules.json?ref=main";
+
+        private const string UserAgent = "JTLSDK-Toolkit";
+        private const string RawContent = "application/vnd.github.raw";
 
         private readonly JsonParser _parser = new JsonParser();
 
@@ -20,6 +23,8 @@ namespace JTLStudio.SDK.Editor.Updates
             }
 
             UnityWebRequest request = UnityWebRequest.Get(CatalogUrl);
+            request.SetRequestHeader("User-Agent", UserAgent);
+            request.SetRequestHeader("Accept", RawContent);
             UnityWebRequestAsyncOperation operation = request.SendWebRequest();
 
             void Poll()

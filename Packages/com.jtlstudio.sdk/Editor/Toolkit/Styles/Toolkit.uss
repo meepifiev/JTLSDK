@@ -34,8 +34,13 @@
 
 .jtl-root .jtl-sidebar__nav {
     flex-grow: 1;
-    flex-direction: column;
-    padding: 0 12px;
+    flex-shrink: 1;
+    min-height: 0;
+    padding: 0 0 0 12px;
+}
+
+.jtl-root .jtl-sidebar__nav .unity-scroll-view__content-container {
+    padding-right: 12px;
 }
 
 .jtl-root .jtl-nav-group {
@@ -227,7 +232,8 @@
     min-height: 0;
 }
 
-.jtl-root .jtl-content .unity-scroller--vertical {
+.jtl-root .jtl-content .unity-scroller--vertical,
+.jtl-root .jtl-sidebar__nav .unity-scroller--vertical {
     width: 10px;
     min-width: 10px;
     margin: 0;
@@ -236,27 +242,33 @@
 }
 
 .jtl-root .jtl-content .unity-scroller__low-button,
-.jtl-root .jtl-content .unity-scroller__high-button {
+.jtl-root .jtl-sidebar__nav .unity-scroller__low-button,
+.jtl-root .jtl-content .unity-scroller__high-button,
+.jtl-root .jtl-sidebar__nav .unity-scroller__high-button {
     display: none;
 }
 
-.jtl-root .jtl-content .unity-scroller--vertical .unity-scroller__slider {
+.jtl-root .jtl-content .unity-scroller--vertical .unity-scroller__slider,
+.jtl-root .jtl-sidebar__nav .unity-scroller--vertical .unity-scroller__slider {
     margin: 0;
     min-width: 0;
     width: 10px;
 }
 
-.jtl-root .jtl-content .unity-scroller--vertical .unity-base-slider__input {
+.jtl-root .jtl-content .unity-scroller--vertical .unity-base-slider__input,
+.jtl-root .jtl-sidebar__nav .unity-scroller--vertical .unity-base-slider__input {
     min-width: 0;
 }
 
-.jtl-root .jtl-content .unity-scroller--vertical .unity-base-slider__tracker {
+.jtl-root .jtl-content .unity-scroller--vertical .unity-base-slider__tracker,
+.jtl-root .jtl-sidebar__nav .unity-scroller--vertical .unity-base-slider__tracker {
     background-color: transparent;
     border-width: 0;
     width: 10px;
 }
 
-.jtl-root .jtl-content .unity-scroller--vertical .unity-base-slider__dragger {
+.jtl-root .jtl-content .unity-scroller--vertical .unity-base-slider__dragger,
+.jtl-root .jtl-sidebar__nav .unity-scroller--vertical .unity-base-slider__dragger {
     width: 3px;
     min-width: 3px;
     left: 4px;
@@ -284,7 +296,11 @@
 }
 
 .jtl-root--collapsed .jtl-sidebar__nav {
-    padding: 0 8px;
+    padding: 0 0 0 8px;
+}
+
+.jtl-root--collapsed .jtl-sidebar__nav .unity-scroll-view__content-container {
+    padding-right: 8px;
 }
 
 .jtl-root--collapsed .jtl-nav-item {

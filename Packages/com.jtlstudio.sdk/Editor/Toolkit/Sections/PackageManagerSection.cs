@@ -220,9 +220,16 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 state += " · " + Context.Text("package.requiresFormat", module.Requires);
             }
 
-            if (module.Platforms.Count > 0)
+            List<string> platforms = new List<string>();
+
+            foreach (string platform in module.Platforms)
             {
-                state += " · " + string.Join(", ", module.Platforms);
+                platforms.Add(Enum.TryParse(platform, out PlatformId id) ? Context.Platforms.DisplayName(id) : platform);
+            }
+
+            if (platforms.Count > 0)
+            {
+                state += " · " + string.Join(", ", platforms);
             }
 
             text.Add(TextLabel(state, "jtl-text--caption"));

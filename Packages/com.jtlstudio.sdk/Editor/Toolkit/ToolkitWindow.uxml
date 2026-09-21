@@ -5,7 +5,7 @@
             <ui:VisualElement class="jtl-sidebar__brand">
                 <ui:VisualElement name="brand-logo" class="jtl-brand__logo" />
             </ui:VisualElement>
-            <ui:VisualElement name="navigation" class="jtl-sidebar__nav">
+            <ui:ScrollView name="navigation" class="jtl-sidebar__nav" mode="Vertical" horizontal-scroller-visibility="Hidden">
                 <ui:VisualElement class="jtl-nav-group">
                     <jtl:NavigationItem section="Configurations" icon="configurations" text-key="nav.configurations" />
                     <jtl:NavigationItem section="Simulation" icon="simulation" text-key="nav.simulation" />
@@ -33,7 +33,7 @@
                     <jtl:NavigationItem section="Shortcut" icon="shortcut" text-key="nav.shortcut" />
                     <jtl:NavigationItem section="Analytics" icon="analytics" text-key="nav.analytics" />
                 </ui:VisualElement>
-            </ui:VisualElement>
+            </ui:ScrollView>
             <ui:VisualElement class="jtl-sidebar__footer">
                 <ui:VisualElement name="documentation-link" class="jtl-sidebar__link">
                     <jtl:Icon icon="documentation" />
