@@ -12,7 +12,7 @@ namespace JTLStudio.SDK
         Flags,
         ServerTime,
         Review,
-        Shortcut,
+        GameLabel,
         PlatformMute
     }
 }

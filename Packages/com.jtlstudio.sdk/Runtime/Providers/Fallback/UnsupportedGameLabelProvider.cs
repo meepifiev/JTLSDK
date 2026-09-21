@@ -1,18 +1,20 @@
 using System;
+using UnityEngine.Scripting.APIUpdating;
 
 namespace JTLStudio.SDK.Providers
 {
     [Serializable]
-    public class UnsupportedShortcutProvider : IShortcutProvider
+    [MovedFrom(false, sourceClassName: "UnsupportedShortcutProvider")]
+    public class UnsupportedGameLabelProvider : IGameLabelProvider
     {
-        public bool CanRequest => false;
+        public bool CanShow => false;
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
             onInitialized(ProviderState.Unsupported);
         }
 
-        public void Request(Action<bool> onResult)
+        public void ShowDialog(Action<bool> onResult)
         {
             onResult(false);
         }

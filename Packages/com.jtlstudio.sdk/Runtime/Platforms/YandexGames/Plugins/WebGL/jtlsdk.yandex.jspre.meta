@@ -5,8 +5,7 @@ PluginImporter:
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
-  defineConstraints:
-  - JTLSDK_YANDEX_GAMES
+  defineConstraints: []
   isPreloaded: 0
   isOverridable: 1
   isExplicitlyReferenced: 0

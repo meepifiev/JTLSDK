@@ -20,9 +20,9 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.Leaderboards = new YandexGamesLeaderboardsProvider();
                     configuration.Flags = new YandexGamesFlagsProvider();
                     configuration.TimeProvider = new YandexGamesTimeProvider();
-                    configuration.Gameplay = new YandexGamesGameplayProvider();
+                    configuration.GameEvents = new YandexGamesGameEventsProvider();
                     configuration.Review = new YandexGamesReviewProvider();
-                    configuration.Shortcut = new YandexGamesShortcutProvider();
+                    configuration.GameLabel = new YandexGamesGameLabelProvider();
                     configuration.DefineSymbol = "JTLSDK_YANDEX_GAMES";
                     break;
 
@@ -36,9 +36,9 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.Leaderboards = new YouTubePlayablesLeaderboardsProvider();
                     configuration.Flags = new UnsupportedFlagsProvider();
                     configuration.TimeProvider = new FallbackTimeProvider();
-                    configuration.Gameplay = new YouTubePlayablesGameplayProvider();
+                    configuration.GameEvents = new YouTubePlayablesGameEventsProvider();
                     configuration.Review = new UnsupportedReviewProvider();
-                    configuration.Shortcut = new UnsupportedShortcutProvider();
+                    configuration.GameLabel = new UnsupportedGameLabelProvider();
                     configuration.DefineSymbol = "JTLSDK_YOUTUBE_PLAYABLES";
                     break;
 
@@ -52,9 +52,9 @@ namespace JTLStudio.SDK.Editor.Configuration
                     configuration.Leaderboards = new UnsupportedLeaderboardsProvider();
                     configuration.Flags = new UnsupportedFlagsProvider();
                     configuration.TimeProvider = new FallbackTimeProvider();
-                    configuration.Gameplay = new FallbackGameplayProvider();
+                    configuration.GameEvents = new FallbackGameEventsProvider();
                     configuration.Review = new UnsupportedReviewProvider();
-                    configuration.Shortcut = new UnsupportedShortcutProvider();
+                    configuration.GameLabel = new UnsupportedGameLabelProvider();
                     configuration.DefineSymbol = "";
                     break;
             }

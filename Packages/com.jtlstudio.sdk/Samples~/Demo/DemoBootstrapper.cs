@@ -52,8 +52,8 @@ namespace JTLStudio.SDK.Samples.Demo
             JTLSDK.Payments.Granted += OnGranted;
             JTLSDK.Pause.Changed += OnPauseChanged;
             JTLSDK.Audio.PlatformMuteChanged += OnPlatformMuteChanged;
-            JTLSDK.Gameplay.GameReady();
-            JTLSDK.Gameplay.Start();
+            JTLSDK.GameEvents.GameReady();
+            JTLSDK.GameEvents.GameplayStarted();
         }
 
         private void DrawStatus()
@@ -69,7 +69,7 @@ namespace JTLStudio.SDK.Samples.Demo
             GUILayout.Label("Language: " + JTLSDK.Language.Current, _labelStyle);
             GUILayout.Label("Save: " + JTLSDK.Data.LoadState + " · dirty " + JTLSDK.Data.IsDirty + " · money " + JTLSDK.Data.GetInt(MoneyKey), _labelStyle);
             GUILayout.Label("Paused: " + JTLSDK.Pause.IsPaused + " · scale " + JTLSDK.Time.Scale + " · volume " + JTLSDK.Audio.Volume + " · muted " + JTLSDK.Audio.IsPlatformMuted, _labelStyle);
-            GUILayout.Label("Gameplay: ready " + JTLSDK.Gameplay.IsGameReady + " · playing " + JTLSDK.Gameplay.IsPlaying, _labelStyle);
+            GUILayout.Label("Game events: ready " + JTLSDK.GameEvents.IsGameReady + " · gameplay " + JTLSDK.GameEvents.IsGameplayActive, _labelStyle);
             GUILayout.Label("Remove ads purchased: " + JTLSDK.Payments.IsPurchased(RemoveAdsProduct), _labelStyle);
         }
 
@@ -126,9 +126,9 @@ namespace JTLStudio.SDK.Samples.Demo
                 JTLSDK.Review.Request(sent => Log("Review: " + sent));
             }
 
-            if (Button("Request shortcut"))
+            if (Button("Show game label dialog"))
             {
-                JTLSDK.Shortcut.Request(created => Log("Shortcut: " + created));
+                JTLSDK.GameLabel.ShowDialog(created => Log("Game label: " + created));
             }
 
             if (Button(_menuPause == null ? "Pause (Menu)" : "Resume (Menu)"))

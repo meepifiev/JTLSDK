@@ -16,7 +16,7 @@ namespace JTLStudio.SDK.Tests.Fakes
         public ILanguageProvider LanguageProvider { get; set; }
         public ILeaderboardsProvider Leaderboards { get; set; }
         public IFlagsProvider Flags { get; set; }
-        public IGameplayProvider Gameplay { get; set; }
+        public IGameEventsProvider GameEvents { get; set; }
         public Language DefaultLanguage { get; set; } = Language.English;
         public List<LanguageReplacement> Replacements { get; } = new List<LanguageReplacement>();
         public List<LeaderboardDefinition> LeaderboardDefinitions { get; } = new List<LeaderboardDefinition>();
@@ -43,7 +43,7 @@ namespace JTLStudio.SDK.Tests.Fakes
             configuration.LanguageProvider = LanguageProvider;
             configuration.Leaderboards = Leaderboards;
             configuration.Flags = Flags;
-            configuration.Gameplay = Gameplay;
+            configuration.GameEvents = GameEvents;
             configuration.Languages.Clear();
             configuration.Languages.AddRange(SupportedLanguages);
 

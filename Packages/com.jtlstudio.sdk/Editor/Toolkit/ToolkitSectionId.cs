@@ -17,9 +17,9 @@ namespace JTLStudio.SDK.Editor.Toolkit
         Ads = 12,
         Player = 13,
         Time = 14,
-        Gameplay = 15,
+        GameEvents = 15,
         Review = 16,
-        Shortcut = 17,
+        GameLabel = 17,
         Pause = 18,
         Audio = 19,
         Platform = 20

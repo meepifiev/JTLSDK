@@ -4,7 +4,7 @@ using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.Tests.Fakes
 {
-    public class FakeGameplayProvider : IGameplayProvider
+    public class FakeGameEventsProvider : IGameEventsProvider
     {
         private Action<ProviderState> _onInitialized;
 

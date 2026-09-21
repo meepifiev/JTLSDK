@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JTLStudio.SDK.Providers;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace JTLStudio.SDK
 {
@@ -21,9 +22,9 @@ namespace JTLStudio.SDK
         [SerializeReference] private ILeaderboardsProvider _leaderboards;
         [SerializeReference] private IFlagsProvider _flags;
         [SerializeReference] private ITimeProvider _timeProvider;
-        [SerializeReference] private IGameplayProvider _gameplay;
+        [SerializeReference, FormerlySerializedAs("_gameplay")] private IGameEventsProvider _gameEvents;
         [SerializeReference] private IReviewProvider _review;
-        [SerializeReference] private IShortcutProvider _shortcut;
+        [SerializeReference, FormerlySerializedAs("_shortcut")] private IGameLabelProvider _gameLabel;
 
         public string DisplayName
         {
@@ -106,10 +107,10 @@ namespace JTLStudio.SDK
             internal set => _timeProvider = value;
         }
 
-        public IGameplayProvider Gameplay
+        public IGameEventsProvider GameEvents
         {
-            get => _gameplay;
-            internal set => _gameplay = value;
+            get => _gameEvents;
+            internal set => _gameEvents = value;
         }
 
         public IReviewProvider Review
@@ -118,10 +119,10 @@ namespace JTLStudio.SDK
             internal set => _review = value;
         }
 
-        public IShortcutProvider Shortcut
+        public IGameLabelProvider GameLabel
         {
-            get => _shortcut;
-            internal set => _shortcut = value;
+            get => _gameLabel;
+            internal set => _gameLabel = value;
         }
     }
 }

@@ -208,7 +208,7 @@ public class SdkConfiguration : ScriptableObject
     [SerializeReference] private ITimeProvider _time;
     [SerializeReference] private IPlatformProvider _platformProvider;
     [SerializeReference] private IReviewProvider _review;
-    [SerializeReference] private IShortcutProvider _shortcut;
+    [SerializeReference] private IGameLabelProvider _gameLabel;
 }
 ```
 
@@ -271,14 +271,14 @@ namespace JTLStudio.SDK
         public static IPause Pause { get; }
         public static ITime Time { get; }
         public static IAudio Audio { get; }
-        public static IGameplay Gameplay { get; }
+        public static IGameEvents GameEvents { get; }
         public static ILeaderboards Leaderboards { get; }
         public static IPlayer Player { get; }
         public static IFlags Flags { get; }
         public static IPlatform Platform { get; }
         public static IDevice Device { get; }
         public static IReview Review { get; }
-        public static IShortcut Shortcut { get; }
+        public static IGameLabel GameLabel { get; }
 
         public static void Create();
         public static void WhenReady(Action onReady);
@@ -333,7 +333,7 @@ public interface IModule
 | `Data.GetInt(...)` | исключение | значение по умолчанию + предупреждение в лог |
 | `Data.SetInt(...)` | исключение | игнорируется + ошибка в лог |
 | `Payments.Purchase(...)` | исключение | колбэк сразу с `PurchaseResult.NotReady` |
-| `Gameplay.GameReady()` | исключение | запоминается и отправляется после готовности |
+| `GameEvents.GameReady()` | исключение | запоминается и отправляется после готовности |
 | `Pause.Set(...)`, `Time.Scale`, `Audio.Volume` | исключение | работают сразу, площадка не нужна |
 
 На стороне JS объект `Module.JTLSDK` создаётся в `jtlsdk.jspre` в момент загрузки страницы, до запуска любого C#. Ни одна функция `.jslib` не обращается к неопределённому объекту. Это закрывает краш Prime `reading data at _primeSDK_data_getInt`.
@@ -364,7 +364,7 @@ public class Bootstrapper : MonoBehaviour
 }
 ```
 
-`Gameplay.GameReady()` вызывается игрой, когда исчез экран загрузки и игрок может нажимать. Не раньше.
+`GameEvents.GameReady()` вызывается игрой, когда исчез экран загрузки и игрок может нажимать. Не раньше.
 
 ---
 
@@ -408,9 +408,9 @@ using (JTLSDK.Pause.Hold(PauseSources.Menu))
 {
 }
 
-JTLSDK.Gameplay.GameReady();
-JTLSDK.Gameplay.Start();
-JTLSDK.Gameplay.Stop();
+JTLSDK.GameEvents.GameReady();
+JTLSDK.GameEvents.Start();
+JTLSDK.GameEvents.Stop();
 
 JTLSDK.Leaderboards.SetScore(LeaderboardIds.Levels, currentLevel);
 
@@ -421,7 +421,7 @@ bool tutorialEnabled = JTLSDK.Flags.GetBool(FlagKeys.Tutorial, true);
 DateTimeOffset now = JTLSDK.Time.Now;
 
 JTLSDK.Review.Request(sent => { });
-JTLSDK.Shortcut.Request(created => { });
+JTLSDK.GameLabel.ShowDialog(created => { });
 
 if (JTLSDK.Platform.Supports(Capability.Purchases) == false)
 {
@@ -487,7 +487,7 @@ public interface IAds : IModule
 
 1. Одновременно идёт один показ. Второй вызов сразу получает `NotShown`. Это закрывает двойную награду по двойному клику.
 2. На время показа ставится пауза с источником `Ads` (раздел 6.5). Пауза снимается в `finally`, даже если колбэк игры бросил исключение.
-3. На время показа gameplay останавливается (`Gameplay.Stop`), после показа восстанавливается прежнее состояние.
+3. На время показа gameplay останавливается (`GameEvents.GameplayStopped`), после показа восстанавливается прежнее состояние.
 4. Колбэк вызывается ровно один раз.
 5. Если включено определение AdBlock, оно выполняется до запроса рекламы.
 
@@ -814,25 +814,27 @@ Cursor               = IsPaused ? видимый и свободный : зна�
 
 `PauseOnFocusLoss` - настройка конфигурации, по умолчанию включена.
 
-### 6.6. Gameplay-события
+### 6.6. Игровые события
 
 ```csharp
-public interface IGameplay : IModule
+public interface IGameEvents : IModule
 {
     bool IsGameReady { get; }
-    bool IsPlaying { get; }
+    bool IsGameplayActive { get; }
 
     void GameReady();
-    void Start();
-    void Stop();
+    void GameplayStarted();
+    void GameplayRestarted();
+    void GameplayStopped();
 }
 ```
 
 Машина состояний в общем слое:
 
 - `GameReady()` отправляется один раз; повторные вызовы игнорируются. До готовности SDK запоминается.
-- `Start()` при `IsPlaying == true` игнорируется, `Stop()` при `false` тоже.
-- На время рекламы `Stop()` вызывается автоматически, после рекламы состояние восстанавливается.
+- `GameplayStarted()` при активном геймплее игнорируется, `GameplayStopped()` при неактивном тоже.
+- `GameplayRestarted()` останавливает активный геймплей и сразу запускает снова. Если геймплей не шёл, просто запускает.
+- На время рекламы геймплей останавливается автоматически, после рекламы состояние восстанавливается.
 - На время паузы площадки то же самое.
 
 Площадки: Яндекс `LoadingAPI.ready()`, `GameplayAPI.start()/stop()`; YouTube `game.gameReady()`, у start/stop реализации нет.
@@ -917,7 +919,7 @@ public interface IReview : IModule
     void Request(Action<bool> onResult);
 }
 
-public interface IShortcut : IModule
+public interface IGameLabel : IModule
 {
     bool CanRequest { get; }
     void Request(Action<bool> onResult);
@@ -956,7 +958,7 @@ public enum Capability
     Flags,
     ServerTime,
     Review,
-    Shortcut,
+    GameLabel,
     PlatformMute
 }
 
@@ -1016,7 +1018,7 @@ C# регистрирует его при `Create()`. Ответы на запр
 | Язык | `environment.i18n.lang` |
 | Флаги | `getFlags` |
 | Время | `serverTime()` |
-| Gameplay | `features.LoadingAPI.ready`, `features.GameplayAPI.start/stop` |
+| Игровые события | `features.LoadingAPI.ready`, `features.GameplayAPI.start/stop` |
 | Пауза | `game_api_pause` / `game_api_resume`, плюс фокус страницы |
 | Отзыв, ярлык | `feedback.*`, `shortcut.*` |
 | Устройство | `deviceInfo` |
@@ -1027,7 +1029,7 @@ C# регистрирует его при `Create()`. Ответы на запр
 |---|---|
 | Инициализация | `<script src="https://www.youtube.com/game_api/v1">` в `<head>` шаблона |
 | `firstFrameReady` | страница, в момент показа экрана загрузки |
-| Gameplay | `game.gameReady()` |
+| Игровые события | `game.gameReady()` |
 | Интерстишл | `ads.requestInterstitialAd()` → `Shown`, отказ → `Failed` |
 | Rewarded | `ads.requestRewardedAd(rewardId)` → `true` `Rewarded`, `false` `Closed`, отказ `Failed` |
 | Баннер, покупки, авторизация, отзыв, ярлык, флаги, серверное время | `Unsupported` |
@@ -1142,7 +1144,7 @@ C# регистрирует его при `Create()`. Ответы на запр
 │  Флаги        [Yandex Games Flags ▾]                                            │
 │  Время        [Yandex Games Time ▾]                                             │
 │  Отзыв        [Yandex Games Review ▾]                                           │
-│  Ярлык        [Yandex Games Shortcut ▾]                                         │
+│  Ярлык        [Yandex Games Game Label ▾]                                         │
 │                                                                                 │
 │ Пауза при потере фокуса  [x]                                                    │
 │ Языки конфигурации       [x] English  [x] Russian  [x] Turkish  ...             │
@@ -1616,6 +1618,12 @@ Assets/WebGLTemplates/JTLSDK/
 | 21.09.2026 | Шаблон повторяет рабочий шаблон yt-ветки IJ-SmashAndHit. Canvas вписывается по высоте, только если окно шире пропорции игры, иначе заполняет экран. Canvas прозрачный, pixel ratio по умолчанию 1, баннеры Unity уходят в консоль. Прогресс-бар умеет рамку, внутренний отступ и градиент. Кнопки полного экрана нет, страница и так на весь экран. |
 | 21.09.2026 | Мост площадки выбирает C# по конфигурации: каждый `.jspre` регистрирует себя в `Module.JTLSDKBridges[name]`, а `JTLSDK_Select` делает нужный активным. Раньше в сборку попадали оба моста, и побеждал последний подключённый, то есть YouTube даже на Яндексе: ограничения по define-символу для `.jspre` на это не влияли. |
 | 21.09.2026 | Панель симуляции во вкладке Game стала кнопкой в полосе инструментов с выпадающим меню: язык, устройство, звук площадки. Пауза площадки, строка состояния и настройка «оверлей на паузе» удалены. |
+| 21.09.2026 | Модуль Gameplay стал «Игровыми событиями»: `JTLSDK.GameEvents.GameReady()`, `GameplayStarted()`, `GameplayRestarted()`, `GameplayStopped()`, `IsGameplayActive`. Ярлык назван как в PluginYG2: `JTLSDK.GameLabel.CanShow` и `ShowDialog`. Старые конфигурации переносятся через `FormerlySerializedAs` и `MovedFrom`. |
+| 21.09.2026 | В меню тулкита две категории: «Возможности» (покупки, сохранения, языки, лидерборды, флаги) и «Модули» (реклама, игровые события, пауза, время, звук, игрок, площадка, отзыв, ярлык игры). |
+| 21.09.2026 | В пресет конфигурации добавлен флажок Debug Symbols (внешний файл символов). |
+| 21.09.2026 | Значения шаблона больше не переменные Unity `{{{ }}}`, а маркеры `%JTLSDK_...%`: их подставляет обработчик сборки в готовый `index.html`, в Player Settings они не показываются. Картинки шаблона готовятся перед сборкой, старые удаляются, JPG копируется как есть. Работает и при сборке из стандартного окна Build Settings. |
+| 21.09.2026 | Мост площадки попадает в сборку только для площадки активной конфигурации: `PluginImporter.SetIncludeInBuildDelegate`. Ограничения по define-символам для `.jspre` убраны. Проверено сборками: у Яндекса только мост Яндекса, у YouTube только мост YouTube. |
+| 21.09.2026 | На площадку только одна конфигурация. Занятые площадки в меню «Новая конфигурация» неактивны. |
 | 21.09.2026 | В меню `JTL SDK` только пункт Toolkit. Настройки создаёт тулкит сам, демо ставится из вкладки Samples в Package Manager. Пункты «Create Settings» и Development удалены. |
 | 21.09.2026 | Восстановление расходуемых покупок ждёт первого обработчика `Granted`, а покупка без обработчика не списывается. Раньше покупка, восстановленная до подписки игры, списывалась без выдачи. |
 | 21.09.2026 | EditMode-тесты проходят на 2021.3.45f2, 2022.3.62f2 и 6000.3.8f1. Настройки площадки пишутся через `NamedBuildTarget`, фон превью - через `BackgroundPropertyHelper` на 2022.2+. На Unity 6 остаются предупреждения об устаревших `UxmlFactory`/`UxmlTraits`: переход на `[UxmlElement]` ломает 2021.3, поэтому он отложен до поднятия минимальной версии. |

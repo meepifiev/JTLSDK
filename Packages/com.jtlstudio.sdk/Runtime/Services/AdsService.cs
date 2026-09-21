@@ -7,13 +7,13 @@ namespace JTLStudio.SDK.Services
     {
         private readonly IAdsProvider _provider;
         private readonly PauseService _pause;
-        private readonly GameplayService _gameplay;
+        private readonly GameEventsService _gameEvents;
 
-        public AdsService(IAdsProvider provider, PauseService pause, GameplayService gameplay, SdkLogger logger) : base(logger)
+        public AdsService(IAdsProvider provider, PauseService pause, GameEventsService gameEvents, SdkLogger logger) : base(logger)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _pause = pause ?? throw new ArgumentNullException(nameof(pause));
-            _gameplay = gameplay ?? throw new ArgumentNullException(nameof(gameplay));
+            _gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
         }
 
         public event Action Opened;
@@ -107,7 +107,7 @@ namespace JTLStudio.SDK.Services
         internal void EndShow(IDisposable pauseHold, Action<AdResult> onResult, AdResult result)
         {
             IsShowing = false;
-            _gameplay.Resume();
+            _gameEvents.Resume();
             pauseHold.Dispose();
             Invoke(Closed);
 
@@ -150,7 +150,7 @@ namespace JTLStudio.SDK.Services
         {
             IsShowing = true;
             IDisposable pauseHold = _pause.Hold(PauseSources.Advertisement);
-            _gameplay.Suspend();
+            _gameEvents.Suspend();
             Invoke(Opened);
             return new AdShow(this, pauseHold, onResult);
         }

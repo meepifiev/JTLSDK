@@ -4,18 +4,18 @@ using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.Prototype
 {
-    public class PrototypeShortcutProvider : IShortcutProvider
+    public class PrototypeGameLabelProvider : IGameLabelProvider
     {
         private bool _requested;
 
-        public bool CanRequest => _requested == false;
+        public bool CanShow => _requested == false;
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
             onInitialized(ProviderState.Ready);
         }
 
-        public void Request(Action<bool> onResult)
+        public void ShowDialog(Action<bool> onResult)
         {
             _requested = true;
             onResult(true);

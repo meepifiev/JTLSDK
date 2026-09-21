@@ -19,14 +19,14 @@ namespace JTLStudio.SDK
         public static IPause Pause => Instance.Pause;
         public static ITime Time => Instance.Time;
         public static IAudio Audio => Instance.Audio;
-        public static IGameplay Gameplay => Instance.Gameplay;
+        public static IGameEvents GameEvents => Instance.GameEvents;
         public static ILeaderboards Leaderboards => Instance.Leaderboards;
         public static IPlayer Player => Instance.Player;
         public static IFlags Flags => Instance.Flags;
         public static IPlatform Platform => Instance.Platform;
         public static IDevice Device => Instance.Device;
         public static IReview Review => Instance.Review;
-        public static IShortcut Shortcut => Instance.Shortcut;
+        public static IGameLabel GameLabel => Instance.GameLabel;
 
         internal static SdkInstance Current => _instance;
 

@@ -40,7 +40,7 @@ private void Awake()
 
 private void OnReady()
 {
-    JTLSDK.Gameplay.GameReady();
+    JTLSDK.GameEvents.GameReady();
 }
 ```
 
@@ -102,16 +102,22 @@ using (JTLSDK.Pause.Hold("Menu"))
 }
 ```
 
-**Геймплей.** `GameReady` один раз после загрузки, `Start` и `Stop` вокруг активной игры.
+**Игровые события.** `GameReady` один раз после загрузки. `GameplayStarted`, `GameplayStopped` и `GameplayRestarted` вокруг активной игры.
 
-**Лидерборды, игрок, флаги, отзыв, ярлык.**
+```csharp
+JTLSDK.GameEvents.GameplayStarted();
+JTLSDK.GameEvents.GameplayRestarted();
+JTLSDK.GameEvents.GameplayStopped();
+```
+
+**Лидерборды, игрок, флаги, отзыв, ярлык игры.**
 
 ```csharp
 JTLSDK.Leaderboards.SetScore(LeaderboardIds.Levels, 27);
 JTLSDK.Player.Authorize(success => { });
 bool hardMode = JTLSDK.Flags.GetBool(FlagKeys.HardMode);
 JTLSDK.Review.Request(sent => { });
-JTLSDK.Shortcut.Request(created => { });
+JTLSDK.GameLabel.ShowDialog(created => { });
 ```
 
 **Площадка и устройство.**

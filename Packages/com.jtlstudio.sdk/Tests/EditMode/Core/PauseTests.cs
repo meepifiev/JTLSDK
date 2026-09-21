@@ -140,14 +140,14 @@ namespace JTLStudio.SDK.Tests.Core
         [Test]
         public void GameplaySuspendsDuringPauseAndResumes()
         {
-            JTLSDK.Gameplay.Start();
-            Assert.IsTrue(JTLSDK.Gameplay.IsPlaying);
+            JTLSDK.GameEvents.GameplayStarted();
+            Assert.IsTrue(JTLSDK.GameEvents.IsGameplayActive);
 
             IDisposable hold = JTLSDK.Pause.Hold("Menu");
-            Assert.IsFalse(JTLSDK.Gameplay.IsPlaying);
+            Assert.IsFalse(JTLSDK.GameEvents.IsGameplayActive);
 
             hold.Dispose();
-            Assert.IsTrue(JTLSDK.Gameplay.IsPlaying);
+            Assert.IsTrue(JTLSDK.GameEvents.IsGameplayActive);
         }
     }
 }

@@ -5,17 +5,17 @@ using NUnit.Framework;
 
 namespace JTLStudio.SDK.Tests.Core
 {
-    public class GameplayTests
+    public class GameEventsTests
     {
         private TestSettingsBuilder _builder;
-        private FakeGameplayProvider _gameplay;
+        private FakeGameEventsProvider _gameplay;
 
         [SetUp]
         public void SetUp()
         {
             JTLSDK.Destroy();
-            _gameplay = new FakeGameplayProvider();
-            _builder = new TestSettingsBuilder { Gameplay = _gameplay };
+            _gameplay = new FakeGameEventsProvider();
+            _builder = new TestSettingsBuilder { GameEvents = _gameplay };
         }
 
         [TearDown]
@@ -30,14 +30,36 @@ namespace JTLStudio.SDK.Tests.Core
             _gameplay.CompleteImmediately = false;
             JTLSDK.Create(_builder.Build());
 
-            JTLSDK.Gameplay.GameReady();
-            JTLSDK.Gameplay.GameReady();
+            JTLSDK.GameEvents.GameReady();
+            JTLSDK.GameEvents.GameReady();
             Assert.IsEmpty(_gameplay.Calls);
 
             _gameplay.Complete(ProviderState.Ready);
 
             CollectionAssert.AreEqual(new[] { "ready" }, _gameplay.Calls);
-            Assert.IsTrue(JTLSDK.Gameplay.IsGameReady);
+            Assert.IsTrue(JTLSDK.GameEvents.IsGameReady);
+        }
+
+        [Test]
+        public void RestartStopsAndStartsActiveGameplay()
+        {
+            JTLSDK.Create(_builder.Build());
+
+            JTLSDK.GameEvents.GameplayStarted();
+            JTLSDK.GameEvents.GameplayRestarted();
+
+            CollectionAssert.AreEqual(new[] { "start", "stop", "start" }, _gameplay.Calls);
+            Assert.IsTrue(JTLSDK.GameEvents.IsGameplayActive);
+        }
+
+        [Test]
+        public void RestartStartsInactiveGameplay()
+        {
+            JTLSDK.Create(_builder.Build());
+
+            JTLSDK.GameEvents.GameplayRestarted();
+
+            CollectionAssert.AreEqual(new[] { "start" }, _gameplay.Calls);
         }
 
         [Test]
@@ -45,10 +67,10 @@ namespace JTLStudio.SDK.Tests.Core
         {
             JTLSDK.Create(_builder.Build());
 
-            JTLSDK.Gameplay.Start();
-            JTLSDK.Gameplay.Start();
-            JTLSDK.Gameplay.Stop();
-            JTLSDK.Gameplay.Stop();
+            JTLSDK.GameEvents.GameplayStarted();
+            JTLSDK.GameEvents.GameplayStarted();
+            JTLSDK.GameEvents.GameplayStopped();
+            JTLSDK.GameEvents.GameplayStopped();
 
             CollectionAssert.AreEqual(new[] { "start", "stop" }, _gameplay.Calls);
         }
@@ -57,7 +79,7 @@ namespace JTLStudio.SDK.Tests.Core
         public void PauseSuspendsGameplayAndRestoresIt()
         {
             JTLSDK.Create(_builder.Build());
-            JTLSDK.Gameplay.Start();
+            JTLSDK.GameEvents.GameplayStarted();
 
             IDisposable hold = JTLSDK.Pause.Hold("Menu");
             hold.Dispose();
@@ -74,7 +96,7 @@ namespace JTLStudio.SDK.Tests.Core
             hold.Dispose();
 
             Assert.IsEmpty(_gameplay.Calls);
-            Assert.IsFalse(JTLSDK.Gameplay.IsPlaying);
+            Assert.IsFalse(JTLSDK.GameEvents.IsGameplayActive);
         }
     }
 }

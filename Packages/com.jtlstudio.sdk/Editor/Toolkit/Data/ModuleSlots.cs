@@ -16,9 +16,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
             new ModuleSlot("module.leaderboards", "_leaderboards", typeof(ILeaderboardsProvider)),
             new ModuleSlot("module.flags", "_flags", typeof(IFlagsProvider)),
             new ModuleSlot("module.time", "_timeProvider", typeof(ITimeProvider)),
-            new ModuleSlot("module.gameplay", "_gameplay", typeof(IGameplayProvider)),
+            new ModuleSlot("module.gameEvents", "_gameEvents", typeof(IGameEventsProvider)),
             new ModuleSlot("module.review", "_review", typeof(IReviewProvider)),
-            new ModuleSlot("module.shortcut", "_shortcut", typeof(IShortcutProvider))
+            new ModuleSlot("module.gameLabel", "_gameLabel", typeof(IGameLabelProvider))
         };
 
         public IReadOnlyList<ModuleSlot> All => _slots;

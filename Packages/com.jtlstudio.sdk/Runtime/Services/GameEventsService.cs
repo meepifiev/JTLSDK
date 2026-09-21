@@ -3,15 +3,15 @@ using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.Services
 {
-    public class GameplayService : ModuleBase, IGameplay
+    public class GameEventsService : ModuleBase, IGameEvents
     {
-        private readonly IGameplayProvider _provider;
+        private readonly IGameEventsProvider _provider;
         private readonly PauseService _pause;
         private bool _gameReadyRequested;
         private bool _wasPlayingBeforeSuspend;
         private int _suspendDepth;
 
-        public GameplayService(IGameplayProvider provider, PauseService pause, SdkLogger logger) : base(logger)
+        public GameEventsService(IGameEventsProvider provider, PauseService pause, SdkLogger logger) : base(logger)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _pause = pause ?? throw new ArgumentNullException(nameof(pause));
@@ -19,9 +19,9 @@ namespace JTLStudio.SDK.Services
         }
 
         public bool IsGameReady { get; private set; }
-        public bool IsPlaying { get; private set; }
+        public bool IsGameplayActive { get; private set; }
 
-        internal override string ModuleName => "Gameplay";
+        internal override string ModuleName => "GameEvents";
 
         public void GameReady()
         {
@@ -38,26 +38,32 @@ namespace JTLStudio.SDK.Services
             }
         }
 
-        public void Start()
+        public void GameplayStarted()
         {
-            if (IsPlaying)
+            if (IsGameplayActive)
             {
                 return;
             }
 
-            IsPlaying = true;
+            IsGameplayActive = true;
             Report(_provider.ReportGameplayStart);
         }
 
-        public void Stop()
+        public void GameplayStopped()
         {
-            if (IsPlaying == false)
+            if (IsGameplayActive == false)
             {
                 return;
             }
 
-            IsPlaying = false;
+            IsGameplayActive = false;
             Report(_provider.ReportGameplayStop);
+        }
+
+        public void GameplayRestarted()
+        {
+            GameplayStopped();
+            GameplayStarted();
         }
 
         internal override void Initialize()
@@ -79,8 +85,8 @@ namespace JTLStudio.SDK.Services
                 return;
             }
 
-            _wasPlayingBeforeSuspend = IsPlaying;
-            Stop();
+            _wasPlayingBeforeSuspend = IsGameplayActive;
+            GameplayStopped();
         }
 
         internal void Resume()
@@ -94,7 +100,7 @@ namespace JTLStudio.SDK.Services
 
             if (_suspendDepth == 0 && _wasPlayingBeforeSuspend)
             {
-                Start();
+                GameplayStarted();
             }
         }
 
@@ -107,7 +113,7 @@ namespace JTLStudio.SDK.Services
                 SendGameReady();
             }
 
-            if (IsPlaying)
+            if (IsGameplayActive)
             {
                 Report(_provider.ReportGameplayStart);
             }

@@ -45,6 +45,11 @@ namespace JTLStudio.SDK.Editor.Configuration
                 PlayerSettings.runInBackground = preset.RunInBackground;
             }
 
+            if (preset.ApplyDebugSymbols)
+            {
+                PlayerSettings.WebGL.debugSymbolMode = preset.DebugSymbols ? WebGLDebugSymbolMode.External : WebGLDebugSymbolMode.Off;
+            }
+
             if (preset.ApplyMemorySize)
             {
                 PlayerSettings.WebGL.memorySize = preset.MemorySizeMegabytes;

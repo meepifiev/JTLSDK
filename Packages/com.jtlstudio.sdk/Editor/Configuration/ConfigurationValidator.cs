@@ -54,9 +54,9 @@ namespace JTLStudio.SDK.Editor.Configuration
             yield return configuration.Leaderboards;
             yield return configuration.Flags;
             yield return configuration.TimeProvider;
-            yield return configuration.Gameplay;
+            yield return configuration.GameEvents;
             yield return configuration.Review;
-            yield return configuration.Shortcut;
+            yield return configuration.GameLabel;
         }
     }
 }

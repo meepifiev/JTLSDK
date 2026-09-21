@@ -82,9 +82,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.ads", "Ads", "Реклама");
             Add("nav.player", "Player", "Игрок");
             Add("nav.time", "Time", "Время");
-            Add("nav.gameplay", "Gameplay", "Геймплей");
+            Add("nav.gameEvents", "Game events", "Игровые события");
             Add("nav.review", "Review", "Отзыв");
-            Add("nav.shortcut", "Shortcut", "Ярлык");
+            Add("nav.gameLabel", "Game label", "Ярлык игры");
+            Add("nav.features", "Features", "Возможности");
             Add("nav.pause", "Pause", "Пауза");
             Add("nav.audio", "Audio", "Звук");
             Add("nav.platform", "Platform", "Площадка");
@@ -193,9 +194,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("module.player", "Player", "Игрок");
             Add("module.flags", "Flags", "Флаги");
             Add("module.time", "Time", "Время");
-            Add("module.gameplay", "Gameplay", "Геймплей");
+            Add("module.gameEvents", "Game events", "Игровые события");
             Add("module.review", "Review", "Отзыв");
-            Add("module.shortcut", "Shortcut", "Ярлык");
+            Add("module.gameLabel", "Game label", "Ярлык игры");
             Add("topbar.noConfiguration", "No configuration", "Нет конфигурации");
             Add("topbar.packageVersion", "Package", "Пакет");
             Add("topbar.manageConfigurations", "Manage configurations", "Управлять конфигурациями");

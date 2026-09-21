@@ -28,7 +28,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
         protected override void OnRendered()
         {
-            Require<ToolkitButton>("new-configuration").clicked += OnNewConfigurationClicked;
+            ToolkitButton newConfiguration = Require<ToolkitButton>("new-configuration");
+            newConfiguration.clicked += OnNewConfigurationClicked;
+            newConfiguration.SetEnabled(Context.Project.Find(PlatformId.YandexGames) == null || Context.Project.Find(PlatformId.YouTubePlayables) == null);
             BuildCards(Require<VisualElement>("configuration-cards"));
             BindGeneralSettings();
         }
@@ -172,9 +174,22 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private void OnNewConfigurationClicked()
         {
             GenericMenu menu = new GenericMenu();
-            menu.AddItem(new GUIContent(Context.Platforms.DisplayName(PlatformId.YandexGames)), false, () => CreateConfiguration(PlatformId.YandexGames));
-            menu.AddItem(new GUIContent(Context.Platforms.DisplayName(PlatformId.YouTubePlayables)), false, () => CreateConfiguration(PlatformId.YouTubePlayables));
+            AddPlatformItem(menu, PlatformId.YandexGames);
+            AddPlatformItem(menu, PlatformId.YouTubePlayables);
             menu.ShowAsContext();
+        }
+
+        private void AddPlatformItem(GenericMenu menu, PlatformId platform)
+        {
+            GUIContent content = new GUIContent(Context.Platforms.DisplayName(platform));
+
+            if (Context.Project.Find(platform) != null)
+            {
+                menu.AddDisabledItem(content);
+                return;
+            }
+
+            menu.AddItem(content, false, () => CreateConfiguration(platform));
         }
 
         private void CreateConfiguration(PlatformId platform)

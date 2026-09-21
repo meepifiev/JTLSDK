@@ -223,9 +223,9 @@ namespace JTLStudio.SDK.Editor.Toolkit
             Register(new ModuleSection(_context, ToolkitSectionId.Ads, "nav.ads", "_ads"));
             Register(new ModuleSection(_context, ToolkitSectionId.Player, "nav.player", "_player"));
             Register(new ModuleSection(_context, ToolkitSectionId.Time, "nav.time", "_timeProvider"));
-            Register(new ModuleSection(_context, ToolkitSectionId.Gameplay, "nav.gameplay", "_gameplay"));
+            Register(new ModuleSection(_context, ToolkitSectionId.GameEvents, "nav.gameEvents", "_gameEvents"));
             Register(new ModuleSection(_context, ToolkitSectionId.Review, "nav.review", "_review"));
-            Register(new ModuleSection(_context, ToolkitSectionId.Shortcut, "nav.shortcut", "_shortcut"));
+            Register(new ModuleSection(_context, ToolkitSectionId.GameLabel, "nav.gameLabel", "_gameLabel"));
             Register(new PauseSection(_context));
             Register(new ModuleSection(_context, ToolkitSectionId.Audio, "nav.audio", "_platformProvider"));
             Register(new ModuleSection(_context, ToolkitSectionId.Platform, "nav.platform", "_platformProvider"));

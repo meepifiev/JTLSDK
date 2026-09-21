@@ -13,7 +13,7 @@ namespace JTLStudio.SDK.Services
         private readonly FlagsService _flags;
         private readonly TimeService _time;
         private readonly ReviewService _review;
-        private readonly ShortcutService _shortcut;
+        private readonly GameLabelService _gameLabel;
 
         public PlatformService(
             IPlatformProvider provider,
@@ -24,7 +24,7 @@ namespace JTLStudio.SDK.Services
             FlagsService flags,
             TimeService time,
             ReviewService review,
-            ShortcutService shortcut,
+            GameLabelService gameLabel,
             SdkLogger logger) : base(logger)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -35,7 +35,7 @@ namespace JTLStudio.SDK.Services
             _flags = flags ?? throw new ArgumentNullException(nameof(flags));
             _time = time ?? throw new ArgumentNullException(nameof(time));
             _review = review ?? throw new ArgumentNullException(nameof(review));
-            _shortcut = shortcut ?? throw new ArgumentNullException(nameof(shortcut));
+            _gameLabel = gameLabel ?? throw new ArgumentNullException(nameof(gameLabel));
         }
 
         public PlatformId Current => _provider.Platform;
@@ -77,8 +77,8 @@ namespace JTLStudio.SDK.Services
                 case Capability.Review:
                     return _review.IsSupported;
 
-                case Capability.Shortcut:
-                    return _shortcut.IsSupported;
+                case Capability.GameLabel:
+                    return _gameLabel.IsSupported;
 
                 case Capability.PlatformMute:
                     return _provider.SupportsPlatformMute;

@@ -20,6 +20,8 @@ namespace JTLStudio.SDK
         [SerializeField] private StrippingLevel _stripping = StrippingLevel.Medium;
         [SerializeField] private bool _applyRunInBackground = true;
         [SerializeField] private bool _runInBackground = true;
+        [SerializeField] private bool _applyDebugSymbols = true;
+        [SerializeField] private bool _debugSymbols;
         [SerializeField] private bool _applyMemorySize;
         [SerializeField] private int _memorySizeMegabytes = 512;
 
@@ -35,6 +37,8 @@ namespace JTLStudio.SDK
         public StrippingLevel Stripping { get => _stripping; set => _stripping = value; }
         public bool ApplyRunInBackground { get => _applyRunInBackground; set => _applyRunInBackground = value; }
         public bool RunInBackground { get => _runInBackground; set => _runInBackground = value; }
+        public bool ApplyDebugSymbols { get => _applyDebugSymbols; set => _applyDebugSymbols = value; }
+        public bool DebugSymbols { get => _debugSymbols; set => _debugSymbols = value; }
         public bool ApplyMemorySize { get => _applyMemorySize; set => _applyMemorySize = value; }
         public int MemorySizeMegabytes { get => _memorySizeMegabytes; set => _memorySizeMegabytes = Mathf.Max(32, value); }
     }

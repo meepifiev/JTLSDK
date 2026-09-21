@@ -9,6 +9,7 @@ namespace JTLStudio.SDK.Editor.Configuration
             preset.DataCaching = true;
             preset.RunInBackground = true;
             preset.MemorySizeMegabytes = 512;
+            preset.DebugSymbols = false;
 
             switch (platform)
             {

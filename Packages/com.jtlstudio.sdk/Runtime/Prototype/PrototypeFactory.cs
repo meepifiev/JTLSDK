@@ -95,9 +95,9 @@ namespace JTLStudio.SDK.Prototype
             return new PrototypeTimeProvider(configured.IsServerTime);
         }
 
-        public IGameplayProvider Gameplay(IGameplayProvider configured)
+        public IGameEventsProvider GameEvents(IGameEventsProvider configured)
         {
-            return new PrototypeGameplayProvider();
+            return new PrototypeGameEventsProvider();
         }
 
         public IReviewProvider Review(IReviewProvider configured)
@@ -110,14 +110,14 @@ namespace JTLStudio.SDK.Prototype
             return new PrototypeReviewProvider();
         }
 
-        public IShortcutProvider Shortcut(IShortcutProvider configured)
+        public IGameLabelProvider GameLabel(IGameLabelProvider configured)
         {
-            if (configured is UnsupportedShortcutProvider)
+            if (configured is UnsupportedGameLabelProvider)
             {
                 return configured;
             }
 
-            return new PrototypeShortcutProvider();
+            return new PrototypeGameLabelProvider();
         }
     }
 }

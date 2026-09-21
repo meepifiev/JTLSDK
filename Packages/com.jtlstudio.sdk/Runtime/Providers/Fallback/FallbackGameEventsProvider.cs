@@ -1,9 +1,11 @@
 using System;
+using UnityEngine.Scripting.APIUpdating;
 
 namespace JTLStudio.SDK.Providers
 {
     [Serializable]
-    public class FallbackGameplayProvider : IGameplayProvider
+    [MovedFrom(false, sourceClassName: "FallbackGameplayProvider")]
+    public class FallbackGameEventsProvider : IGameEventsProvider
     {
         public void Initialize(Action<ProviderState> onInitialized)
         {

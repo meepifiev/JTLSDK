@@ -40,7 +40,7 @@ private void Awake()
 
 private void OnReady()
 {
-    JTLSDK.Gameplay.GameReady();
+    JTLSDK.GameEvents.GameReady();
 }
 ```
 
@@ -102,16 +102,22 @@ using (JTLSDK.Pause.Hold("Menu"))
 }
 ```
 
-**Gameplay.** Call `GameReady` once after loading, and `Start` and `Stop` around active play.
+**Game events.** Call `GameReady` once after loading. Call `GameplayStarted`, `GameplayStopped` and `GameplayRestarted` around active play.
 
-**Leaderboards, player, flags, review, shortcut.**
+```csharp
+JTLSDK.GameEvents.GameplayStarted();
+JTLSDK.GameEvents.GameplayRestarted();
+JTLSDK.GameEvents.GameplayStopped();
+```
+
+**Leaderboards, player, flags, review, game label.**
 
 ```csharp
 JTLSDK.Leaderboards.SetScore(LeaderboardIds.Levels, 27);
 JTLSDK.Player.Authorize(success => { });
 bool hardMode = JTLSDK.Flags.GetBool(FlagKeys.HardMode);
 JTLSDK.Review.Request(sent => { });
-JTLSDK.Shortcut.Request(created => { });
+JTLSDK.GameLabel.ShowDialog(created => { });
 ```
 
 **Platform and device.**

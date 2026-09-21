@@ -1,12 +1,14 @@
 using System;
+using UnityEngine.Scripting.APIUpdating;
 using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
-namespace JTLStudio.SDK.YandexGames
+namespace JTLStudio.SDK.YouTubePlayables
 {
     [Serializable]
-    [ProviderPlatforms(PlatformId.YandexGames)]
-    public class YandexGamesGameplayProvider : BridgeProviderBase, IGameplayProvider
+    [MovedFrom(false, sourceClassName: "YouTubePlayablesGameplayProvider")]
+    [ProviderPlatforms(PlatformId.YouTubePlayables)]
+    public class YouTubePlayablesGameEventsProvider : BridgeProviderBase, IGameEventsProvider
     {
         public void Initialize(Action<ProviderState> onInitialized)
         {
@@ -20,12 +22,10 @@ namespace JTLStudio.SDK.YandexGames
 
         public void ReportGameplayStart()
         {
-            Call("gameplay", "start", null, _ => { });
         }
 
         public void ReportGameplayStop()
         {
-            Call("gameplay", "stop", null, _ => { });
         }
     }
 }

@@ -38,8 +38,26 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
             }
         }
 
+        public SdkConfiguration Find(PlatformId platform)
+        {
+            foreach (SdkConfiguration configuration in Configurations)
+            {
+                if (configuration.Platform == platform)
+                {
+                    return configuration;
+                }
+            }
+
+            return null;
+        }
+
         public SdkConfiguration Create(PlatformId platform)
         {
+            if (Find(platform) != null)
+            {
+                throw new InvalidOperationException(platform + " already has a configuration.");
+            }
+
             SdkConfiguration configuration = _assets.CreateConfiguration(platform, _platforms.DisplayName(platform));
             configuration.Languages.Clear();
             configuration.Languages.AddRange(Settings.SupportedLanguages);

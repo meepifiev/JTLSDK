@@ -19,6 +19,7 @@ namespace JTLStudio.SDK.Editor.Build
         private const string YouTubeScriptHost = "https://www.youtube.com/game_api/";
 
         private readonly TemplateService _template = new TemplateService();
+        private readonly PlatformBridgeFilter _bridges = new PlatformBridgeFilter();
         private readonly ConfigurationValidator _validator = new ConfigurationValidator();
         private readonly DefineSymbolService _defines = new DefineSymbolService();
 
@@ -80,14 +81,9 @@ namespace JTLStudio.SDK.Editor.Build
             string configurationName = configuration == null ? "Editor" : configuration.DisplayName;
             string folder = Path.Combine(settings.BuildPath, ResolveName(settings, configuration, buildNumber));
 
-            try
-            {
-                _template.Apply(settings, configuration, buildNumber, settings.DevelopmentBuild);
-            }
-            catch (Exception exception)
-            {
-                return new BuildResult(false, folder, 0, 0, new List<BuildCheck>(), exception.Message);
-            }
+            PlayerSettings.WebGL.template = TemplateService.TemplateSetting;
+            _bridges.Register();
+            SessionState.SetInt(TemplateService.BuildNumberKey, buildNumber);
 
             BuildPlayerOptions options = new BuildPlayerOptions
             {
@@ -101,6 +97,7 @@ namespace JTLStudio.SDK.Editor.Build
             Stopwatch stopwatch = Stopwatch.StartNew();
             BuildReport report = BuildPipeline.BuildPlayer(options);
             stopwatch.Stop();
+            SessionState.EraseInt(TemplateService.BuildNumberKey);
 
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
@@ -151,7 +148,7 @@ namespace JTLStudio.SDK.Editor.Build
             string index = Path.Combine(folder, "index.html");
             List<BuildCheck> checks = new List<BuildCheck>
             {
-                new BuildCheck("build.check.variables", File.Exists(index) && File.ReadAllText(index).Contains("{{{") == false)
+                new BuildCheck("build.check.variables", File.Exists(index) && File.ReadAllText(index).Contains("{{{") == false && File.ReadAllText(index).Contains("%JTLSDK_") == false)
             };
 
             if (platform != PlatformId.YouTubePlayables)

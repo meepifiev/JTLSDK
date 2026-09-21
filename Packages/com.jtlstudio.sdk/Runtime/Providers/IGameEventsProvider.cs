@@ -1,6 +1,6 @@
 namespace JTLStudio.SDK.Providers
 {
-    public interface IGameplayProvider : IProvider
+    public interface IGameEventsProvider : IProvider
     {
         void ReportGameReady();
         void ReportGameplayStart();

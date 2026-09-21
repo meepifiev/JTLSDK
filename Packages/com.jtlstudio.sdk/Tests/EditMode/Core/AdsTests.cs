@@ -67,21 +67,21 @@ namespace JTLStudio.SDK.Tests.Core
         public void PauseAndGameplayAreHeldDuringShow()
         {
             JTLSDK.Create(_builder.Build());
-            JTLSDK.Gameplay.Start();
+            JTLSDK.GameEvents.GameplayStarted();
             AdResult? result = null;
 
             JTLSDK.Ads.ShowRewarded("reward", value => result = value);
 
             Assert.IsTrue(JTLSDK.Ads.IsShowing);
             Assert.IsTrue(JTLSDK.Pause.IsPaused);
-            Assert.IsFalse(JTLSDK.Gameplay.IsPlaying);
+            Assert.IsFalse(JTLSDK.GameEvents.IsGameplayActive);
 
             _ads.CompleteShow(AdResult.Rewarded);
 
             Assert.AreEqual(AdResult.Rewarded, result);
             Assert.IsFalse(JTLSDK.Ads.IsShowing);
             Assert.IsFalse(JTLSDK.Pause.IsPaused);
-            Assert.IsTrue(JTLSDK.Gameplay.IsPlaying);
+            Assert.IsTrue(JTLSDK.GameEvents.IsGameplayActive);
         }
 
         [Test]

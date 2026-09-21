@@ -3,33 +3,33 @@ using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.Services
 {
-    public class ShortcutService : ModuleBase, IShortcut
+    public class GameLabelService : ModuleBase, IGameLabel
     {
-        private readonly IShortcutProvider _provider;
+        private readonly IGameLabelProvider _provider;
 
-        public ShortcutService(IShortcutProvider provider, SdkLogger logger) : base(logger)
+        public GameLabelService(IGameLabelProvider provider, SdkLogger logger) : base(logger)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public bool CanRequest => State == ModuleState.Ready && _provider.CanRequest;
+        public bool CanShow => State == ModuleState.Ready && _provider.CanShow;
 
-        internal override string ModuleName => "Shortcut";
+        internal override string ModuleName => "GameLabel";
 
-        public void Request(Action<bool> onResult)
+        public void ShowDialog(Action<bool> onResult)
         {
             if (onResult == null)
             {
                 throw new ArgumentNullException(nameof(onResult));
             }
 
-            if (CanRequest == false)
+            if (CanShow == false)
             {
                 onResult(false);
                 return;
             }
 
-            _provider.Request(onResult);
+            _provider.ShowDialog(onResult);
         }
 
         internal override void Initialize()

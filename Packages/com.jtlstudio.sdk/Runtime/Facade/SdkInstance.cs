@@ -23,7 +23,7 @@ namespace JTLStudio.SDK
         private readonly TimeService _time;
         private readonly AudioService _audio;
         private readonly DeviceService _device;
-        private readonly GameplayService _gameplay;
+        private readonly GameEventsService _gameEvents;
         private readonly AdsService _ads;
         private readonly DataService _data;
         private readonly PaymentsService _payments;
@@ -32,7 +32,7 @@ namespace JTLStudio.SDK
         private readonly PlayerService _player;
         private readonly FlagsService _flags;
         private readonly ReviewService _review;
-        private readonly ShortcutService _shortcut;
+        private readonly GameLabelService _gameLabel;
 
         private readonly WebBridge _bridge;
         private SdkRuntimeBehaviour _behaviour;
@@ -56,15 +56,15 @@ namespace JTLStudio.SDK
             ILeaderboardsProvider leaderboardsProvider = ResolveProvider(configuration?.Leaderboards, new UnsupportedLeaderboardsProvider());
             IFlagsProvider flagsProvider = ResolveProvider(configuration?.Flags, new UnsupportedFlagsProvider());
             ITimeProvider timeProvider = ResolveProvider(configuration?.TimeProvider, new FallbackTimeProvider());
-            IGameplayProvider gameplayProvider = ResolveProvider(configuration?.Gameplay, new FallbackGameplayProvider());
+            IGameEventsProvider gameEventsProvider = ResolveProvider(configuration?.GameEvents, new FallbackGameEventsProvider());
             IReviewProvider reviewProvider = ResolveProvider(configuration?.Review, new UnsupportedReviewProvider());
-            IShortcutProvider shortcutProvider = ResolveProvider(configuration?.Shortcut, new UnsupportedShortcutProvider());
+            IGameLabelProvider gameLabelProvider = ResolveProvider(configuration?.GameLabel, new UnsupportedGameLabelProvider());
 
             bool pauseOnFocusLoss = configuration == null || configuration.PauseOnFocusLoss;
             PlatformId platformId = configuration == null ? PlatformId.Editor : configuration.Platform;
 
             _bridge = new WebBridge(_logger, platformId);
-            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameplayProvider, reviewProvider, shortcutProvider);
+            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameEventsProvider, reviewProvider, gameLabelProvider);
 
 #if UNITY_EDITOR
             if (settings.UsePrototypesInEditor)
@@ -79,9 +79,9 @@ namespace JTLStudio.SDK
                 leaderboardsProvider = prototypes.Leaderboards(leaderboardsProvider);
                 flagsProvider = prototypes.Flags(flagsProvider);
                 timeProvider = prototypes.Time(timeProvider);
-                gameplayProvider = prototypes.Gameplay(gameplayProvider);
+                gameEventsProvider = prototypes.GameEvents(gameEventsProvider);
                 reviewProvider = prototypes.Review(reviewProvider);
-                shortcutProvider = prototypes.Shortcut(shortcutProvider);
+                gameLabelProvider = prototypes.GameLabel(gameLabelProvider);
             }
 #endif
 
@@ -89,8 +89,8 @@ namespace JTLStudio.SDK
             _time = new TimeService(timeProvider, _pause, _logger);
             _audio = new AudioService(platformProvider, _pause, _logger);
             _device = new DeviceService(platformProvider, _pause, _logger);
-            _gameplay = new GameplayService(gameplayProvider, _pause, _logger);
-            _ads = new AdsService(adsProvider, _pause, _gameplay, _logger);
+            _gameEvents = new GameEventsService(gameEventsProvider, _pause, _logger);
+            _ads = new AdsService(adsProvider, _pause, _gameEvents, _logger);
             _data = new DataService(dataProvider, settings.AutosaveDelaySeconds, _logger);
             _player = new PlayerService(playerProvider, _data, _logger);
             _payments = new PaymentsService(paymentsProvider, _data, _pause, settings.Products, platformId, _logger);
@@ -98,15 +98,15 @@ namespace JTLStudio.SDK
             _leaderboards = new LeaderboardsService(leaderboardsProvider, _player, settings.Leaderboards, platformId, _logger);
             _flags = new FlagsService(flagsProvider, settings.Flags, _logger);
             _review = new ReviewService(reviewProvider, _logger);
-            _shortcut = new ShortcutService(shortcutProvider, _logger);
-            _platform = new PlatformService(platformProvider, _ads, _payments, _leaderboards, _player, _flags, _time, _review, _shortcut, _logger);
+            _gameLabel = new GameLabelService(gameLabelProvider, _logger);
+            _platform = new PlatformService(platformProvider, _ads, _payments, _leaderboards, _player, _flags, _time, _review, _gameLabel, _logger);
 
             _modules.Add(_platform);
             _modules.Add(_pause);
             _modules.Add(_time);
             _modules.Add(_audio);
             _modules.Add(_device);
-            _modules.Add(_gameplay);
+            _modules.Add(_gameEvents);
             _modules.Add(_ads);
             _modules.Add(_data);
             _modules.Add(_player);
@@ -115,7 +115,7 @@ namespace JTLStudio.SDK
             _modules.Add(_leaderboards);
             _modules.Add(_flags);
             _modules.Add(_review);
-            _modules.Add(_shortcut);
+            _modules.Add(_gameLabel);
 
             foreach (ModuleBase module in _modules)
             {
@@ -132,14 +132,14 @@ namespace JTLStudio.SDK
         public IPause Pause => _pause;
         public ITime Time => _time;
         public IAudio Audio => _audio;
-        public IGameplay Gameplay => _gameplay;
+        public IGameEvents GameEvents => _gameEvents;
         public ILeaderboards Leaderboards => _leaderboards;
         public IPlayer Player => _player;
         public IFlags Flags => _flags;
         public IPlatform Platform => _platform;
         public IDevice Device => _device;
         public IReview Review => _review;
-        public IShortcut Shortcut => _shortcut;
+        public IGameLabel GameLabel => _gameLabel;
 
         internal IReadOnlyList<ModuleBase> Modules => _modules;
 

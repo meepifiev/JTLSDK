@@ -4,7 +4,7 @@ using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.Prototype
 {
-    public class PrototypeGameplayProvider : IGameplayProvider
+    public class PrototypeGameEventsProvider : IGameEventsProvider
     {
         public bool GameReadyReported { get; private set; }
         public bool IsPlaying { get; private set; }

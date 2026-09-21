@@ -135,6 +135,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             table.Add(SettingRow("Data Caching", SwitchControl(preset.FindPropertyRelative("_dataCaching")), preset.FindPropertyRelative("_applyDataCaching")));
             table.Add(SettingRow("Managed Stripping Level", EnumControl<StrippingLevel>(preset.FindPropertyRelative("_stripping"), false), preset.FindPropertyRelative("_applyStripping")));
             table.Add(SettingRow("Run In Background", SwitchControl(preset.FindPropertyRelative("_runInBackground")), preset.FindPropertyRelative("_applyRunInBackground")));
+            table.Add(SettingRow("Debug Symbols", SwitchControl(preset.FindPropertyRelative("_debugSymbols")), preset.FindPropertyRelative("_applyDebugSymbols")));
             table.Add(SettingRow("Memory Size", MemoryControl(preset.FindPropertyRelative("_memorySizeMegabytes")), preset.FindPropertyRelative("_applyMemorySize")));
             card.Add(table);
             return card;
