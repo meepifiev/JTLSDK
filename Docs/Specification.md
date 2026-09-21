@@ -109,6 +109,7 @@ Packages/com.jtlstudio.sdk/
     Services/          общие сервисы
     Providers/         интерфейсы провайдеров
     Bridge/            C#-сторона моста
+    Prototype/         провайдеры-прототипы (код под UNITY_EDITOR)
     Plugins/WebGL/     jtlsdk.jspre (собирается из Bridge~)
     Platforms/
       YandexGames/     JTLStudio.SDK.YandexGames.asmdef, провайдеры, yandexgames.jslib
@@ -146,13 +147,15 @@ WebGL-шаблон в пакете не лежит. Он живёт в отде�
 
 Сборки:
 
-| asmdef | Define constraints | Содержимое |
+| asmdef | Платформы | Содержимое |
 |---|---|---|
-| `JTLStudio.SDK` | нет | фасад, модули, сервисы, мост, Editor-провайдеры (под `UNITY_EDITOR`) |
-| `JTLStudio.SDK.YandexGames` | `JTLSDK_YANDEX_GAMES` | провайдеры Яндекса |
-| `JTLStudio.SDK.YouTubePlayables` | `JTLSDK_YOUTUBE_PLAYABLES` | провайдеры YouTube |
-| `JTLStudio.SDK.Editor` | `UNITY_EDITOR` | тулкит и всё редакторское |
-| `JTLStudio.SDK.Tests` | `UNITY_INCLUDE_TESTS` | тесты |
+| `JTLStudio.SDK` | все | фасад, модули, сервисы, мост, прототипы (`Runtime/Prototype`, код под `UNITY_EDITOR`) |
+| `JTLStudio.SDK.YandexGames` | Editor, WebGL | провайдеры Яндекса |
+| `JTLStudio.SDK.YouTubePlayables` | Editor, WebGL | провайдеры YouTube |
+| `JTLStudio.SDK.Editor` | Editor | тулкит и всё редакторское |
+| `JTLStudio.SDK.Tests.EditMode` | Editor, `UNITY_INCLUDE_TESTS` | тесты |
+
+Сборки площадок компилируются всегда, без define constraints: провайдеры хранятся в конфигурациях через `SerializeReference` и должны существовать до активации, иначе конфигурацию нельзя ни создать, ни показать в тулките. Define-символ активной конфигурации гейтит только тела `[DllImport]` (`#if JTLSDK_YANDEX_GAMES && UNITY_WEBGL && !UNITY_EDITOR`) и `.jslib` через `PluginImporter.DefineConstraints`. Провайдер неактивной площадки в билд не попадает благодаря managed stripping, потому что на него никто не ссылается.
 
 Asmdef обязательны: Unity не компилирует скрипты пакета из `Packages` без asmdef (проверено на 2021.3.45f2: `Script '...' will not be compiled because it exists outside the Assets folder and does not belong to any assembly definition file`). Модель та же, что у Prime.
 
@@ -996,7 +999,7 @@ C# регистрирует его при `Create()`. Ответы на запр
 
 ### 8.1. Editor
 
-Провайдеры-прототипы. Работают только в редакторе, лежат в `Runtime` под `UNITY_EDITOR`, в билд не попадают. Реклама и покупки рисуют оверлей во вкладке Game (раздел 10). Сейв в `PlayerPrefs`. Язык, устройство, пауза площадки и её звук переключаются в оверлее вкладки Game. Прототипы проходят через те же общие сервисы, что и площадки.
+Провайдеры-прототипы. Работают только в редакторе, лежат в `Runtime/Prototype` под `UNITY_EDITOR`, в билд не попадают. Реклама и покупки рисуют оверлей во вкладке Game (раздел 10). Сейв в `PlayerPrefs`. Язык, устройство, пауза площадки и её звук переключаются в оверлее вкладки Game. Прототипы проходят через те же общие сервисы, что и площадки.
 
 ### 8.2. Yandex Games
 

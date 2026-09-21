@@ -1,0 +1,19 @@
+{
+    "name": "JTLStudio.SDK.YandexGames",
+    "rootNamespace": "JTLStudio.SDK.YandexGames",
+    "references": [
+        "JTLStudio.SDK"
+    ],
+    "includePlatforms": [
+        "Editor",
+        "WebGL"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
