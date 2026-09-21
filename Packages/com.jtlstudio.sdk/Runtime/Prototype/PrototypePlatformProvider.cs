@@ -26,6 +26,7 @@ namespace JTLStudio.SDK.Prototype
         public bool SupportsPlatformMute { get; }
         public bool IsPlatformMuted => SupportsPlatformMute && _muted;
         public bool IsPlatformPaused { get; private set; }
+        public PrototypeSimulationSettings Settings => _settings;
 
         public void Initialize(Action<ProviderState> onInitialized)
         {

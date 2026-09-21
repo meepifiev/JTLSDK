@@ -10,6 +10,7 @@ namespace JTLStudio.SDK.Prototype
         public static event Action PlatformChanged;
 
         public static PrototypePlatformProvider ActivePlatform { get; private set; }
+        public static PrototypeSimulationSettings ActiveSettings => ActivePlatform?.Settings;
 
         public static bool HasAdPresenter => AdRequested != null;
         public static bool HasPurchasePresenter => PurchaseRequested != null;

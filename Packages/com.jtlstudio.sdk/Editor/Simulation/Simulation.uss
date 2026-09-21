@@ -1,0 +1,189 @@
+.jtl-simulation-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.jtl-overlay-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 240px;
+    padding: 10px;
+    background-color: rgba(14, 14, 16, 0.92);
+    border-width: 1px;
+    border-color: #33333A;
+    border-radius: 8px;
+}
+
+.jtl-overlay-collapsed {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgba(14, 14, 16, 0.92);
+    border-width: 1px;
+    border-color: #33333A;
+    border-radius: 6px;
+    color: #F2F2F3;
+    -unity-font-style: bold;
+    font-size: 12px;
+}
+
+.jtl-overlay-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.jtl-overlay-title {
+    flex-grow: 1;
+    color: #F2F2F3;
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+.jtl-overlay-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 24px;
+    margin-bottom: 4px;
+}
+
+.jtl-overlay-label {
+    flex-grow: 1;
+    color: #9A9AA3;
+    font-size: 11px;
+}
+
+.jtl-overlay-row > .unity-base-field {
+    margin: 0;
+    width: 110px;
+}
+
+.jtl-overlay-row > .unity-base-field > .unity-base-field__label {
+    display: none;
+}
+
+.jtl-overlay-row .unity-base-popup-field__input,
+.jtl-overlay-row .unity-base-text-field__input {
+    background-color: #1C1C20;
+    border-color: #26262B;
+    border-radius: 6px;
+    color: #F2F2F3;
+    min-height: 24px;
+}
+
+.jtl-overlay-row .unity-toggle {
+    width: auto;
+}
+
+.jtl-overlay-caption {
+    color: #66666E;
+    font-size: 10px;
+    padding-top: 4px;
+    border-top-width: 1px;
+    border-top-color: #26262B;
+}
+
+.jtl-icon-button {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    border-width: 0;
+    color: #9A9AA3;
+    font-size: 14px;
+}
+
+.jtl-icon-button:hover {
+    color: #F2F2F3;
+}
+
+.jtl-request-dim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    align-items: center;
+    justify-content: center;
+}
+
+.jtl-request-card {
+    width: 420px;
+    padding: 16px;
+    background-color: #151518;
+    border-width: 1px;
+    border-color: #33333A;
+    border-radius: 8px;
+}
+
+.jtl-request-title {
+    color: #F2F2F3;
+    font-size: 15px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.jtl-request-caption {
+    color: #9A9AA3;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.jtl-request-option {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 12px;
+    margin: 0 0 8px 0;
+    background-color: #1C1C20;
+    border-width: 1px;
+    border-color: #26262B;
+    border-radius: 6px;
+}
+
+.jtl-request-option:hover {
+    border-color: #33333A;
+}
+
+.jtl-request-option--primary {
+    background-color: #3E6B9D;
+    border-color: #4C7DB5;
+}
+
+.jtl-request-option--primary:hover {
+    background-color: #345C89;
+}
+
+.jtl-request-option__label {
+    color: #F2F2F3;
+    font-size: 13px;
+    -unity-font-style: bold;
+}
+
+.jtl-request-option__result {
+    color: #9A9AA3;
+    font-size: 11px;
+}
+
+.jtl-request-option--primary .jtl-request-option__result {
+    color: #C7D8EA;
+}
+
+.jtl-request-remember {
+    margin-top: 2px;
+    color: #F2F2F3;
+    font-size: 13px;
+}
+
+.jtl-request-remember .unity-toggle__text {
+    color: #F2F2F3;
+    margin-left: 6px;
+}

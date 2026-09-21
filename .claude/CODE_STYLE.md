@@ -25,7 +25,7 @@ Code reads by names and structure. If a class, method or field name does not say
 
 - Auto-properties when there is no logic; expression-bodied properties for read-only access to a field.
 - Methods start with a verb: `Create`, `Show`, `Load`, `Apply`, `Reset`.
-- Static methods are not used, except in the `JTLSDK` facade and `[MonoPInvokeCallback]` trampolines of the bridge.
+- Static methods are not used, except in the `JTLSDK` facade, `[MonoPInvokeCallback]` trampolines of the bridge, and editor entry points that Unity requires to be static (`[InitializeOnLoad]`, `[MenuItem]`). An entry point only creates an instance and hands over to it.
 - Member order: constants and static fields, serialized fields, fields, delegates, constructors, events, properties, Unity lifecycle, public methods, private methods, event handlers. Within a group: `public`, `internal`, `protected`, `private`.
 
 ## Events and callbacks
