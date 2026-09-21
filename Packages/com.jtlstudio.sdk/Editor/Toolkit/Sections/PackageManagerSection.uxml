@@ -3,15 +3,8 @@
         <jtl:SectionHeader title-key="package.title" description-key="package.description" />
         <jtl:Card>
             <ui:VisualElement class="jtl-row jtl-hstack-14">
-                <ui:VisualElement class="jtl-row jtl-hstack-10">
-                    <ui:VisualElement class="jtl-brand__mark">
-                        <ui:Label text="J" class="jtl-brand__mark-glyph" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-column">
-                        <ui:Label text="JTL SDK" class="jtl-text jtl-text--title" />
-                        <jtl:LocalizedLabel key="package.sdkVersions" class="jtl-text--caption" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
+                <ui:VisualElement class="jtl-brand__logo jtl-brand__logo--package" />
+                <jtl:LocalizedLabel key="package.sdkVersions" class="jtl-text--caption" />
                 <ui:VisualElement class="jtl-spacer" />
                 <jtl:Badge text-key="badge.updateAvailable" variant="accent" />
                 <jtl:ToolkitButton text-key="package.releaseNotes" variant="ghost" trailing-icon="chevron-down" />

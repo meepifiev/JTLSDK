@@ -3,13 +3,7 @@
         <ui:VisualElement name="sidebar" class="jtl-sidebar">
             <ui:VisualElement class="jtl-sidebar__brand-spacer" />
             <ui:VisualElement class="jtl-sidebar__brand">
-                <ui:VisualElement class="jtl-brand__mark">
-                    <ui:Label text="J" class="jtl-brand__mark-glyph" />
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-brand__text">
-                    <ui:Label text="JTL SDK" class="jtl-brand__title" />
-                    <jtl:LocalizedLabel key="brand.caption" class="jtl-brand__caption" />
-                </ui:VisualElement>
+                <ui:VisualElement name="brand-logo" class="jtl-brand__logo" />
             </ui:VisualElement>
             <ui:VisualElement name="navigation" class="jtl-sidebar__nav">
                 <ui:VisualElement class="jtl-nav-group">

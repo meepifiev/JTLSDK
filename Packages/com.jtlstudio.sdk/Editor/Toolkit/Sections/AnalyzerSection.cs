@@ -15,10 +15,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             new[] { "GlobalTimeScaler.cs:23", "Time.timeScale = 0.3f", "JTLSDK.Time.Scale = 0.3f" },
             new[] { "PauseMenu.cs:64", "Time.timeScale = 0f", "JTLSDK.Time.Scale = 0f" },
             new[] { "SettingHandler.cs:41", "AudioListener.volume = v", "JTLSDK.Audio.Volume = v" },
-            new[] { "MusicPlayer.cs:18", "AudioListener.pause = true", "JTLSDK.Audio.Paused = true" },
+            new[] { "MusicPlayer.cs:18", "AudioListener.pause = true", "JTLSDK.Pause.Set(\"Music\", true)" },
             new[] { "SavesService.cs:88", "PlayerPrefs.GetInt(\"Level\")", "JTLSDK.Data.GetInt(\"Level\")" },
             new[] { "SavesService.cs:96", "PlayerPrefs.SetInt(\"Level\", n)", "JTLSDK.Data.SetInt(\"Level\", n)" },
-            new[] { "BootStrap.cs:12", "Application.targetFrameRate = 60", "JTLSDK.App.TargetFrameRate = 60" }
+            new[] { "CursorLock.cs:12", "Cursor.lockState = CursorLockMode.Locked", "JTLSDK.Device.CursorLock = CursorLockMode.Locked" }
         };
 
         public AnalyzerSection(ToolkitContext context) : base(context)
@@ -57,6 +57,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             Label call = new Label(finding[1]);
             call.AddToClassList("jtl-finding-row__call");
+            call.AddToClassList("jtl-mono");
             row.Add(call);
 
             VisualElement arrow = new VisualElement();
@@ -66,6 +67,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             Label replacement = new Label(finding[2]);
             replacement.AddToClassList("jtl-finding-row__replacement");
+            replacement.AddToClassList("jtl-mono");
             row.Add(replacement);
 
             VisualElement actions = new VisualElement();

@@ -64,14 +64,14 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
 
         private void RegisterShell()
         {
-            Add("brand.caption", "Build once. Play everywhere.", "Собери один раз. Играй везде.");
             Add("nav.configurations", "Configurations", "Конфигурации");
             Add("nav.simulation", "Simulation", "Симуляция");
             Add("nav.template", "Template", "Шаблон");
             Add("nav.build", "Build", "Сборка");
             Add("nav.packageManager", "Package Manager", "Менеджер пакетов");
-            Add("nav.analyzer", "Analyzer", "Анализатор");
+            Add("nav.analyzer", "Analyzer Code", "Анализатор кода");
             Add("nav.modules", "MODULES", "МОДУЛИ");
+            Add("nav.packageVersion", "Package version", "Версия пакета");
             Add("nav.languages", "Languages", "Языки");
             Add("nav.purchases", "Purchases", "Покупки");
             Add("nav.leaderboards", "Leaderboards", "Лидерборды");

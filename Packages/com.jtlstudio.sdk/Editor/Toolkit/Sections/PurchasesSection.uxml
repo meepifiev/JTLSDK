@@ -12,7 +12,7 @@
             <ui:VisualElement class="jtl-row jtl-row--start jtl-hstack-16">
                 <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
                     <jtl:FieldRow label-key="purchases.productId" label-width="120">
-                        <ui:TextField value="remove_ads" class="jtl-field jtl-grow" />
+                        <ui:TextField value="remove_ads" class="jtl-field jtl-grow jtl-mono" />
                     </jtl:FieldRow>
                     <jtl:FieldRow label-key="purchases.type" label-width="120">
                         <jtl:Dropdown choices-key="purchases.types" selected="0" width="200" />
@@ -20,7 +20,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
                     <jtl:FieldRow label-key="purchases.yandexId" label-width="130">
-                        <ui:TextField value="remove_ads" class="jtl-field jtl-grow" />
+                        <ui:TextField value="remove_ads" class="jtl-field jtl-grow jtl-mono" />
                     </jtl:FieldRow>
                     <jtl:FieldRow label-key="purchases.testPrice" label-width="130">
                         <jtl:NumberFieldWithUnit value="49" width="90" />
@@ -38,7 +38,7 @@
             <ui:VisualElement class="jtl-row jtl-row--start jtl-hstack-16">
                 <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
                     <jtl:FieldRow label-key="purchases.productId" label-width="120">
-                        <ui:TextField value="coins_1000" class="jtl-field jtl-grow" />
+                        <ui:TextField value="coins_1000" class="jtl-field jtl-grow jtl-mono" />
                     </jtl:FieldRow>
                     <jtl:FieldRow label-key="purchases.type" label-width="120">
                         <jtl:Dropdown choices-key="purchases.types" selected="1" width="200" />
@@ -46,7 +46,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="jtl-column jtl-basis jtl-vstack-8">
                     <jtl:FieldRow label-key="purchases.yandexId" label-width="130">
-                        <ui:TextField value="coins_1000" class="jtl-field jtl-grow" />
+                        <ui:TextField value="coins_1000" class="jtl-field jtl-grow jtl-mono" />
                     </jtl:FieldRow>
                     <jtl:FieldRow label-key="purchases.testPrice" label-width="130">
                         <jtl:NumberFieldWithUnit value="15" width="90" />

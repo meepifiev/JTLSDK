@@ -14,6 +14,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private readonly ToolkitContext _context;
         private readonly VisualElement _root = new VisualElement();
         private readonly LayoutGaps _gaps = new LayoutGaps();
+        private readonly MonospaceFont _monospace = new MonospaceFont();
         private VisualTreeAsset _template;
 
         protected ToolkitSection(ToolkitContext context)
@@ -47,6 +48,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
             OnRendered();
             Localize(_root);
             _gaps.Apply(_root);
+            _monospace.Apply(_root);
         }
 
         protected virtual void OnRendered()

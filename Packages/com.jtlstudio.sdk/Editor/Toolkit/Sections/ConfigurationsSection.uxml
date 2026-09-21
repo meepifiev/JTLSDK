@@ -14,7 +14,7 @@
                 <ui:VisualElement class="jtl-table">
                     <ui:VisualElement class="jtl-table__row jtl-table__row--head">
                         <jtl:LocalizedLabel key="configurations.defineSymbol" class="jtl-text--secondary jtl-grow" />
-                        <ui:Label text="JTL_YANDEX_GAMES" class="jtl-text--small" />
+                        <ui:Label text="JTLSDK_YANDEX_GAMES" class="jtl-text--small jtl-mono" />
                         <jtl:IconButton icon="copy" size="22" class="jtl-ml-4" />
                     </ui:VisualElement>
                     <ui:VisualElement class="jtl-table__row">
@@ -40,7 +40,7 @@
                 <ui:VisualElement class="jtl-table">
                     <ui:VisualElement class="jtl-table__row jtl-table__row--head">
                         <jtl:LocalizedLabel key="configurations.defineSymbol" class="jtl-text--secondary jtl-grow" />
-                        <ui:Label text="JTL_YOUTUBE_PLAYABLES" class="jtl-text--small" />
+                        <ui:Label text="JTLSDK_YOUTUBE_PLAYABLES" class="jtl-text--small jtl-mono" />
                         <jtl:IconButton icon="copy" size="22" class="jtl-ml-4" />
                     </ui:VisualElement>
                     <ui:VisualElement class="jtl-table__row">

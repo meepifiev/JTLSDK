@@ -63,3 +63,21 @@
     --jtl-label-width: 190px;
     --jtl-label-width-card: 150px;
 }
+
+.jtl-root {
+    flex-grow: 1;
+    flex-direction: row;
+    min-width: 0;
+    background-color: var(--jtl-bg);
+    color: var(--jtl-text);
+    font-size: 13px;
+    -unity-font-style: normal;
+}
+
+.jtl-root .unity-label {
+    color: var(--jtl-text);
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    -unity-text-align: middle-left;
+}

@@ -9,9 +9,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
         public const int DefaultSize = 24;
         private const string ClassName = "jtl-portal-mark";
         private const string PortalPrefix = "jtl-portal-mark--";
-        private const string YandexGlyph = "Y";
-        private const string YouTubeGlyph = "▶";
-        private const float GlyphScale = 0.55f;
         private const float RadiusScale = 0.25f;
 
         public new class UxmlFactory : UxmlFactory<PortalMark, UxmlTraits>
@@ -32,7 +29,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
             }
         }
 
-        private readonly Label _glyph = new Label();
         private string _portal = YandexGames;
         private int _size = DefaultSize;
 
@@ -40,12 +36,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
         {
             AddToClassList(ClassName);
             AddToClassList(PortalPrefix + YandexGames);
-            _glyph.AddToClassList("jtl-portal-mark__glyph");
-            _glyph.pickingMode = PickingMode.Ignore;
             pickingMode = PickingMode.Ignore;
-            Add(_glyph);
             ApplySize();
-            ApplyGlyph();
         }
 
         public PortalMark(string portal, int size) : this()
@@ -62,7 +54,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
                 RemoveFromClassList(PortalPrefix + _portal);
                 _portal = string.IsNullOrEmpty(value) ? YandexGames : value;
                 AddToClassList(PortalPrefix + _portal);
-                ApplyGlyph();
             }
         }
 
@@ -87,12 +78,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
             style.borderTopRightRadius = radius;
             style.borderBottomLeftRadius = radius;
             style.borderBottomRightRadius = radius;
-            _glyph.style.fontSize = _size * GlyphScale;
-        }
-
-        private void ApplyGlyph()
-        {
-            _glyph.text = _portal == YouTubePlayables ? YouTubeGlyph : YandexGlyph;
         }
     }
 }

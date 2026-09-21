@@ -19,7 +19,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private const string CollapsedClass = "jtl-root--collapsed";
         private const string PackageManifestPath = "Packages/com.jtlstudio.sdk/package.json";
         private const string FallbackVersion = "0.1.0";
-        private const string VersionPrefix = "v";
+        private const string VersionPrefix = " v";
         private const string WindowTemplate = "ToolkitWindow.uxml";
         private const string TokensStyleSheet = "Styles/Tokens.uss";
         private const string ToolkitStyleSheet = "Styles/Toolkit.uss";
@@ -38,7 +38,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private SegmentedControl _languageSwitch;
         private ToolkitSection _currentSection;
 
-        [MenuItem("Window/JTL SDK/Toolkit", false, 0)]
+        [MenuItem("JTL SDK/Toolkit", false, 0)]
         public static void Open()
         {
             ToolkitWindow window = GetWindow<ToolkitWindow>();
@@ -131,8 +131,8 @@ namespace JTLStudio.SDK.Editor.Toolkit
             _context.NavigationRequested += OnNavigationRequested;
             _context.StatusRequested += OnStatusRequested;
             rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(TokensStyleSheet));
-            rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(ToolkitStyleSheet));
             rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(ComponentsStyleSheet));
+            rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(ToolkitStyleSheet));
             _assets.LoadTemplate(WindowTemplate).CloneTree(rootVisualElement);
             _root = rootVisualElement.Q<VisualElement>("root");
             _sidebar = rootVisualElement.Q<VisualElement>("sidebar");
@@ -142,7 +142,6 @@ namespace JTLStudio.SDK.Editor.Toolkit
             _languageSwitch = rootVisualElement.Q<SegmentedControl>("language-switch");
             _languageSwitch.Index = (int)_localization.Language;
             _languageSwitch.IndexChanged += OnLanguageIndexChanged;
-            rootVisualElement.Q<Label>("version").text = VersionPrefix + ReadPackageVersion();
             _navigationItems.Clear();
             _navigationItems.AddRange(rootVisualElement.Query<NavigationItem>().ToList());
 
@@ -181,6 +180,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
         private void LocalizeShell()
         {
+            rootVisualElement.Q<Label>("version").text = _localization.Get("nav.packageVersion") + VersionPrefix + ReadPackageVersion();
             Localize(_sidebar);
             Localize(_topBar);
             _statusBar.ApplyLocalization(_localization);

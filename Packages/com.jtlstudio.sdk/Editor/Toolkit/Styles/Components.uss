@@ -1137,17 +1137,13 @@
 }
 
 .jtl-root .jtl-portal-mark--yandex {
-    background-color: #FC3F1D;
+    background-image: url("../Icons/Portals/yandex-games.png");
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .jtl-root .jtl-portal-mark--youtube {
-    background-color: #E53935;
-}
-
-.jtl-root .jtl-portal-mark__glyph {
-    color: #FFFFFF;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
+    background-image: url("../Icons/Portals/youtube-playables.png");
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .jtl-root .jtl-swatch__color {
@@ -1602,4 +1598,10 @@
 .jtl-root .jtl-language-column .jtl-checkbox {
     height: 26px;
     min-height: 26px;
+}
+
+.jtl-root .jtl-mono,
+.jtl-root .jtl-mono .unity-text-element,
+.jtl-root .jtl-mono > .unity-base-text-field__input {
+    font-size: 12px;
 }

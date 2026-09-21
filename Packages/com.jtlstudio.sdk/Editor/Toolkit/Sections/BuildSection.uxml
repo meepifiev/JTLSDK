@@ -23,7 +23,7 @@
                     <jtl:ToolkitButton text-key="build.browse" icon="folder" />
                 </jtl:FieldRow>
                 <jtl:FieldRow label-key="build.namePattern" label-width="190" note-key="build.nameResolves">
-                    <ui:TextField value="{product}_{configuration}_b{build}" class="jtl-field jtl-grow" />
+                    <ui:TextField value="{product}_{configuration}_b{build}" class="jtl-field jtl-grow jtl-mono" />
                 </jtl:FieldRow>
                 <jtl:FieldRow label-key="build.buildNumber" label-width="190">
                     <ui:Label text="42" class="jtl-text" />

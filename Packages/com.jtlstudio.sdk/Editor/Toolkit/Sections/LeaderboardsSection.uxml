@@ -20,7 +20,7 @@
                         <ui:Label text="levels" class="jtl-text--small" />
                     </ui:VisualElement>
                     <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <ui:TextField value="levels_board" class="jtl-field jtl-grow" />
+                        <ui:TextField value="levels_board" class="jtl-field jtl-grow jtl-mono" />
                     </ui:VisualElement>
                     <ui:VisualElement class="jtl-table__cell" style="width: 140px;">
                         <jtl:LocalizedLabel key="leaderboards.singleBoard" class="jtl-text--secondary" />

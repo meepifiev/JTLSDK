@@ -17,7 +17,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="jtl-table__row">
                     <ui:VisualElement class="jtl-table__cell" style="width: 170px;">
-                        <ui:Label text="tutorial_enabled" class="jtl-text--small" />
+                        <ui:Label text="tutorial_enabled" class="jtl-text--small jtl-mono" />
                     </ui:VisualElement>
                     <ui:VisualElement class="jtl-table__cell" style="width: 120px;">
                         <jtl:Dropdown choices-key="flags.types" selected="0" width="110" />

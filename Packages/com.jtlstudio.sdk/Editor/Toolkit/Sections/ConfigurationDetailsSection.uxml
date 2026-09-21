@@ -12,7 +12,7 @@
             </ui:VisualElement>
             <ui:VisualElement class="jtl-spacer" />
             <ui:VisualElement class="jtl-chip">
-                <ui:Label text="JTL_YOUTUBE_PLAYABLES" class="jtl-chip__text" />
+                <ui:Label text="JTLSDK_YOUTUBE_PLAYABLES" class="jtl-chip__text jtl-mono" />
                 <jtl:IconButton icon="copy" size="20" />
             </ui:VisualElement>
             <jtl:ToolkitButton text-key="configurations.makeActive" variant="primary" />
