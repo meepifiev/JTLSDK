@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Build;
 
 namespace JTLStudio.SDK.Editor.Configuration
 {
@@ -7,11 +8,11 @@ namespace JTLStudio.SDK.Editor.Configuration
     {
         public const string Prefix = "JTLSDK_";
 
-        private const BuildTargetGroup TargetGroup = BuildTargetGroup.WebGL;
+        private readonly NamedBuildTarget _target = NamedBuildTarget.WebGL;
 
         public void Apply(string activeSymbol)
         {
-            List<string> symbols = new List<string>(PlayerSettings.GetScriptingDefineSymbolsForGroup(TargetGroup).Split(';'));
+            List<string> symbols = new List<string>(PlayerSettings.GetScriptingDefineSymbols(_target).Split(';'));
             symbols.RemoveAll(symbol => symbol.StartsWith(Prefix) || string.IsNullOrWhiteSpace(symbol));
 
             if (string.IsNullOrEmpty(activeSymbol) == false)
@@ -19,12 +20,12 @@ namespace JTLStudio.SDK.Editor.Configuration
                 symbols.Add(activeSymbol);
             }
 
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(TargetGroup, string.Join(";", symbols));
+            PlayerSettings.SetScriptingDefineSymbols(_target, string.Join(";", symbols));
         }
 
         public string Current()
         {
-            foreach (string symbol in PlayerSettings.GetScriptingDefineSymbolsForGroup(TargetGroup).Split(';'))
+            foreach (string symbol in PlayerSettings.GetScriptingDefineSymbols(_target).Split(';'))
             {
                 if (symbol.StartsWith(Prefix))
                 {

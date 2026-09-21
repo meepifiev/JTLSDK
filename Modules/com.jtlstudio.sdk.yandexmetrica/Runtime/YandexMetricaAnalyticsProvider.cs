@@ -16,9 +16,11 @@ namespace JTLStudio.SDK.YandexMetrica
         [SerializeField] private bool _accurateTrackBounce = true;
 
 #if UNITY_WEBGL && !UNITY_EDITOR && JTLSDK_YANDEX_GAMES
-        [DllImport("__Internal")] private static extern int JTLSDK_Metrica_Initialize(int counterId, int webvisor, int clickmap, int trackLinks, int accurateTrackBounce);
+        [DllImport("__Internal")] private static extern int JTLSDK_Metrica_Initialize(int counterId, int options);
         [DllImport("__Internal")] private static extern void JTLSDK_Metrica_ReachGoal(int counterId, string goal, string parametersJson);
 #endif
+
+        private int Options => (_webvisor ? 1 : 0) | (_clickmap ? 2 : 0) | (_trackLinks ? 4 : 0) | (_accurateTrackBounce ? 8 : 0);
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
@@ -34,7 +36,7 @@ namespace JTLStudio.SDK.YandexMetrica
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR && JTLSDK_YANDEX_GAMES
-            bool started = JTLSDK_Metrica_Initialize(_counterId, _webvisor ? 1 : 0, _clickmap ? 1 : 0, _trackLinks ? 1 : 0, _accurateTrackBounce ? 1 : 0) == 1;
+            bool started = JTLSDK_Metrica_Initialize(_counterId, Options) == 1;
             onInitialized(started ? ProviderState.Ready : ProviderState.Unsupported);
 #else
             onInitialized(ProviderState.Unsupported);

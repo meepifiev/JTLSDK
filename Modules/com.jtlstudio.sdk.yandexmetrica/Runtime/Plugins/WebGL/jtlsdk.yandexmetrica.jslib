@@ -1,5 +1,5 @@
 mergeInto(LibraryManager.library, {
-  JTLSDK_Metrica_Initialize: function (counterId, webvisor, clickmap, trackLinks, accurateTrackBounce) {
+  JTLSDK_Metrica_Initialize: function (counterId, options) {
     if (typeof window === "undefined" || typeof window.ytgame !== "undefined") {
       return 0;
     }
@@ -16,10 +16,10 @@ mergeInto(LibraryManager.library, {
     }
 
     window.ym(counterId, "init", {
-      webvisor: webvisor === 1,
-      clickmap: clickmap === 1,
-      trackLinks: trackLinks === 1,
-      accurateTrackBounce: accurateTrackBounce === 1
+      webvisor: (options & 1) !== 0,
+      clickmap: (options & 2) !== 0,
+      trackLinks: (options & 4) !== 0,
+      accurateTrackBounce: (options & 8) !== 0
     });
     return 1;
   },

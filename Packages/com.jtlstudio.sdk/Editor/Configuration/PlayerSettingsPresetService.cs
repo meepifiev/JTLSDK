@@ -1,11 +1,12 @@
 using System;
 using UnityEditor;
+using UnityEditor.Build;
 
 namespace JTLStudio.SDK.Editor.Configuration
 {
     public class PlayerSettingsPresetService
     {
-        private const BuildTargetGroup TargetGroup = BuildTargetGroup.WebGL;
+        private readonly NamedBuildTarget _target = NamedBuildTarget.WebGL;
 
         public void Apply(PlayerSettingsPreset preset)
         {
@@ -36,7 +37,7 @@ namespace JTLStudio.SDK.Editor.Configuration
 
             if (preset.ApplyStripping)
             {
-                PlayerSettings.SetManagedStrippingLevel(TargetGroup, ToUnity(preset.Stripping));
+                PlayerSettings.SetManagedStrippingLevel(_target, ToUnity(preset.Stripping));
             }
 
             if (preset.ApplyRunInBackground)

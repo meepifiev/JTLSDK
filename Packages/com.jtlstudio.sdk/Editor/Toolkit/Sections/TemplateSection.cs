@@ -208,14 +208,14 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             if (Settings.LoaderBackground.Kind == BackgroundKind.Image && Settings.LoaderBackground.Image != null)
             {
                 frame.style.backgroundImage = Settings.LoaderBackground.Image;
-                frame.style.unityBackgroundScaleMode = ScaleMode.ScaleAndCrop;
+                SetScaleMode(frame, ScaleMode.ScaleAndCrop);
             }
 
             VisualElement logo = new VisualElement();
             float logoWidth = Mathf.Min(Settings.LogoSize, width * 0.6f);
             logo.style.width = logoWidth;
             logo.style.height = Settings.Logo == null ? logoWidth * 0.5f : logoWidth * Settings.Logo.height / Mathf.Max(1f, Settings.Logo.width);
-            logo.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+            SetScaleMode(logo, ScaleMode.ScaleToFit);
 
             if (Settings.Logo != null)
             {
@@ -271,6 +271,18 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private Color PreviewColor(TemplateBackground background)
         {
             return background.Kind == BackgroundKind.Gradient ? Color.Lerp(background.GradientFrom, background.GradientTo, 0.5f) : background.Color;
+        }
+
+        private void SetScaleMode(VisualElement element, ScaleMode mode)
+        {
+#if UNITY_2022_2_OR_NEWER
+            element.style.backgroundPositionX = BackgroundPropertyHelper.ConvertScaleModeToBackgroundPosition(mode);
+            element.style.backgroundPositionY = BackgroundPropertyHelper.ConvertScaleModeToBackgroundPosition(mode);
+            element.style.backgroundRepeat = BackgroundPropertyHelper.ConvertScaleModeToBackgroundRepeat(mode);
+            element.style.backgroundSize = BackgroundPropertyHelper.ConvertScaleModeToBackgroundSize(mode);
+#else
+            element.style.unityBackgroundScaleMode = mode;
+#endif
         }
 
         private void SetRadius(VisualElement element, float radius)
