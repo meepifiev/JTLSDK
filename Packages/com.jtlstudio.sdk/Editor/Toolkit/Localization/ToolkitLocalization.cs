@@ -108,6 +108,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("build.tagline", "SAME GAME|MORE PLAYERS|BIGGER OPPORTUNITIES", "ОДНА ИГРА|БОЛЬШЕ ИГРОКОВ|БОЛЬШЕ ВОЗМОЖНОСТЕЙ");
             Add("build.recentBuilds", "Recent Builds", "Последние сборки");
             Add("build.noBuilds", "No builds yet.", "Сборок пока нет.");
+            Add("build.clearHistory", "Clear", "Очистить");
+            Add("build.clearHistoryTitle", "Clear recent builds?", "Очистить последние сборки?");
+            Add("build.clearHistoryHint", "Only the list is cleared. Build files stay on disk.", "Очищается только список. Файлы сборок остаются на диске.");
             Add("build.columnName", "NAME", "ИМЯ");
             Add("build.columnPlatform", "TARGET PLATFORM", "ПЛОЩАДКА");
             Add("build.columnSize", "SIZE", "РАЗМЕР");

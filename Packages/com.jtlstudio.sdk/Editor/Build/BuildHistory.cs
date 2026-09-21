@@ -24,5 +24,11 @@ namespace JTLStudio.SDK.Editor.Build
 
             Save(true);
         }
+
+        public void Clear()
+        {
+            _records.Clear();
+            Save(true);
+        }
     }
 }

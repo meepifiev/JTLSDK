@@ -186,6 +186,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 return card;
             }
 
+            ToolkitButton clear = Button("build.clearHistory", ToolkitButton.GhostVariant, "delete", ClearHistory);
+            clear.Compact = true;
+            clear.tooltip = Context.Text("build.clearHistoryHint");
+            card.Header.Add(clear);
+
             VisualElement head = BuildRow("jtl-build-history__head");
             head.Add(Cell("name", Localized("build.columnName", "jtl-build-history__heading")));
             head.Add(Cell("platform", Localized("build.columnPlatform", "jtl-build-history__heading")));
@@ -204,6 +209,17 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             }
 
             return card;
+        }
+
+        private void ClearHistory()
+        {
+            if (Context.Confirm("build.clearHistoryTitle", "build.clearHistoryHint", "build.clearHistory") == false)
+            {
+                return;
+            }
+
+            BuildHistory.instance.Clear();
+            Render();
         }
 
         private VisualElement RecordRow(BuildRecord record, bool first)
