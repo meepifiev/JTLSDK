@@ -90,8 +90,12 @@ namespace JTLStudio.SDK.Editor.Configuration
             Set("JTLSDK_LOADER_BACKGROUND", settings.LoaderBackground.ToCss(LoaderBackgroundFile));
             Set("JTLSDK_LOGO_SIZE", settings.LogoSize.ToString(CultureInfo.InvariantCulture));
             Set("JTLSDK_LOGO_DISPLAY", hasLogo ? "block" : "none");
-            Set("JTLSDK_PROGRESS_FILL", "#" + ColorUtility.ToHtmlStringRGB(settings.ProgressFill));
-            Set("JTLSDK_PROGRESS_TRACK", "#" + ColorUtility.ToHtmlStringRGB(settings.ProgressTrack));
+            Set("JTLSDK_PROGRESS_FILL", Css(settings.ProgressFill));
+            Set("JTLSDK_PROGRESS_FILL_TO", Css(settings.ProgressGradient ? settings.ProgressFillTo : settings.ProgressFill));
+            Set("JTLSDK_PROGRESS_TRACK", Css(settings.ProgressTrack));
+            Set("JTLSDK_PROGRESS_BORDER_WIDTH", settings.ProgressBorderWidth.ToString(CultureInfo.InvariantCulture));
+            Set("JTLSDK_PROGRESS_BORDER_COLOR", Css(settings.ProgressBorderColor));
+            Set("JTLSDK_PROGRESS_PADDING", settings.ProgressPadding.ToString(CultureInfo.InvariantCulture));
             Set("JTLSDK_PROGRESS_WIDTH", settings.ProgressWidthPercent.ToString(CultureInfo.InvariantCulture));
             Set("JTLSDK_PROGRESS_HEIGHT", settings.ProgressHeight.ToString(CultureInfo.InvariantCulture));
             Set("JTLSDK_PROGRESS_RADIUS", settings.ProgressRadius.ToString(CultureInfo.InvariantCulture));
@@ -101,9 +105,13 @@ namespace JTLStudio.SDK.Editor.Configuration
             Set("JTLSDK_ASPECT_MOBILE", settings.FixedAspect && settings.FreeAspectOnMobile ? "free" : "same");
             Set("JTLSDK_DPR_DESKTOP", PixelRatio(settings.DesktopPixelRatioMode, settings.DesktopPixelRatio));
             Set("JTLSDK_DPR_MOBILE", PixelRatio(settings.MobilePixelRatioMode, settings.MobilePixelRatio));
-            Set("JTLSDK_FULLSCREEN_BUTTON", settings.FullscreenButton ? "true" : "false");
             Set("JTLSDK_DEV_BADGE", development ? "DEV · b" + buildNumber.ToString(CultureInfo.InvariantCulture) + " · " + PlatformName(platform) + " · v" + JTLSDK.Version : "");
             AssetDatabase.Refresh();
+        }
+
+        private string Css(Color color)
+        {
+            return color.a >= 0.999f ? "#" + ColorUtility.ToHtmlStringRGB(color) : "#" + ColorUtility.ToHtmlStringRGBA(color);
         }
 
         private void Set(string name, string value)

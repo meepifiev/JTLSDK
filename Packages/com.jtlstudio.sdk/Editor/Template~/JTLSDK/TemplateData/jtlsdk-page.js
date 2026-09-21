@@ -4,10 +4,8 @@
   var body = document.body;
   var data = body.dataset;
   var canvas = document.getElementById("unity-canvas");
-  var container = document.getElementById("jtlsdk-container");
   var loader = document.getElementById("jtlsdk-loader");
   var progressFill = document.getElementById("jtlsdk-progress-fill");
-  var fullscreenButton = document.getElementById("jtlsdk-fullscreen");
   var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   var page = window.JTLSDK_PAGE || (window.JTLSDK_PAGE = {});
 
@@ -40,21 +38,24 @@
 
   function fitCanvas() {
     var aspect = isMobile && data.aspectMobile === "free" ? 0 : parseAspect(data.aspect);
-    var width = container.clientWidth;
-    var height = container.clientHeight;
+    var width = window.innerWidth;
+    var height = window.innerHeight;
 
-    if (aspect <= 0) {
-      canvas.style.width = width + "px";
+    if (aspect > 0 && width / height > aspect) {
+      canvas.style.width = Math.round(height * aspect) + "px";
       canvas.style.height = height + "px";
       return;
     }
 
-    if (width / height > aspect) {
-      canvas.style.width = Math.round(height * aspect) + "px";
-      canvas.style.height = height + "px";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+  }
+
+  function showBanner(message, type) {
+    if (type === "error") {
+      console.error(message);
     } else {
-      canvas.style.width = width + "px";
-      canvas.style.height = Math.round(width / aspect) + "px";
+      console.warn(message);
     }
   }
 
@@ -81,17 +82,6 @@
     }
   }
 
-  function setupFullscreen(instance) {
-    if (data.fullscreen !== "true") {
-      return;
-    }
-
-    fullscreenButton.classList.add("jtlsdk-fullscreen--visible");
-    fullscreenButton.addEventListener("click", function () {
-      instance.SetFullscreen(1);
-    });
-  }
-
   function hideLoader() {
     loader.classList.add("jtlsdk-loader--hidden");
     window.setTimeout(function () {
@@ -109,10 +99,12 @@
     companyName: data.company,
     productName: data.product,
     productVersion: data.version,
-    devicePixelRatio: resolvePixelRatio(isMobile ? data.dprMobile : data.dprDesktop)
+    devicePixelRatio: resolvePixelRatio(isMobile ? data.dprMobile : data.dprDesktop),
+    showBanner: showBanner
   };
 
   window.addEventListener("resize", fitCanvas);
+  window.addEventListener("orientationchange", fitCanvas);
   fitCanvas();
   preloadPlatform();
 
@@ -123,7 +115,6 @@
       progressFill.style.width = Math.round(progress * 100) + "%";
     }).then(function (instance) {
       page.unityInstance = instance;
-      setupFullscreen(instance);
       hideLoader();
     }).catch(function (message) {
       console.error(message);

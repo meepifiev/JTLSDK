@@ -29,6 +29,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private bool _mobilePreview;
         private float _previewProgress = 0.55f;
         private Texture2D _gradient;
+        private Texture2D _fillGradient;
         private VisualElement _frame;
         private VisualElement _logo;
         private VisualElement _track;
@@ -156,8 +157,18 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private VisualElement CreateProgressCard()
         {
             Card card = new Card { TitleKey = "template.progressBar" };
-            card.Add(Field("template.fill", ColorInput(Settings.ProgressFill, color => Settings.ProgressFill = color)));
-            card.Add(Field("template.track", ColorInput(Settings.ProgressTrack, color => Settings.ProgressTrack = color)));
+            card.Add(Field("template.fillStyle", Segments("template.fillStyles", Settings.ProgressGradient ? 1 : 0, index => Rebuild(() => Settings.ProgressGradient = index == 1))));
+            card.Add(Field(Settings.ProgressGradient ? "template.gradientFrom" : "template.fill", ColorInput(Settings.ProgressFill, color => Settings.ProgressFill = color, true)));
+
+            if (Settings.ProgressGradient)
+            {
+                card.Add(Field("template.gradientTo", ColorInput(Settings.ProgressFillTo, color => Settings.ProgressFillTo = color, true)));
+            }
+
+            card.Add(Field("template.track", ColorInput(Settings.ProgressTrack, color => Settings.ProgressTrack = color, true)));
+            card.Add(Field("template.borderWidth", IntegerInput(() => Settings.ProgressBorderWidth, value => Settings.ProgressBorderWidth = value, "unit.px")));
+            card.Add(Field("template.borderColor", ColorInput(Settings.ProgressBorderColor, color => Settings.ProgressBorderColor = color, true)));
+            card.Add(Field("template.padding", IntegerInput(() => Settings.ProgressPadding, value => Settings.ProgressPadding = value, "unit.px")));
             card.Add(Field("template.progressWidth", IntegerInput(() => Settings.ProgressWidthPercent, value => Settings.ProgressWidthPercent = value, "unit.percent")));
             card.Add(Field("template.progressHeight", IntegerInput(() => Settings.ProgressHeight, value => Settings.ProgressHeight = value, "unit.px")));
             card.Add(Field("template.progressRadius", IntegerInput(() => Settings.ProgressRadius, value => Settings.ProgressRadius = value, "unit.px")));
@@ -181,7 +192,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             card.Add(Field("template.pixelRatioDesktop", PixelRatioInput(Settings.DesktopPixelRatioMode, () => Settings.DesktopPixelRatio, mode => Settings.DesktopPixelRatioMode = mode, value => Settings.DesktopPixelRatio = value)));
             card.Add(Field("template.pixelRatioMobile", PixelRatioInput(Settings.MobilePixelRatioMode, () => Settings.MobilePixelRatio, mode => Settings.MobilePixelRatioMode = mode, value => Settings.MobilePixelRatio = value)));
-            card.Add(Field("template.fullscreenButton", Switch(Settings.FullscreenButton, value => Update(() => Settings.FullscreenButton = value))));
             return card;
         }
 
@@ -293,13 +303,20 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             _track.style.width = Length.Percent(Settings.ProgressWidthPercent);
             _track.style.height = Mathf.Max(1, Settings.ProgressHeight);
             _track.style.backgroundColor = Settings.ProgressTrack;
+            SetBorder(_track, Settings.ProgressBorderWidth, Settings.ProgressBorderColor);
+            SetPadding(_track, Settings.ProgressPadding);
+            int inset = Settings.ProgressPadding + Settings.ProgressBorderWidth;
+            float trackHeight = Mathf.Max(1, Settings.ProgressHeight);
+            float fillHeight = Mathf.Max(0f, trackHeight - inset * 2f);
             _track.style.position = Settings.ProgressAtBottom ? Position.Absolute : Position.Relative;
             _track.style.bottom = Settings.ProgressAtBottom ? new StyleLength(24f) : new StyleLength(StyleKeyword.Auto);
             _track.style.marginTop = Settings.ProgressAtBottom ? 0 : 16;
-            SetRadius(_track, Settings.ProgressRadius);
+            SetRadius(_track, Mathf.Min(Settings.ProgressRadius, trackHeight * 0.5f));
             _fill.style.width = Length.Percent(_previewProgress * 100f);
             _fill.style.backgroundColor = Settings.ProgressFill;
-            SetRadius(_fill, Settings.ProgressRadius);
+            _fill.style.backgroundImage = Settings.ProgressGradient ? FillGradientTexture(Settings.ProgressFill, Settings.ProgressFillTo) : null;
+            SetScaleMode(_fill, ScaleMode.StretchToFill);
+            SetRadius(_fill, Mathf.Min(Mathf.Max(0f, Settings.ProgressRadius - inset), fillHeight * 0.5f));
 
             _loadingText.text = Settings.LoadingText;
             _loadingText.style.display = string.IsNullOrEmpty(Settings.LoadingText) ? DisplayStyle.None : DisplayStyle.Flex;
@@ -365,6 +382,52 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return _gradient;
         }
 
+        private Texture2D FillGradientTexture(Color from, Color to)
+        {
+            const int Width = 64;
+
+            if (_fillGradient == null)
+            {
+                _fillGradient = new Texture2D(Width, 1, TextureFormat.RGBA32, false)
+                {
+                    wrapMode = TextureWrapMode.Clamp,
+                    filterMode = FilterMode.Bilinear,
+                    hideFlags = HideFlags.HideAndDontSave
+                };
+            }
+
+            Color[] pixels = new Color[Width];
+
+            for (int x = 0; x < Width; x++)
+            {
+                pixels[x] = Color.Lerp(from, to, x / (float)(Width - 1));
+            }
+
+            _fillGradient.SetPixels(pixels);
+            _fillGradient.Apply(false);
+            return _fillGradient;
+        }
+
+        private void SetBorder(VisualElement element, int width, Color color)
+        {
+            element.style.borderTopWidth = width;
+            element.style.borderRightWidth = width;
+            element.style.borderBottomWidth = width;
+            element.style.borderLeftWidth = width;
+            element.style.borderTopColor = color;
+            element.style.borderRightColor = color;
+            element.style.borderBottomColor = color;
+            element.style.borderLeftColor = color;
+        }
+
+        private void SetPadding(VisualElement element, int padding)
+        {
+            element.style.paddingTop = padding;
+            element.style.paddingRight = padding;
+            element.style.paddingBottom = padding;
+            element.style.paddingLeft = padding;
+        }
+
         private void SetScaleMode(VisualElement element, ScaleMode mode)
         {
 #if UNITY_2022_2_OR_NEWER
@@ -420,9 +483,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return field;
         }
 
-        private ColorSwatchField ColorInput(Color value, Action<Color> assign)
+        private ColorSwatchField ColorInput(Color value, Action<Color> assign, bool alpha = false)
         {
-            ColorSwatchField field = new ColorSwatchField { Value = value };
+            ColorSwatchField field = new ColorSwatchField { ShowAlpha = alpha, Value = value };
             field.style.width = SwatchWidth;
             field.ValueChanged += color => Update(() => assign(color));
             return field;

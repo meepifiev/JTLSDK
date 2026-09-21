@@ -1175,7 +1175,6 @@ C# регистрирует его при `Create()`. Ответы на запр
 │ Рендер                                                                          │
 │  Pixel ratio десктоп  (●) Авто  ( ) Фиксированный [1.0]  ( ) Авто, не выше [2.0]│
 │  Pixel ratio мобильные ( ) Авто  ( ) Фиксированный [1.0]  (●) Авто, не выше [1.5]│
-│  Кнопка полного экрана [ ]                                                      │
 │                                                                                 │
 │ Переопределено в конфигурации YouTube Playables: соотношение сторон, pixel ratio│
 │                                                                                 │
@@ -1456,7 +1455,7 @@ Assets/WebGLTemplates/JTLSDK/
   thumbnail.png
   TemplateData/
     style.css
-    jtlsdk-page.js        экран загрузки, pixel ratio, пропорции, firstFrameReady, полноэкранный режим
+    jtlsdk-page.js        экран загрузки, pixel ratio, вписывание canvas, firstFrameReady
     logo.png              копируется из настроек тулкита
     loader-background.png если у экрана загрузки фон-картинка
     page-background.png   если у страницы фон-картинка
@@ -1469,11 +1468,10 @@ Assets/WebGLTemplates/JTLSDK/
 | `JTLSDK_LOGO_DISPLAY`, `JTLSDK_LOGO_SIZE` | Шаблон › Логотип |
 | `JTLSDK_LOADER_BACKGROUND` | Шаблон › Экран загрузки › Фон (готовый CSS) |
 | `JTLSDK_PAGE_BACKGROUND` | Шаблон › Фон страницы |
-| `JTLSDK_PROGRESS_FILL`, `_TRACK`, `_WIDTH`, `_HEIGHT`, `_RADIUS`, `_POSITION` | прогресс-бар |
+| `JTLSDK_PROGRESS_FILL`, `_FILL_TO`, `_TRACK`, `_BORDER_WIDTH`, `_BORDER_COLOR`, `_PADDING`, `_WIDTH`, `_HEIGHT`, `_RADIUS`, `_POSITION` | прогресс-бар: заливка цветом или градиентом, рамка, внутренний отступ, цвета с прозрачностью |
 | `JTLSDK_LOADING_TEXT` | текст под прогрессом |
 | `JTLSDK_ASPECT`, `JTLSDK_ASPECT_MOBILE` | пропорции канваса и их отключение на мобильных |
 | `JTLSDK_DPR_DESKTOP`, `JTLSDK_DPR_MOBILE` | `auto`, число или `max:2` |
-| `JTLSDK_FULLSCREEN_BUTTON` | кнопка полного экрана |
 | `JTLSDK_PLATFORM`, `JTLSDK_PLATFORM_HEAD` | площадка активной конфигурации и её скрипт в `<head>` |
 | `JTLSDK_DEV_BADGE` | плашка Development-сборки: `DEV · b43 · Yandex Games · v1.3.0` |
 
@@ -1616,6 +1614,7 @@ Assets/WebGLTemplates/JTLSDK/
 | 21.09.2026 | Аналитика убрана из ядра вместе с модулем Yandex Metrica. Она появится позже отдельным модулем. Механизм `modules.json` остаётся, список модулей пуст. |
 | 21.09.2026 | Шаблон по умолчанию фирменный: логотип JTL SDK (`Editor/Toolkit/Icons/Brand/jtlsdk-template-logo.png`), радиальный тёмно-синий градиент, синий прогресс-бар. Логотип выбирается режимом: JTL SDK, свой или без логотипа. Превью в тулките рисует настоящий градиент. |
 | 21.09.2026 | Настройки шаблона доступны только после установки. Шаблон можно удалить из тулкита. Сборка больше не ставит шаблон сама, вместо этого проверка «WebGL-шаблон установлен». |
+| 21.09.2026 | Шаблон повторяет рабочий шаблон yt-ветки IJ-SmashAndHit. Canvas вписывается по высоте, только если окно шире пропорции игры, иначе заполняет экран. Canvas прозрачный, pixel ratio по умолчанию 1, баннеры Unity уходят в консоль. Прогресс-бар умеет рамку, внутренний отступ и градиент. Кнопки полного экрана нет, страница и так на весь экран. |
 | 21.09.2026 | В меню `JTL SDK` только пункт Toolkit. Настройки создаёт тулкит сам, демо ставится из вкладки Samples в Package Manager. Пункты «Create Settings» и Development удалены. |
 | 21.09.2026 | Восстановление расходуемых покупок ждёт первого обработчика `Granted`, а покупка без обработчика не списывается. Раньше покупка, восстановленная до подписки игры, списывалась без выдачи. |
 | 21.09.2026 | EditMode-тесты проходят на 2021.3.45f2, 2022.3.62f2 и 6000.3.8f1. Настройки площадки пишутся через `NamedBuildTarget`, фон превью - через `BackgroundPropertyHelper` на 2022.2+. На Unity 6 остаются предупреждения об устаревших `UxmlFactory`/`UxmlTraits`: переход на `[UxmlElement]` ломает 2021.3, поэтому он отложен до поднятия минимальной версии. |

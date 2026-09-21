@@ -30,7 +30,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
         }
 
         private readonly ColorField _picker = new ColorField { showAlpha = false, showEyeDropper = false };
-        private readonly TextField _hex = new TextField { maxLength = 7 };
+        private readonly TextField _hex = new TextField { maxLength = 9 };
 
         public ColorSwatchField()
         {
@@ -48,14 +48,24 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 
         public event Action<Color> ValueChanged;
 
+        public bool ShowAlpha
+        {
+            get => _picker.showAlpha;
+            set
+            {
+                _picker.showAlpha = value;
+                Value = _picker.value;
+            }
+        }
+
         public Color Value
         {
             get => _picker.value;
             set
             {
-                Color opaque = new Color(value.r, value.g, value.b, 1f);
-                _picker.SetValueWithoutNotify(opaque);
-                _hex.SetValueWithoutNotify(ToHex(opaque));
+                Color color = ShowAlpha ? value : new Color(value.r, value.g, value.b, 1f);
+                _picker.SetValueWithoutNotify(color);
+                _hex.SetValueWithoutNotify(ToHex(color));
             }
         }
 
@@ -100,7 +110,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
                 return;
             }
 
-            color.a = 1f;
+            if (ShowAlpha == false)
+            {
+                color.a = 1f;
+            }
 
             if (color == _picker.value)
             {
@@ -113,7 +126,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 
         private string ToHex(Color color)
         {
-            return HexPrefix + ColorUtility.ToHtmlStringRGB(color);
+            return HexPrefix + (ShowAlpha && color.a < 0.999f ? ColorUtility.ToHtmlStringRGBA(color) : ColorUtility.ToHtmlStringRGB(color));
         }
     }
 }

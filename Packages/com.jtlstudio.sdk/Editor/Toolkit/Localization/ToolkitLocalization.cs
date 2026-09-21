@@ -131,6 +131,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("template.installedTo", "Template installed to {0}.", "Шаблон установлен в {0}.");
             Add("template.logo", "Logo", "Логотип");
             Add("template.logoSource", "Source", "Источник");
+            Add("template.fillStyle", "Fill style", "Заливка");
+            Add("template.fillStyles", "Solid|Gradient", "Цвет|Градиент");
+            Add("template.borderWidth", "Border", "Рамка");
+            Add("template.borderColor", "Border color", "Цвет рамки");
+            Add("template.padding", "Inner padding", "Внутренний отступ");
             Add("template.notInstalled", "Template is not installed", "Шаблон не установлен");
             Add("template.remove", "Remove", "Удалить");
             Add("template.removeTitle", "Remove template", "Удалить шаблон");
@@ -171,7 +176,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("template.pixelRatioDesktop", "Pixel ratio · desktop", "Pixel ratio · десктоп");
             Add("template.pixelRatioMobile", "Pixel ratio · mobile", "Pixel ratio · мобильные");
             Add("template.pixelRatioModes", "Auto|Fixed|Auto, limited", "Авто|Фиксированный|Авто с лимитом");
-            Add("template.fullscreenButton", "Fullscreen button", "Кнопка полного экрана");
             Add("template.preview", "Preview", "Превью");
             Add("template.previewDevices", "Desktop|Mobile", "Десктоп|Мобильный");
             Add("template.progress", "Progress", "Прогресс");
