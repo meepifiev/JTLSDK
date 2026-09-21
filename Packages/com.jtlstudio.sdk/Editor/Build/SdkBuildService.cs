@@ -14,6 +14,8 @@ namespace JTLStudio.SDK.Editor.Build
 {
     public class SdkBuildService
     {
+        public const float BytesPerMegabyte = 1000000f;
+
         private const long MaximumFileBytes = 30L * 1024 * 1024;
         private const int MaximumFiles = 8000;
         private const string YouTubeScriptHost = "https://www.youtube.com/game_api/";
@@ -116,9 +118,10 @@ namespace JTLStudio.SDK.Editor.Build
                 output = folder + ".zip";
                 Zip(folder, output);
                 Directory.Delete(folder, true);
+                bytes = new FileInfo(output).Length;
             }
 
-            UnityEngine.Debug.Log("[JTL SDK] Build " + buildNumber + " · " + configurationName + " · " + (bytes / 1048576f).ToString("0.0", CultureInfo.InvariantCulture) + " MB · " + Path.GetFullPath(output));
+            UnityEngine.Debug.Log("[JTL SDK] Build " + buildNumber + " · " + configurationName + " · " + (bytes / BytesPerMegabyte).ToString("0.0", CultureInfo.InvariantCulture) + " MB · " + Path.GetFullPath(output));
 
             Record(output, platform, bytes, true);
 

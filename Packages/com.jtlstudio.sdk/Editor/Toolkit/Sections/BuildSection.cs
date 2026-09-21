@@ -22,7 +22,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private const float MinimumMainWidth = 460f;
         private const float MinimumHeroWidthForPlatforms = 560f;
         private const float CompactBuildsWidth = 640f;
-        private const float Megabyte = 1048576f;
         private const string TargetName = "WebGL";
         private const string CellPrefix = "jtl-build-history__cell--";
 
@@ -221,7 +220,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             platform.Add(TextLabel(Context.Platforms.DisplayName(record.Platform), "jtl-build-history__text"));
             row.Add(Cell("platform", platform));
 
-            string size = record.IsSuccess ? Context.Text("build.size", (record.Bytes / Megabyte).ToString("0.0", CultureInfo.InvariantCulture)) : "—";
+            string size = record.IsSuccess ? Context.Text("build.size", (record.Bytes / SdkBuildService.BytesPerMegabyte).ToString("0.0", CultureInfo.InvariantCulture)) : "—";
             row.Add(Cell("size", TextLabel(size, "jtl-build-history__text", "jtl-text--secondary")));
 
             VisualElement status = Row(7);
@@ -694,7 +693,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
 
             if (_lastResult.IsSuccess)
             {
-                Context.Report(StatusKind.Success, "build.done", Settings.BuildNumber, (_lastResult.TotalBytes / Megabyte).ToString("0.0", CultureInfo.InvariantCulture), _lastResult.OutputPath);
+                Context.Report(StatusKind.Success, "build.done", Settings.BuildNumber, (_lastResult.TotalBytes / SdkBuildService.BytesPerMegabyte).ToString("0.0", CultureInfo.InvariantCulture), _lastResult.OutputPath);
             }
             else
             {
