@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24bf2c7f17d2d413f80ceea92c37cc9c, type: 3}
+  m_Name: JTLSDKSettings
+  m_EditorClassIdentifier: 
+  _activeConfiguration: {fileID: 11400000, guid: 7a585e77084e944758dc0d0e3a491fed, type: 2}
+  _initializationTimeoutSeconds: 15
+  _autosaveDelaySeconds: 2
+  _logLevel: 2
+  _defaultLanguage: 0
+  _supportedLanguages: 0000000001000000
+  _languageReplacements: []
+  _products:
+  - _id: remove_ads
+    _type: 0
+    _platformIds: []
+    _testPrice: 1
+    _testCurrency: YAN
+  - _id: coins_1000
+    _type: 1
+    _platformIds: []
+    _testPrice: 1
+    _testCurrency: YAN
+  _leaderboards:
+  - _id: levels
+    _platformIds: []
+  _flags:
+  - _key: tutorial_enabled
+    _type: 0
+    _defaultValue: true
+  _usePrototypesInEditor: 1

@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d25363e8620ac4c1ea2650739512eab7, type: 3}
+  m_Name: Yandex_Games
+  m_EditorClassIdentifier: 
+  _displayName: Yandex Games
+  _platform: 1
+  _defineSymbol: JTLSDK_YANDEX_GAMES
+  _pauseOnFocusLoss: 1
+  _showOverlayOnPause: 0
+  _languages: 0000000001000000
+  _platformProvider:
+    rid: 5000479319377838080
+  _ads:
+    rid: 5000479319377838081
+  _data:
+    rid: 5000479319377838082
+  _payments:
+    rid: 5000479319377838083
+  _languageProvider:
+    rid: 5000479319377838084
+  _player:
+    rid: 5000479319377838085
+  _leaderboards:
+    rid: 5000479319377838086
+  _flags:
+    rid: 5000479319377838087
+  _timeProvider:
+    rid: 5000479319377838088
+  _gameplay:
+    rid: 5000479319377838089
+  _review:
+    rid: 5000479319377838090
+  _shortcut:
+    rid: 5000479319377838091
+  references:
+    version: 2
+    RefIds:
+    - rid: 5000479319377838080
+      type: {class: YandexGamesPlatformProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data:
+        _appId: 
+    - rid: 5000479319377838081
+      type: {class: YandexGamesAdsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data:
+        _adBlockDetection: 1
+        _minimumInterstitialIntervalSeconds: 60
+        _skipInterstitialAfterRewardedSeconds: 60
+        _stickyBanner: 0
+    - rid: 5000479319377838082
+      type: {class: YandexGamesDataProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838083
+      type: {class: YandexGamesPaymentsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838084
+      type: {class: YandexGamesLanguageProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838085
+      type: {class: YandexGamesPlayerProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838086
+      type: {class: YandexGamesLeaderboardsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838087
+      type: {class: YandexGamesFlagsProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838088
+      type: {class: YandexGamesTimeProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838089
+      type: {class: YandexGamesGameplayProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838090
+      type: {class: YandexGamesReviewProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 
+    - rid: 5000479319377838091
+      type: {class: YandexGamesShortcutProvider, ns: JTLStudio.SDK.YandexGames, asm: JTLStudio.SDK.YandexGames}
+      data: 

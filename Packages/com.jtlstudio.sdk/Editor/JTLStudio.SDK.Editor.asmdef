@@ -2,7 +2,9 @@
     "name": "JTLStudio.SDK.Editor",
     "rootNamespace": "JTLStudio.SDK.Editor",
     "references": [
-        "JTLStudio.SDK"
+        "JTLStudio.SDK",
+        "JTLStudio.SDK.YandexGames",
+        "JTLStudio.SDK.YouTubePlayables"
     ],
     "includePlatforms": [
         "Editor"
