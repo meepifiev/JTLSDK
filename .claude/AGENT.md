@@ -30,7 +30,7 @@ JTLSDK facade -> module interfaces -> common services -> provider interfaces -> 
 
 ## Git
 
-- Commit after each completed step with a message that names the step. Push to `main`.
+- Commit after each completed step. The message is one short subject line, no body, no `Co-Authored-By` or other trailers. Push to `main`.
 - Never commit `.DS_Store`, `Library`, `Logs`, `UserSettings`, imported samples under `Assets/Samples`.
 
 ## Before answering
