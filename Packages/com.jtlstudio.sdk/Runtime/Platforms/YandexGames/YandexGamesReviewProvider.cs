@@ -1,21 +1,26 @@
 using System;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
-    public class YandexGamesReviewProvider : IReviewProvider
+    public class YandexGamesReviewProvider : BridgeProviderBase, IReviewProvider
     {
-        public bool CanRequest => false;
+        public bool CanRequest { get; private set; }
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            InitializeWith("review", "canRequest", onInitialized, response => CanRequest = response.GetBool("value"));
         }
 
         public void Request(Action<bool> onResult)
         {
-            onResult(false);
+            Call("review", "request", null, response =>
+            {
+                CanRequest = false;
+                onResult(response.IsSuccess && response.GetBool("sent"));
+            });
         }
     }
 }

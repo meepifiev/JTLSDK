@@ -9,9 +9,12 @@ export interface ModuleAdapter {
   readonly queries?: Record<string, QueryHandler>;
 }
 
+export type EventEmitter = (code: number, payload: unknown) => void;
+
 export interface PlatformAdapter {
   readonly name: string;
   readonly modules: Record<string, ModuleAdapter>;
+  bind(emit: EventEmitter): void;
 }
 
 export const ResultCode = {

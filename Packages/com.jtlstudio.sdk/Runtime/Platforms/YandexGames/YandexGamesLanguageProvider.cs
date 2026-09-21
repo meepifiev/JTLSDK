@@ -1,16 +1,17 @@
 using System;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
-    public class YandexGamesLanguageProvider : ILanguageProvider
+    public class YandexGamesLanguageProvider : BridgeProviderBase, ILanguageProvider
     {
-        public string LanguageCode => "";
+        public string LanguageCode { get; private set; } = "";
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            InitializeWith("platform", "initialize", onInitialized, response => LanguageCode = response.GetString("language"));
         }
     }
 }

@@ -1,41 +1,85 @@
 using System;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 using UnityEngine;
 
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
-    public class YandexGamesPlatformProvider : IPlatformProvider
+    public class YandexGamesPlatformProvider : BridgeProviderBase, IPlatformProvider
     {
         [SerializeField] private string _appId = "";
+
+        private readonly LanguageCodes _codes = new LanguageCodes();
+        private string _resolvedAppId;
+        private DeviceType _deviceType = DeviceType.Desktop;
+        private string _languageCode = "";
 
         public event Action<bool> PauseRequested;
         public event Action<bool> PlatformMuteChanged;
 
         public PlatformId Platform => PlatformId.YandexGames;
-        public string AppId => _appId;
-        public DeviceType DeviceType => DeviceType.Desktop;
+        public string AppId => string.IsNullOrEmpty(_resolvedAppId) ? _appId : _resolvedAppId;
+        public DeviceType DeviceType => _deviceType;
         public bool SupportsPlatformMute => false;
         public bool IsPlatformMuted => false;
 
+        public override void Attach(WebBridge bridge)
+        {
+            base.Attach(bridge);
+            bridge.EventReceived += OnBridgeEvent;
+        }
+
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            InitializeWith("platform", "initialize", onInitialized, response =>
+            {
+                _resolvedAppId = response.GetString("appId");
+                _languageCode = response.GetString("language");
+                _deviceType = ParseDeviceType(response.GetString("deviceType"));
+            });
         }
 
         public void ShowContinuePrompt(Action onContinue)
         {
-            onContinue?.Invoke();
+            string languageCode = _codes.TryParse(_languageCode, out Language language) ? _codes.ToCode(language) : "en";
+            Call("platform", "continuePrompt", new BridgePayload().Set("language", languageCode), _ => onContinue?.Invoke());
         }
 
-        internal void RaisePause(bool paused)
+        private DeviceType ParseDeviceType(string value)
         {
-            PauseRequested?.Invoke(paused);
+            switch (value)
+            {
+                case "mobile":
+                    return DeviceType.Mobile;
+
+                case "tablet":
+                    return DeviceType.Tablet;
+
+                case "tv":
+                    return DeviceType.TV;
+
+                default:
+                    return DeviceType.Desktop;
+            }
         }
 
-        internal void RaiseMute(bool muted)
+        private void OnBridgeEvent(BridgeEventCode code, BridgeResponse response)
         {
-            PlatformMuteChanged?.Invoke(muted);
+            switch (code)
+            {
+                case BridgeEventCode.Pause:
+                    PauseRequested?.Invoke(true);
+                    break;
+
+                case BridgeEventCode.Resume:
+                    PauseRequested?.Invoke(false);
+                    break;
+
+                case BridgeEventCode.MuteChanged:
+                    PlatformMuteChanged?.Invoke(response.GetBool("muted"));
+                    break;
+            }
         }
     }
 }

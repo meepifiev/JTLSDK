@@ -7,9 +7,9 @@ namespace JTLStudio.SDK.Editor
 {
     public static class JtlSdkMenu
     {
-        private const string Root = "Window/JTL SDK/";
+        private const string Root = "JTL SDK/";
 
-        [MenuItem(Root + "Create Settings", false, 100)]
+        [MenuItem(Root + "Create Settings", false, 20)]
         private static void CreateSettings()
         {
             JTLSDKSettings settings = new SettingsAssetService().GetOrCreate();
@@ -17,7 +17,7 @@ namespace JTLStudio.SDK.Editor
             EditorGUIUtility.PingObject(settings);
         }
 
-        [MenuItem(Root + "Development/Create Demo Settings", false, 200)]
+        [MenuItem(Root + "Development/Create Demo Settings", false, 100)]
         private static void CreateDemoSettings()
         {
             JTLSDKSettings settings = new DemoSettingsSetup().Create();
@@ -25,7 +25,7 @@ namespace JTLStudio.SDK.Editor
             Debug.Log("[JTL SDK] Demo settings are ready: " + AssetDatabase.GetAssetPath(settings));
         }
 
-        [MenuItem(Root + "Development/Import Demo Sample", false, 201)]
+        [MenuItem(Root + "Development/Import Demo Sample", false, 101)]
         private static void ImportDemoSample()
         {
             SampleSync sync = new SampleSync();
@@ -33,7 +33,7 @@ namespace JTLStudio.SDK.Editor
             Debug.Log("[JTL SDK] Demo sample imported to " + sync.ImportedSamplePath);
         }
 
-        [MenuItem(Root + "Development/Sync Demo To Package", false, 202)]
+        [MenuItem(Root + "Development/Sync Demo To Package", false, 102)]
         private static void SyncDemoToPackage()
         {
             SampleSync sync = new SampleSync();

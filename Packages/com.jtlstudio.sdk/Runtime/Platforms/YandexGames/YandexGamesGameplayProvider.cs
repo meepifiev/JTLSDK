@@ -1,26 +1,30 @@
 using System;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
-    public class YandexGamesGameplayProvider : IGameplayProvider
+    public class YandexGamesGameplayProvider : BridgeProviderBase, IGameplayProvider
     {
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            onInitialized(IsBridgeReady ? ProviderState.Ready : ProviderState.Failed);
         }
 
         public void ReportGameReady()
         {
+            Call("gameplay", "ready", null, _ => { });
         }
 
         public void ReportGameplayStart()
         {
+            Call("gameplay", "start", null, _ => { });
         }
 
         public void ReportGameplayStop()
         {
+            Call("gameplay", "stop", null, _ => { });
         }
     }
 }

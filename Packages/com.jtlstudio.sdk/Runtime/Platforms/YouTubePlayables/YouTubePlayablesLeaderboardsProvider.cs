@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.YouTubePlayables
 {
     [Serializable]
-    public class YouTubePlayablesLeaderboardsProvider : ILeaderboardsProvider
+    public class YouTubePlayablesLeaderboardsProvider : BridgeProviderBase, ILeaderboardsProvider
     {
         public bool SupportsLoad => false;
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            onInitialized(IsBridgeReady ? ProviderState.Ready : ProviderState.Failed);
         }
 
         public void SetScore(string platformLeaderboardId, long score, Action<bool> onResult)
         {
-            onResult(false);
+            Call("leaderboards", "setScore", new BridgePayload().Set("id", platformLeaderboardId).Set("score", score), response => onResult(response.IsSuccess));
         }
 
         public void GetPlayerEntry(string platformLeaderboardId, Action<LeaderboardEntry?> onResult)

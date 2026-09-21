@@ -1,17 +1,33 @@
 using System;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
-    public class YandexGamesTimeProvider : ITimeProvider
+    public class YandexGamesTimeProvider : BridgeProviderBase, ITimeProvider
     {
-        public bool IsServerTime => false;
-        public DateTimeOffset Now => DateTimeOffset.Now;
+        private DateTimeOffset _serverAtSync;
+        private DateTimeOffset _localAtSync;
+
+        public bool IsServerTime { get; private set; }
+        public DateTimeOffset Now => IsServerTime ? _serverAtSync + (DateTimeOffset.UtcNow - _localAtSync) : DateTimeOffset.Now;
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            InitializeWith("time", "server", onInitialized, response =>
+            {
+                long milliseconds = response.GetLong("milliseconds");
+
+                if (milliseconds <= 0)
+                {
+                    return;
+                }
+
+                _serverAtSync = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
+                _localAtSync = DateTimeOffset.UtcNow;
+                IsServerTime = true;
+            });
         }
     }
 }

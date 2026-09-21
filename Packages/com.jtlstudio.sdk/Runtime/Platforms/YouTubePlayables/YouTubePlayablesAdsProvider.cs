@@ -1,10 +1,11 @@
 using System;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.YouTubePlayables
 {
     [Serializable]
-    public class YouTubePlayablesAdsProvider : IAdsProvider
+    public class YouTubePlayablesAdsProvider : BridgeProviderBase, IAdsProvider
     {
         public bool SupportsInterstitial => true;
         public bool SupportsRewarded => true;
@@ -13,17 +14,26 @@ namespace JTLStudio.SDK.YouTubePlayables
 
         public void Initialize(Action<ProviderState> onInitialized)
         {
-            onInitialized(ProviderState.Failed);
+            onInitialized(IsBridgeReady ? ProviderState.Ready : ProviderState.Failed);
         }
 
         public void ShowInterstitial(Action<AdResult> onResult)
         {
-            onResult(AdResult.Failed);
+            Call("ads", "showInterstitial", null, response => onResult(response.IsSuccess ? AdResult.Shown : AdResult.Failed));
         }
 
         public void ShowRewarded(string rewardId, Action<AdResult> onResult)
         {
-            onResult(AdResult.Failed);
+            Call("ads", "showRewarded", new BridgePayload().Set("rewardId", rewardId), response =>
+            {
+                if (response.IsSuccess == false)
+                {
+                    onResult(AdResult.Failed);
+                    return;
+                }
+
+                onResult(response.GetString("result") == "rewarded" ? AdResult.Rewarded : AdResult.Closed);
+            });
         }
 
         public void ShowBanner()

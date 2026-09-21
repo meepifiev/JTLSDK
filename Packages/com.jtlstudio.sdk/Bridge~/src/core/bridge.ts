@@ -130,6 +130,7 @@ export class Bridge {
 
 export function install(platform: PlatformAdapter): Bridge {
   const bridge = new Bridge(platform);
+  platform.bind((code, payload) => bridge.event(code, payload));
   Module.JTLSDK = bridge;
   return bridge;
 }

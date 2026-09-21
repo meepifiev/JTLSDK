@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JTLStudio.SDK.Bridge;
 using JTLStudio.SDK.Providers;
 using JTLStudio.SDK.Services;
 #if UNITY_EDITOR
@@ -33,6 +34,7 @@ namespace JTLStudio.SDK
         private readonly ReviewService _review;
         private readonly ShortcutService _shortcut;
 
+        private readonly WebBridge _bridge;
         private SdkRuntimeBehaviour _behaviour;
         private float _initializationSeconds;
         private bool _initialized;
@@ -57,6 +59,9 @@ namespace JTLStudio.SDK
             IGameplayProvider gameplayProvider = ResolveProvider(configuration?.Gameplay, new FallbackGameplayProvider());
             IReviewProvider reviewProvider = ResolveProvider(configuration?.Review, new UnsupportedReviewProvider());
             IShortcutProvider shortcutProvider = ResolveProvider(configuration?.Shortcut, new UnsupportedShortcutProvider());
+
+            _bridge = new WebBridge(_logger);
+            AttachBridge(platformProvider, adsProvider, dataProvider, paymentsProvider, languageProvider, playerProvider, leaderboardsProvider, flagsProvider, timeProvider, gameplayProvider, reviewProvider, shortcutProvider);
 
             bool pauseOnFocusLoss = configuration == null || configuration.PauseOnFocusLoss;
             PlatformId platformId = configuration == null ? PlatformId.Editor : configuration.Platform;
@@ -163,6 +168,7 @@ namespace JTLStudio.SDK
 
             _initialized = true;
             CreateRuntimeObject();
+            _bridge.Connect();
 
             foreach (ModuleBase module in _modules)
             {
@@ -241,6 +247,7 @@ namespace JTLStudio.SDK
             }
 
             _readyCallbacks.Clear();
+            _bridge.Disconnect();
 
             if (_behaviour != null)
             {
@@ -255,6 +262,17 @@ namespace JTLStudio.SDK
                 else
                 {
                     UnityEngine.Object.DestroyImmediate(runtimeObject);
+                }
+            }
+        }
+
+        private void AttachBridge(params object[] providers)
+        {
+            foreach (object provider in providers)
+            {
+                if (provider is IBridgeConsumer consumer)
+                {
+                    consumer.Attach(_bridge);
                 }
             }
         }

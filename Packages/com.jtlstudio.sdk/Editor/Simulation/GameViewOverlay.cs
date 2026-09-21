@@ -9,7 +9,6 @@ namespace JTLStudio.SDK.Editor.Simulation
     public class GameViewOverlay : VisualElement
     {
         private readonly SimulationSession _session;
-        private readonly SimulationTexts _texts = new SimulationTexts();
         private readonly VisualElement _panel;
         private readonly Button _collapsedButton;
         private readonly DropdownField _languageField;
@@ -49,20 +48,20 @@ namespace JTLStudio.SDK.Editor.Simulation
 
             _languageField = new DropdownField();
             _languageField.RegisterValueChangedCallback(OnLanguageChanged);
-            _panel.Add(CreateRow(_texts.Get("language"), _languageField));
+            _panel.Add(CreateRow("Language", _languageField));
 
             _deviceField = new DropdownField(new List<string>(Enum.GetNames(typeof(DeviceType))), 0);
             _deviceField.RegisterValueChangedCallback(OnDeviceChanged);
-            _panel.Add(CreateRow(_texts.Get("device"), _deviceField));
+            _panel.Add(CreateRow("Device", _deviceField));
 
             _pauseToggle = new Toggle();
             _pauseToggle.RegisterValueChangedCallback(OnPauseChanged);
-            _pauseRow = CreateRow(_texts.Get("platformPause"), _pauseToggle);
+            _pauseRow = CreateRow("Platform pause", _pauseToggle);
             _panel.Add(_pauseRow);
 
             _muteToggle = new Toggle();
             _muteToggle.RegisterValueChangedCallback(OnMuteChanged);
-            _muteRow = CreateRow(_texts.Get("platformMuted"), _muteToggle);
+            _muteRow = CreateRow("Platform audio muted", _muteToggle);
             _panel.Add(_muteRow);
 
             _caption = new Label("");
@@ -156,14 +155,14 @@ namespace JTLStudio.SDK.Editor.Simulation
         {
             if (JTLSDK.IsCreated == false)
             {
-                _caption.text = _texts.Get("notCreated");
+                _caption.text = "JTLSDK.Create() not called";
                 return;
             }
 
             string platform = JTLSDK.Platform.Current.ToString();
-            string state = _texts.Get(JTLSDK.IsReady ? "ready" : "initializing");
+            string state = JTLSDK.IsReady ? "ready" : "initializing";
             string data = JTLSDK.Data.LoadState.ToString().ToLowerInvariant();
-            _caption.text = platform + " · " + state + " · " + _texts.Get("save") + " " + data;
+            _caption.text = platform + " · " + state + " · save " + data;
         }
 
         private void OnLanguageChanged(ChangeEvent<string> changeEvent)
