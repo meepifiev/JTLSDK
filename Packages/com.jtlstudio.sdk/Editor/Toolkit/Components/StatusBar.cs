@@ -47,6 +47,12 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 
         public void ApplyLocalization(ToolkitLocalization localization)
         {
+            if (string.IsNullOrEmpty(_status.Text) == false)
+            {
+                _text.text = _status.Text;
+                return;
+            }
+
             _text.text = string.IsNullOrEmpty(_status.MessageKey) ? string.Empty : localization.Get(_status.MessageKey);
         }
 

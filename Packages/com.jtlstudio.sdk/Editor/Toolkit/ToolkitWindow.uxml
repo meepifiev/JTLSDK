@@ -43,14 +43,14 @@
             <ui:VisualElement name="top-bar" class="jtl-top-bar">
                 <jtl:LocalizedLabel key="topbar.activeConfiguration" class="jtl-top-bar__label" />
                 <ui:Button name="configuration-button" class="jtl-button jtl-button--dropdown jtl-top-bar__configuration">
-                    <jtl:PortalMark portal="yandex" size="16" />
-                    <ui:Label text="Yandex Games" class="jtl-button__label" />
+                    <jtl:PortalMark name="configuration-mark" portal="yandex" size="16" />
+                    <ui:Label name="configuration-name" text="" class="jtl-button__label" />
                     <jtl:Icon icon="chevron-down" tone="muted" class="jtl-button__trailing" />
                 </ui:Button>
                 <ui:VisualElement class="jtl-top-bar__spacer" />
                 <ui:VisualElement class="jtl-pill jtl-top-bar__pill">
                     <ui:VisualElement class="jtl-pill__dot" />
-                    <jtl:LocalizedLabel key="topbar.package" class="jtl-pill__text" />
+                    <ui:Label name="package-pill" text="" class="jtl-pill__text" />
                 </ui:VisualElement>
                 <jtl:SegmentedControl name="language-switch" choices="EN|RU" index="0" class="jtl-top-bar__language" />
                 <jtl:IconButton name="settings-button" icon="settings" class="jtl-top-bar__icon-button" />

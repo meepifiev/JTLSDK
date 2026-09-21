@@ -14,6 +14,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
         public ToolkitLocalization()
         {
             RegisterShell();
+            RegisterLiveData();
             RegisterCommon();
             RegisterConfigurations();
             RegisterConfigurationDetails();
@@ -83,6 +84,86 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("topbar.package", "Package 1.0.0 · 1.1.0 available", "Пакет 1.0.0 · доступна 1.1.0");
         }
 
+        private void RegisterLiveData()
+        {
+            Add("platform.yandexDescription", "Yandex Games: ads, purchases, cloud saves, leaderboards, flags and server time.", "Яндекс Игры: реклама, покупки, облачные сохранения, лидерборды, флаги и серверное время.");
+            Add("platform.youtubeDescription", "YouTube Playables: ads, cloud saves and score. No purchases, no authorization.", "YouTube Playables: реклама, облачные сохранения и счёт. Без покупок и авторизации.");
+            Add("platform.editorDescription", "Editor only: prototypes answer every call.", "Только редактор: на все вызовы отвечают прототипы.");
+            Add("module.platform", "Platform", "Площадка");
+            Add("module.language", "Language", "Язык");
+            Add("module.player", "Player", "Игрок");
+            Add("module.flags", "Flags", "Флаги");
+            Add("module.time", "Time", "Время");
+            Add("module.gameplay", "Gameplay", "Геймплей");
+            Add("module.review", "Review", "Отзыв");
+            Add("module.shortcut", "Shortcut", "Ярлык");
+            Add("topbar.noConfiguration", "No configuration", "Нет конфигурации");
+            Add("topbar.packageVersion", "Package", "Пакет");
+            Add("topbar.manageConfigurations", "Manage configurations", "Управлять конфигурациями");
+            Add("configurations.ready", "Configurations loaded from the project.", "Конфигурации загружены из проекта.");
+            Add("configurations.emptyTitle", "No configurations yet", "Конфигураций пока нет");
+            Add("configurations.emptyDescription", "Create one per portal. The first one becomes active.", "Создай по одной на площадку. Первая станет активной.");
+            Add("configurations.createYandex", "Create Yandex Games", "Создать Yandex Games");
+            Add("configurations.createYouTube", "Create YouTube Playables", "Создать YouTube Playables");
+            Add("configurations.notApplied", "Not applied", "Не применяется");
+            Add("configurations.languagesCount", "{0} of {1}", "{0} из {1}");
+            Add("configurations.created", "{0} configuration created.", "Конфигурация {0} создана.");
+            Add("configurations.activated", "{0} is active. Unity recompiles the project.", "{0} активна. Unity перекомпилирует проект.");
+            Add("configurations.copied", "Copied {0}.", "Скопировано: {0}.");
+            Add("details.ready", "Changes are saved to the configuration asset immediately.", "Изменения сразу сохраняются в ассет конфигурации.");
+            Add("details.noConfigurationTitle", "No configuration selected", "Конфигурация не выбрана");
+            Add("details.noConfigurationDescription", "Open one from the list or create a new one.", "Открой конфигурацию из списка или создай новую.");
+            Add("details.backToList", "Back to configurations", "К списку конфигураций");
+            Add("details.general", "Configuration", "Конфигурация");
+            Add("details.name", "Name", "Название");
+            Add("details.unsupportedNote", "Not available on this portal", "Недоступно на этой площадке");
+            Add("details.hasSettings", "Has settings", "Есть настройки");
+            Add("details.noSettings", "No settings", "Без настроек");
+            Add("details.pause", "Pause", "Пауза");
+            Add("details.pauseOnFocusLoss", "Pause on focus loss", "Пауза при потере фокуса");
+            Add("details.showOverlayOnPause", "Show overlay on pause", "Оверлей на паузе");
+            Add("details.languages", "Languages on this configuration", "Языки этой конфигурации");
+            Add("details.languagesDescription", "Only languages enabled in the project are listed.", "В списке только языки, включённые в проекте.");
+            Add("details.noProjectLanguages", "Enable languages in the Languages section first.", "Сначала включи языки в разделе «Языки».");
+            Add("details.delete", "Delete", "Удалить");
+            Add("details.cancel", "Cancel", "Отмена");
+            Add("details.deleteTitle", "Delete configuration?", "Удалить конфигурацию?");
+            Add("details.deleteMessage", "{0} will be deleted from the project. This cannot be undone.", "Конфигурация {0} будет удалена из проекта. Это нельзя отменить.");
+            Add("details.deleted", "{0} deleted.", "{0} удалена.");
+            Add("common.constantsGenerated", "Constants written to {0}.", "Константы записаны в {0}.");
+            Add("languages.ready", "Languages are stored in JTLSDKSettings.", "Языки хранятся в JTLSDKSettings.");
+            Add("languages.selectedCountFormat", "{0} of {1} selected", "Выбрано {0} из {1}");
+            Add("languages.noConfigurations", "No configurations yet.", "Конфигураций пока нет.");
+            Add("languages.lastLanguage", "At least one language must stay enabled.", "Хотя бы один язык должен остаться включённым.");
+            Add("languages.startLanguageSaved", "Play Mode starts in {0}.", "Play Mode стартует на языке: {0}.");
+            Add("purchases.ready", "Products are stored in JTLSDKSettings.", "Товары хранятся в JTLSDKSettings.");
+            Add("purchases.emptyTitle", "No products yet", "Товаров пока нет");
+            Add("purchases.emptyDescription", "Declare a product id here, then map it to each portal.", "Объяви id товара здесь и сопоставь его с id на площадках.");
+            Add("purchases.unsupportedWarning", "Purchases are not supported on the active configuration {0}.", "Покупки не поддерживаются в активной конфигурации {0}.");
+            Add("purchases.yandexIdNote", "Leave empty to reuse the product id.", "Оставь пустым, чтобы использовать id товара.");
+            Add("purchases.added", "{0} added.", "{0} добавлен.");
+            Add("leaderboards.ready", "Leaderboards are stored in JTLSDKSettings.", "Лидерборды хранятся в JTLSDKSettings.");
+            Add("leaderboards.empty", "No leaderboards yet.", "Лидербордов пока нет.");
+            Add("flags.ready", "Flag defaults are stored in JTLSDKSettings.", "Значения флагов по умолчанию хранятся в JTLSDKSettings.");
+            Add("flags.empty", "No flags yet.", "Флагов пока нет.");
+            Add("simulation.ready", "Simulation settings are stored per user in UserSettings.", "Настройки симуляции хранятся у каждого пользователя в UserSettings.");
+            Add("simulation.saved", "Simulation settings saved. They apply on the next Play Mode start.", "Настройки симуляции сохранены. Применятся при следующем запуске Play Mode.");
+            Add("simulation.loadFailure", "Simulate load failure", "Имитировать ошибку загрузки");
+            Add("saves.ready", "Editor save data lives in PlayerPrefs under JTLSDK.Data.", "Сейв редактора хранится в PlayerPrefs под ключом JTLSDK.Data.");
+            Add("saves.sizeWithLimit", "{0} KB of {1} KB", "{0} КБ из {1} КБ");
+            Add("saves.corrupted", "Save data is not valid JSON.", "Сейв не является корректным JSON.");
+            Add("saves.invalidValue", "{0}: the value does not match its type.", "{0}: значение не подходит под тип.");
+            Add("saves.valueSaved", "{0} saved.", "{0} сохранён.");
+            Add("saves.keyDeleted", "{0} deleted.", "{0} удалён.");
+            Add("saves.resetTitle", "Reset all save data?", "Сбросить весь сейв?");
+            Add("saves.resetMessage", "Every key in the editor save is deleted. Builds are not affected.", "Все ключи сейва редактора будут удалены. Билды это не затронет.");
+            Add("saves.resetDone", "Editor save data cleared.", "Сейв редактора очищен.");
+            Add("saves.exported", "Saved to {0}.", "Сохранено в {0}.");
+            Add("saves.imported", "Imported from {0}.", "Импортировано из {0}.");
+            Add("saves.copyJson", "Copy JSON", "Скопировать JSON");
+            Add("saves.copied", "Save JSON copied.", "JSON сейва скопирован.");
+        }
+
         private void RegisterCommon()
         {
             Add("badge.active", "Active", "Активная");
@@ -134,7 +215,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
 
         private void RegisterConfigurationDetails()
         {
-            Add("details.portal", "Portal: YouTube Playables", "Площадка: YouTube Playables");
+            Add("details.portal", "Portal: {0}", "Площадка: {0}");
             Add("details.projectSettings", "Project settings applied on activation", "Настройки проекта при активации");
             Add("details.projectSettingsCaption", "Apply column controls what activation writes", "Колонка «Применять» задаёт, что записывает активация");
             Add("details.columnSetting", "SETTING", "НАСТРОЙКА");
@@ -360,8 +441,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("saves.description", "The editor copy of the player's save data. Edits apply on the next Play Mode start.", "Копия сохранений игрока в редакторе. Правки применяются при следующем запуске Play Mode.");
             Add("saves.showEmpty", "Show empty state", "Показать пустое состояние");
             Add("saves.showFilled", "Show filled state", "Показать заполненное состояние");
-            Add("saves.revision", "Revision 42", "Ревизия 42");
-            Add("saves.size", "1.8 KB of 200 KB", "1,8 КБ из 200 КБ");
+            Add("saves.revision", "Revision {0}", "Ревизия {0}");
+            Add("saves.size", "{0} KB", "{0} КБ");
             Add("saves.searchPlaceholder", "Search keys", "Поиск ключей");
             Add("saves.addKey", "Add key", "Добавить ключ");
             Add("saves.columnKey", "Key", "Ключ");

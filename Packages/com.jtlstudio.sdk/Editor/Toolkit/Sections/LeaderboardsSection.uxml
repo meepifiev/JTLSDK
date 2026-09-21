@@ -1,57 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
         <jtl:SectionHeader title-key="leaderboards.title" description-key="leaderboards.description" />
-        <jtl:Card title-key="leaderboards.cardTitle">
-            <ui:VisualElement class="jtl-table">
-                <ui:VisualElement class="jtl-table__row jtl-table__row--head">
-                    <ui:VisualElement class="jtl-table__cell" style="width: 150px;">
-                        <jtl:LocalizedLabel key="leaderboards.columnId" class="jtl-table__heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <jtl:LocalizedLabel key="leaderboards.columnYandex" class="jtl-table__heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell" style="width: 140px;">
-                        <jtl:LocalizedLabel key="leaderboards.columnYoutube" class="jtl-table__heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;" />
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-table__row">
-                    <ui:VisualElement class="jtl-table__cell" style="width: 150px;">
-                        <ui:Label text="levels" class="jtl-text--small" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <ui:TextField value="levels_board" class="jtl-field jtl-grow jtl-mono" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell" style="width: 140px;">
-                        <jtl:LocalizedLabel key="leaderboards.singleBoard" class="jtl-text--secondary" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
-                        <jtl:IconButton icon="delete" size="24" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-table__row">
-                    <ui:VisualElement class="jtl-table__cell" style="width: 150px;">
-                        <ui:Label text="time_attack" class="jtl-text--small" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <ui:TextField value="time_attack_board" class="jtl-field jtl-grow" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell" style="width: 140px;">
-                        <jtl:LocalizedLabel key="leaderboards.singleBoard" class="jtl-text--secondary" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
-                        <jtl:IconButton icon="delete" size="24" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement class="jtl-row">
-                <jtl:ToolkitButton text-key="leaderboards.add" icon="plus" compact="true" />
-            </ui:VisualElement>
-            <ui:VisualElement class="jtl-row jtl-hstack-10 jtl-pt-4">
-                <jtl:ToolkitButton text-key="common.generateConstants" icon="refresh" />
-                <ui:Label text="Assets/Scripts/Generated/JTLSDKIds.cs" class="jtl-text--caption" />
-            </ui:VisualElement>
-        </jtl:Card>
-        <jtl:InlineMessage text-key="leaderboards.youtubeNote" variant="info" />
+        <ui:VisualElement name="leaderboards" class="jtl-column jtl-vstack-12" />
     </ui:VisualElement>
 </ui:UXML>

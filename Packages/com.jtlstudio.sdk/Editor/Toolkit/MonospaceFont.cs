@@ -28,11 +28,10 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
             foreach (VisualElement element in elements)
             {
-                element.style.unityFont = _font;
-
-                foreach (VisualElement child in element.Query<VisualElement>().ToList())
+                foreach (VisualElement target in element.Query<VisualElement>().ToList())
                 {
-                    child.style.unityFont = _font;
+                    target.style.unityFont = _font;
+                    target.style.unityFontDefinition = FontDefinition.FromFont(_font);
                 }
             }
         }

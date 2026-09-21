@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using JTLStudio.SDK.Editor.Toolkit.Components;
 using UnityEngine.UIElements;
 
@@ -78,6 +79,66 @@ namespace JTLStudio.SDK.Editor.Toolkit
             }
 
             return element;
+        }
+
+        protected VisualElement Row(int gap)
+        {
+            VisualElement row = new VisualElement();
+            row.AddToClassList("jtl-row");
+            row.AddToClassList("jtl-hstack-" + gap.ToString(CultureInfo.InvariantCulture));
+            return row;
+        }
+
+        protected VisualElement Column(int gap)
+        {
+            VisualElement column = new VisualElement();
+            column.AddToClassList("jtl-column");
+            column.AddToClassList("jtl-vstack-" + gap.ToString(CultureInfo.InvariantCulture));
+            return column;
+        }
+
+        protected VisualElement Spacer()
+        {
+            VisualElement spacer = new VisualElement();
+            spacer.AddToClassList("jtl-spacer");
+            return spacer;
+        }
+
+        protected Label TextLabel(string text, params string[] classNames)
+        {
+            Label label = new Label(text);
+
+            foreach (string className in classNames)
+            {
+                label.AddToClassList(className);
+            }
+
+            return label;
+        }
+
+        protected LocalizedLabel Localized(string key, params string[] classNames)
+        {
+            LocalizedLabel label = new LocalizedLabel(key);
+
+            foreach (string className in classNames)
+            {
+                label.AddToClassList(className);
+            }
+
+            return label;
+        }
+
+        protected ToolkitButton Button(string textKey, string variant, string iconName, Action onClick)
+        {
+            ToolkitButton button = new ToolkitButton(textKey, variant);
+
+            if (string.IsNullOrEmpty(iconName) == false)
+            {
+                button.IconName = iconName;
+            }
+
+            button.clicked += onClick;
+            return button;
         }
 
         protected void NavigateTo(ToolkitSectionId sectionId)

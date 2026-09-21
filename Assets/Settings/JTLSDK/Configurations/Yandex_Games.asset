@@ -18,6 +18,21 @@ MonoBehaviour:
   _pauseOnFocusLoss: 1
   _showOverlayOnPause: 0
   _languages: 0000000001000000
+  _playerSettings:
+    _applyTemplate: 1
+    _template: PROJECT:JTLSDK
+    _applyCompression: 1
+    _compression: 2
+    _applyDecompressionFallback: 1
+    _decompressionFallback: 0
+    _applyDataCaching: 1
+    _dataCaching: 1
+    _applyStripping: 1
+    _stripping: 3
+    _applyRunInBackground: 1
+    _runInBackground: 1
+    _applyMemorySize: 0
+    _memorySizeMegabytes: 512
   _platformProvider:
     rid: 5000479319377838080
   _ads:

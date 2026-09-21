@@ -1,56 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
     <ui:VisualElement class="jtl-column jtl-vstack-16">
         <jtl:SectionHeader title-key="flags.title" description-key="flags.description" />
-        <jtl:Card title-key="flags.cardTitle" caption-key="flags.caption">
-            <ui:VisualElement class="jtl-table">
-                <ui:VisualElement class="jtl-table__row jtl-table__row--head">
-                    <ui:VisualElement class="jtl-table__cell" style="width: 170px;">
-                        <jtl:LocalizedLabel key="flags.columnKey" class="jtl-table__heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell" style="width: 120px;">
-                        <jtl:LocalizedLabel key="flags.columnType" class="jtl-table__heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <jtl:LocalizedLabel key="flags.columnDefault" class="jtl-table__heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;" />
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-table__row">
-                    <ui:VisualElement class="jtl-table__cell" style="width: 170px;">
-                        <ui:Label text="tutorial_enabled" class="jtl-text--small jtl-mono" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell" style="width: 120px;">
-                        <jtl:Dropdown choices-key="flags.types" selected="0" width="110" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <jtl:SwitchToggle value="true" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
-                        <jtl:IconButton icon="delete" size="24" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-table__row">
-                    <ui:VisualElement class="jtl-table__cell" style="width: 170px;">
-                        <ui:Label text="ads_interval" class="jtl-text--small" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell" style="width: 120px;">
-                        <jtl:Dropdown choices-key="flags.types" selected="1" width="110" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
-                        <jtl:NumberFieldWithUnit value="60" unit-key="unit.seconds" width="110" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
-                        <jtl:IconButton icon="delete" size="24" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement class="jtl-row">
-                <jtl:ToolkitButton text-key="flags.add" icon="plus" compact="true" />
-            </ui:VisualElement>
-            <ui:VisualElement class="jtl-row jtl-hstack-10 jtl-pt-4">
-                <jtl:ToolkitButton text-key="common.generateConstants" icon="refresh" />
-                <ui:Label text="Assets/Scripts/Generated/JTLSDKIds.cs" class="jtl-text--caption" />
-            </ui:VisualElement>
-        </jtl:Card>
+        <ui:VisualElement name="flags" class="jtl-column jtl-vstack-12" />
     </ui:VisualElement>
 </ui:UXML>

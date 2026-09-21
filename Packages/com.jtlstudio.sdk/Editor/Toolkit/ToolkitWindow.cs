@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JTLStudio.SDK.Editor.Toolkit.Components;
+using JTLStudio.SDK.Editor.Toolkit.Data;
 using JTLStudio.SDK.Editor.Toolkit.Localization;
 using JTLStudio.SDK.Editor.Toolkit.Sections;
 using UnityEditor;
@@ -26,6 +27,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private const string ComponentsStyleSheet = "Styles/Components.uss";
 
         private readonly ToolkitAssets _assets = new ToolkitAssets();
+        private readonly ToolkitProject _project = new ToolkitProject();
         private readonly ToolkitLocalization _localization = new ToolkitLocalization();
         private readonly Dictionary<ToolkitSectionId, ToolkitSection> _sections = new Dictionary<ToolkitSectionId, ToolkitSection>();
         private readonly List<NavigationItem> _navigationItems = new List<NavigationItem>();
@@ -75,6 +77,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
             _context.NavigationRequested -= OnNavigationRequested;
             _context.StatusRequested -= OnStatusRequested;
+            _project.Changed -= OnProjectChanged;
         }
 
         public void EnsureBuilt()
@@ -127,7 +130,8 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
         private void Build()
         {
-            _context = new ToolkitContext(_localization, _assets);
+            _context = new ToolkitContext(_localization, _assets, _project);
+            _project.Changed += OnProjectChanged;
             _context.NavigationRequested += OnNavigationRequested;
             _context.StatusRequested += OnStatusRequested;
             rootVisualElement.styleSheets.Add(_assets.LoadStyleSheet(TokensStyleSheet));
@@ -150,6 +154,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
                 item.Clicked += OnNavigationItemClicked;
             }
 
+            rootVisualElement.Q<Button>("configuration-button").clicked += OnConfigurationButtonClicked;
             CreateSections();
             _root.RegisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
             LocalizeShell();
@@ -181,6 +186,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private void LocalizeShell()
         {
             rootVisualElement.Q<Label>("version").text = _localization.Get("nav.packageVersion") + VersionPrefix + ReadPackageVersion();
+            RefreshTopBar();
             Localize(_sidebar);
             Localize(_topBar);
             _statusBar.ApplyLocalization(_localization);
@@ -217,6 +223,62 @@ namespace JTLStudio.SDK.Editor.Toolkit
         {
             PackageInfo package = PackageInfo.FindForAssetPath(PackageManifestPath);
             return package == null ? FallbackVersion : package.version;
+        }
+
+        private void RefreshTopBar()
+        {
+            SdkConfiguration active = _project.Active;
+            PlatformPresentation platforms = _context.Platforms;
+            PortalMark mark = rootVisualElement.Q<PortalMark>("configuration-mark");
+            mark.style.display = active == null ? DisplayStyle.None : DisplayStyle.Flex;
+
+            if (active != null)
+            {
+                mark.Portal = platforms.PortalMark(active.Platform);
+            }
+
+            rootVisualElement.Q<Label>("configuration-name").text = active == null ? _localization.Get("topbar.noConfiguration") : active.DisplayName;
+            rootVisualElement.Q<Label>("package-pill").text = _localization.Get("topbar.packageVersion") + " " + ReadPackageVersion();
+        }
+
+        private void OnConfigurationButtonClicked()
+        {
+            GenericMenu menu = new GenericMenu();
+            SdkConfiguration active = _project.Active;
+
+            foreach (SdkConfiguration configuration in _project.Configurations)
+            {
+                SdkConfiguration captured = configuration;
+                menu.AddItem(new GUIContent(configuration.DisplayName), configuration == active, () => ActivateFromTopBar(captured));
+            }
+
+            menu.AddSeparator(string.Empty);
+            menu.AddItem(new GUIContent(_localization.Get("topbar.manageConfigurations")), false, () => Navigate(ToolkitSectionId.Configurations));
+            menu.ShowAsContext();
+        }
+
+        private void ActivateFromTopBar(SdkConfiguration configuration)
+        {
+            if (_project.Active == configuration)
+            {
+                return;
+            }
+
+            _project.Activate(configuration);
+            _context.Report(StatusKind.Success, "configurations.activated", configuration.DisplayName);
+
+            if (_currentSection != null)
+            {
+                Navigate(_currentSection.Id);
+            }
+        }
+
+        private void OnProjectChanged()
+        {
+            if (_root != null)
+            {
+                RefreshTopBar();
+            }
         }
 
         private void OnNavigationItemClicked(NavigationItem item)

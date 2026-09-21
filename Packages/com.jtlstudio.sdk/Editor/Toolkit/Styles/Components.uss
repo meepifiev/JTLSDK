@@ -1605,3 +1605,30 @@
 .jtl-root .jtl-mono > .unity-base-text-field__input {
     font-size: 12px;
 }
+
+.jtl-root .jtl-configuration-grid {
+    flex-direction: column;
+}
+
+.jtl-root .jtl-configuration-grid__row {
+    margin-bottom: 12px;
+}
+
+.jtl-root .jtl-wrap {
+    flex-wrap: wrap;
+}
+
+.jtl-root .jtl-language-check {
+    width: 150px;
+    margin-bottom: 8px;
+}
+
+.jtl-root .jtl-provider-fields .unity-base-field__label {
+    color: var(--jtl-text-secondary);
+    font-size: 12px;
+    min-width: 190px;
+}
+
+.jtl-root .jtl-provider-fields .unity-base-field {
+    margin: 0 0 6px 0;
+}

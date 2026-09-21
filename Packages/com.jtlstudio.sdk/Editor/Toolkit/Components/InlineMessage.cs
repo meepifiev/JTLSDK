@@ -56,6 +56,12 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 
         public string TextKey { get; set; }
 
+        public string Text
+        {
+            get => _text.text;
+            set => _text.text = value;
+        }
+
         public string Variant
         {
             get => _variant;

@@ -22,17 +22,23 @@ MonoBehaviour:
   _products:
   - _id: remove_ads
     _type: 0
-    _platformIds: []
+    _platformIds:
+    - _platform: 1
+      _id: 
     _testPrice: 1
     _testCurrency: YAN
   - _id: coins_1000
     _type: 1
-    _platformIds: []
+    _platformIds:
+    - _platform: 1
+      _id: 
     _testPrice: 1
     _testCurrency: YAN
   _leaderboards:
   - _id: levels
-    _platformIds: []
+    _platformIds:
+    - _platform: 1
+      _id: 
   _flags:
   - _key: tutorial_enabled
     _type: 0
