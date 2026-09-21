@@ -54,3 +54,5 @@ crashlytics-build.properties
 
 # Agent worktrees
 /.claude/worktrees/
+/[Aa]ssets/WebGLTemplates/
+/[Aa]ssets/WebGLTemplates.meta
