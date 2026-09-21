@@ -11,7 +11,10 @@ namespace JTLStudio.SDK.Services
         private readonly PauseService _pause;
         private readonly IReadOnlyList<ProductDefinition> _catalog;
         private readonly PlatformId _platform;
+        private Action<string> _granted;
         private bool _purchaseInProgress;
+        private bool _restoreAllowed;
+        private bool _restored;
 
         public PaymentsService(
             IPaymentsProvider provider,
@@ -28,7 +31,15 @@ namespace JTLStudio.SDK.Services
             _platform = platform;
         }
 
-        public event Action<string> Granted;
+        public event Action<string> Granted
+        {
+            add
+            {
+                _granted += value;
+                RestorePending();
+            }
+            remove => _granted -= value;
+        }
 
         internal override string ModuleName => "Payments";
 
@@ -139,12 +150,25 @@ namespace JTLStudio.SDK.Services
 
             if (state == ProviderState.Ready)
             {
-                _data.WhenReady(RestorePending);
+                _data.WhenReady(AllowRestore);
             }
+        }
+
+        private void AllowRestore()
+        {
+            _restoreAllowed = true;
+            RestorePending();
         }
 
         private void RestorePending()
         {
+            if (_restoreAllowed == false || _restored || _granted == null)
+            {
+                return;
+            }
+
+            _restored = true;
+
             foreach (PlatformPurchase purchase in new List<PlatformPurchase>(_provider.Purchases))
             {
                 ProductDefinition definition = FindDefinitionByPlatformId(purchase.ProductId);
@@ -172,9 +196,16 @@ namespace JTLStudio.SDK.Services
 
         private void Grant(ProductDefinition definition, PlatformPurchase purchase, Action onDone)
         {
+            if (_granted == null)
+            {
+                Logger.Error("Payments.Granted has no handler. '" + definition.Id + "' stays pending until a handler is added.");
+                onDone?.Invoke();
+                return;
+            }
+
             try
             {
-                Granted?.Invoke(definition.Id);
+                _granted(definition.Id);
             }
             catch (Exception exception)
             {

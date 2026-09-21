@@ -112,18 +112,47 @@ namespace JTLStudio.SDK.Tests.Core
         }
 
         [Test]
-        public void PendingConsumableIsGrantedOnStart()
+        public void PendingConsumableIsGrantedWhenHandlerIsAdded()
         {
             _payments.AddOwnedPurchase(Coins);
             _payments.AddOwnedPurchase(RemoveAds);
             List<string> granted = new List<string>();
 
             JTLSDK.Create(_builder.Build());
+            Assert.AreEqual(0, _payments.ConsumedTokens.Count);
+
             JTLSDK.Payments.Granted += granted.Add;
 
-            Assert.AreEqual(0, granted.Count);
+            CollectionAssert.AreEqual(new[] { Coins }, granted);
             Assert.AreEqual(1, _payments.ConsumedTokens.Count);
             Assert.IsTrue(JTLSDK.Payments.IsPurchased(RemoveAds));
+        }
+
+        [Test]
+        public void PendingConsumableIsGrantedOnce()
+        {
+            _payments.AddOwnedPurchase(Coins);
+            List<string> granted = new List<string>();
+
+            JTLSDK.Create(_builder.Build());
+            JTLSDK.Payments.Granted += granted.Add;
+            JTLSDK.Payments.Granted += _ => { };
+
+            CollectionAssert.AreEqual(new[] { Coins }, granted);
+            Assert.AreEqual(1, _payments.ConsumedTokens.Count);
+        }
+
+        [Test]
+        public void PurchaseWithoutHandlerIsNotConsumed()
+        {
+            JTLSDK.Create(_builder.Build());
+            PurchaseResult? result = null;
+
+            JTLSDK.Payments.Purchase(Coins, value => result = value);
+            _payments.CompletePurchase(PurchaseResult.Purchased);
+
+            Assert.AreEqual(PurchaseResult.Purchased, result);
+            Assert.AreEqual(0, _payments.ConsumedTokens.Count);
         }
 
         [Test]
