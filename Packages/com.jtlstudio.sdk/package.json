@@ -1,0 +1,20 @@
+{
+  "name": "com.jtlstudio.sdk",
+  "displayName": "JTL SDK",
+  "version": "0.1.0",
+  "unity": "2021.3",
+  "unityRelease": "18f1",
+  "description": "Platform-independent SDK for WebGL game portals: ads, purchases, cloud saves, language, pause, leaderboards.",
+  "author": {
+    "name": "JTL Studio",
+    "url": "https://github.com/meepifiev/JTLSDK"
+  },
+  "license": "MIT",
+  "keywords": [
+    "webgl",
+    "yandex-games",
+    "youtube-playables",
+    "sdk"
+  ],
+  "dependencies": {}
+}

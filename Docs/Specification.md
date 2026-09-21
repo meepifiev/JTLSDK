@@ -1,0 +1,1507 @@
+# JTL SDK. Техническая сводка
+
+Версия документа: 0.1 (21.09.2026). Статус: решения согласованы, разработка не начата.
+
+Документ описывает, что такое JTL SDK, как он устроен, как им пользоваться из игры, как он реализован на каждой площадке и как выглядит тулкит. Всё, что здесь написано, обязательно к исполнению при разработке. Спорные места вынесены в раздел «Открытые вопросы».
+
+---
+
+## 1. Цель и принципы
+
+JTL SDK - собственный платформенный слой студии JTL Studio для WebGL-игр на веб-порталах. Он заменяет Prime SDK, PluginYG2 и обёртку YouTube Playables одним пакетом с единым API.
+
+Что даёт:
+
+- Одна ветка игры вместо ветки на площадку. Площадка выбирается в тулките, код игры не меняется.
+- Один API для рекламы, покупок, сохранений, языка, паузы, лидербордов, игрока, флагов, времени.
+- Одинаковое поведение в редакторе и в билде. Всё, что можно проверить в Play Mode, проверяется в Play Mode.
+- Нет ситуации «вызов до готовности роняет игру».
+
+Принципы:
+
+1. **Код игры не знает площадку.** Он работает со статическим фасадом `JTLSDK` и проверяет возможности через `Supports(...)`.
+2. **Общая логика пишется один раз.** Площадка реализует только тонкий адаптер. Частота показов, паузы, учёт покупок живут в общем слое или в настройках адаптера площадки, а не в игре.
+3. **Ошибки не подменяются значениями.** Каждый вызов возвращает результат (`AdResult`, `PurchaseResult`), по которому видно, что произошло.
+4. **Готовность - это состояние, а не соглашение.** До `IsReady` любой вызов безопасен и предсказуем.
+5. **Редактор равен билду.** Прототипы в редакторе проходят через тот же общий слой, что и площадки.
+
+Что взято из изученных SDK:
+
+| Источник | Взято |
+|---|---|
+| Prime SDK | схема инициализации (модули, провайдеры, готовность), статический фасад, пауза по источникам с владением timeScale/звуком/курсором, машина состояний gameplay, восстановление покупок по счётчику выдач, симуляция оверлеями, определение AdBlock, оверлей «Нажми, чтобы продолжить», анализатор API |
+| PluginYG2 | предзагрузка данных на странице до старта Unity, насыщенные настройки WebGL-шаблона, симуляция отказов, пресеты сборки на площадку, плашка тестовой сборки, zip и нумерация билдов, скрытие UI под возможности площадки |
+| YouTube Playables | `firstFrameReady` со страницы, звук площадки главнее звука игры, стабильный id награды, проверка лимитов площадки при сборке, `FromJsonOverwrite` поверх значений по умолчанию |
+
+Чего не повторяем: колбэки-поля вместо событий, `SendMessage` по имени объекта, строки `"true"` через мост, разное поведение редактора и билда, consume до выдачи, глобальная перезапись define-символов на все платформы, закрытая кодогенерация.
+
+---
+
+## 2. Имена, репозиторий, установка
+
+| Что | Значение |
+|---|---|
+| Отображаемое имя | JTL SDK |
+| Статический фасад | `JTLSDK` |
+| Namespace | `JTLStudio.SDK` |
+| Пакет | `com.jtlstudio.sdk` |
+| Репозиторий | `github.com/meepifiev/JTLSDK` (публичный, MIT) |
+| Скачиваемые модули | `github.com/meepifiev/JTLSDK-<Module>`, например `JTLSDK-YandexMetrica` |
+| Папка проекта | `~/repos/JTLSDK` |
+| Unity | минимум 2021.3.18f1; разработка на 2021.3.45f2; проверка на 2022.3 LTS и Unity 6 |
+
+Репозиторий - это Unity-проект, пакет лежит внутри как embedded:
+
+```text
+JTLSDK/
+  Assets/                          демо-сцена, интеграционные тесты, тестовые ассеты
+  Packages/com.jtlstudio.sdk/      сам пакет (то, что ставится в игры)
+  ProjectSettings/
+  Docs/                            этот документ и рабочие заметки
+  modules.json                     список скачиваемых модулей
+  .github/workflows/               CI
+  LICENSE
+```
+
+Установка в игру через Package Manager по ссылке с путём и тегом:
+
+```text
+https://github.com/meepifiev/JTLSDK.git?path=Packages/com.jtlstudio.sdk#v1.0.0
+```
+
+Обновление через окно тулкита (раздел 13).
+
+---
+
+## 3. Архитектура
+
+### 3.1. Слои
+
+```text
+Игра
+  └─ JTLSDK (статический фасад)
+       └─ Модули: интерфейсы IAds, IData, IPayments, ...
+            └─ Общие сервисы: AdsService, DataService, PaymentsService, PauseService, ...
+                 └─ Провайдеры площадки: IAdsProvider, IDataProvider, ...
+                      ├─ Editor (прототипы)
+                      ├─ YandexGames (C# + jslib)
+                      └─ YouTubePlayables (C# + jslib)
+                           └─ Мост C# ⇄ JS (jtlsdk.jspre, TypeScript)
+```
+
+- **Фасад** отдаёт модули и управляет жизненным циклом.
+- **Модуль** - публичный интерфейс для игры.
+- **Общий сервис** реализует модуль и держит всю логику, которая одинакова на всех площадках: единственный показ рекламы за раз, пауза, учёт покупок, ревизии сейвов, машина состояний gameplay.
+- **Провайдер** реализует только вызовы конкретной площадки. Провайдер не знает про паузу, счётчики и очереди.
+- **Мост** переводит вызовы в JS и обратно.
+
+### 3.2. Структура пакета и сборки
+
+```text
+Packages/com.jtlstudio.sdk/
+  package.json
+  Runtime/
+    JTLStudio.SDK.asmdef
+    Facade/            JTLSDK.cs, SdkInstance.cs, SdkSettings.cs
+    Modules/           интерфейсы модулей, enum, структуры результатов
+    Services/          общие сервисы
+    Providers/         интерфейсы провайдеров
+    Bridge/            C#-сторона моста
+    Plugins/WebGL/     jtlsdk.jspre (собирается из Bridge~)
+    Platforms/
+      YandexGames/     JTLStudio.SDK.YandexGames.asmdef, провайдеры, yandexgames.jslib
+      YouTubePlayables/ JTLStudio.SDK.YouTubePlayables.asmdef, провайдеры, youtube.jslib
+  Editor/
+    JTLStudio.SDK.Editor.asmdef
+    Toolkit/           окно, разделы, UXML, USS, локализация RU/EN
+    Simulation/        прототипы, оверлей во вкладке Game
+    Configuration/     применение конфигураций, define-символы, шаблон
+    Build/             сборка, нумерация, проверки, zip, плашка
+    Updates/           GitHub Releases, модули
+    Analyzer/          анализатор API
+    SaveEditor/        окно сохранений
+  Bridge~/             TypeScript-исходники моста, package.json, tsconfig.json
+  Templates~/          WebGL-шаблон (копируется в Assets/WebGLTemplates/JTLSDK)
+  Tests/               EditMode и PlayMode тесты
+  Documentation~/      документация RU и EN
+```
+
+Сборки:
+
+| asmdef | Define constraints | Содержимое |
+|---|---|---|
+| `JTLStudio.SDK` | нет | фасад, модули, сервисы, мост, Editor-провайдеры (под `UNITY_EDITOR`) |
+| `JTLStudio.SDK.YandexGames` | `JTLSDK_YANDEX_GAMES` | провайдеры Яндекса |
+| `JTLStudio.SDK.YouTubePlayables` | `JTLSDK_YOUTUBE_PLAYABLES` | провайдеры YouTube |
+| `JTLStudio.SDK.Editor` | `UNITY_EDITOR` | тулкит и всё редакторское |
+| `JTLStudio.SDK.Tests` | `UNITY_INCLUDE_TESTS` | тесты |
+
+`.jslib` площадок получают те же define constraints через `PluginImporter.DefineConstraints`, поэтому в билд попадает JS только активной площадки. `jtlsdk.jspre` общий и попадает всегда.
+
+Define-символ активной конфигурации ставится только для WebGL (`BuildTargetGroup.WebGL`) и только один. При смене конфигурации старый символ снимается.
+
+### 3.3. Модули и провайдеры
+
+Каждый модуль реализован общим сервисом, который получает провайдер площадки:
+
+```csharp
+public interface IAdsProvider
+{
+    AdsCapabilities Capabilities { get; }
+    void Initialize(Action<ProviderState> onInitialized);
+    void ShowInterstitial(Action<AdResult> onResult);
+    void ShowRewarded(string platformRewardId, Action<AdResult> onResult);
+    void ShowBanner();
+    void HideBanner();
+}
+```
+
+Провайдер хранится в конфигурации через `[SerializeReference]` вместе со своими настройками. Провайдеры находятся через `TypeCache.GetTypesDerivedFrom<IAdsProvider>()`, поэтому провайдер из любой сборки проекта появляется в выпадающем списке тулкита. Нет строковых имён провайдеров и нет кодогенерации.
+
+Если у площадки нет модуля, в конфигурации стоит `Unsupported`-провайдер. Он отвечает `IsSupported == false`, а на вызовы возвращает результат `NotSupported` без ошибок.
+
+### 3.4. Конфигурации
+
+Конфигурация - ScriptableObject `SdkConfiguration`. Их несколько, активная одна.
+
+```csharp
+public class SdkConfiguration : ScriptableObject
+{
+    [SerializeField] private string _displayName;
+    [SerializeField] private PlatformId _platform;
+    [SerializeField] private string _defineSymbol;
+    [SerializeField] private PlayerSettingsPreset _playerSettings;
+    [SerializeField] private TemplateOverrides _templateOverrides;
+    [SerializeField] private Language[] _supportedLanguages;
+    [SerializeReference] private IAdsProvider _ads;
+    [SerializeReference] private IPaymentsProvider _payments;
+    [SerializeReference] private IDataProvider _data;
+    [SerializeReference] private ILanguageProvider _language;
+    [SerializeReference] private IPlayerProvider _player;
+    [SerializeReference] private ILeaderboardsProvider _leaderboards;
+    [SerializeReference] private IFlagsProvider _flags;
+    [SerializeReference] private ITimeProvider _time;
+    [SerializeReference] private IPlatformProvider _platformProvider;
+    [SerializeReference] private IReviewProvider _review;
+    [SerializeReference] private IShortcutProvider _shortcut;
+}
+```
+
+`PlayerSettingsPreset` - что применяется к проекту при активации:
+
+| Поле | Yandex Games | YouTube Playables |
+|---|---|---|
+| WebGL Template | JTLSDK | JTLSDK |
+| Compression Format | Brotli | Disabled |
+| Decompression Fallback | выкл | выкл |
+| Data Caching | вкл | вкл |
+| Managed Stripping Level | Medium | High |
+| Run In Background | вкл | вкл |
+| Memory Size (MB) | 512 | 512 |
+
+У каждого поля пресета есть галка «Применять». Что не отмечено, тулкит не трогает.
+
+Активация конфигурации (кнопка «Сделать активной» в тулките):
+
+1. Снять define-символ прошлой конфигурации, поставить новый.
+2. Применить отмеченные поля `PlayerSettingsPreset`.
+3. Скопировать шаблон из `Templates~` в `Assets/WebGLTemplates/JTLSDK`, если его нет или версия пакета новее. Если шаблон правили вручную, спросить.
+4. Записать ссылку на активную конфигурацию в `JTLSDKSettings`.
+5. Unity перекомпилирует проект. Это нормально и ожидаемо, как смена платформы.
+
+Одна сборка = одна конфигурация. Определения площадки по URL нет.
+
+### 3.5. Где лежат настройки
+
+| Файл | Что хранит | В VCS | В билде |
+|---|---|---|---|
+| `Assets/Resources/JTLSDK/JTLSDKSettings.asset` | ссылка на активную конфигурацию, языки, каталог покупок, лидерборды, флаги по умолчанию, таймаут инициализации, задержка автосохранения, логирование | да | да |
+| `Assets/JTLSDK/Configurations/*.asset` | конфигурации | да | только активная (по ссылке) |
+| `ProjectSettings/JTLSDKEditorSettings.asset` | шаблон (общие настройки), сборка, симуляция по умолчанию, язык тулкита, счётчик билдов | да | нет |
+| `UserSettings/JTLSDKUserSettings.asset` | стартовый язык Play Mode, запомненные результаты прототипов, кеш проверки обновлений | нет | нет |
+
+`Create()` читает только `Resources/JTLSDK/JTLSDKSettings.asset`. Это единственное, что SDK кладёт в Resources.
+
+---
+
+## 4. Инициализация и жизненный цикл
+
+### 4.1. Фасад
+
+```csharp
+namespace JTLStudio.SDK
+{
+    public static class JTLSDK
+    {
+        public const string Version = "0.1.0";
+
+        public static bool IsCreated { get; }
+        public static bool IsReady { get; }
+
+        public static IAds Ads { get; }
+        public static IData Data { get; }
+        public static IPayments Payments { get; }
+        public static ILanguage Language { get; }
+        public static IPause Pause { get; }
+        public static ITime Time { get; }
+        public static IAudio Audio { get; }
+        public static IGameplay Gameplay { get; }
+        public static ILeaderboards Leaderboards { get; }
+        public static IPlayer Player { get; }
+        public static IFlags Flags { get; }
+        public static IPlatform Platform { get; }
+        public static IDevice Device { get; }
+        public static IReview Review { get; }
+        public static IShortcut Shortcut { get; }
+
+        public static void Create();
+        public static void WhenReady(Action onReady);
+    }
+}
+```
+
+Все модули наследуют базовый интерфейс:
+
+```csharp
+public enum ModuleState
+{
+    Pending,
+    Ready,
+    Failed,
+    Unsupported
+}
+
+public interface IModule
+{
+    ModuleState State { get; }
+    bool IsSupported { get; }
+    bool IsReady { get; }
+    void WhenReady(Action onReady);
+}
+```
+
+`IsReady` истинно, когда инициализация модуля закончилась любым исходом (`Ready` или `Failed`). Ошибка видна по `State`.
+
+### 4.2. Что делает `Create()`
+
+1. Загружает `JTLSDKSettings` из Resources. Если файла нет, бросает `InvalidOperationException`.
+2. Создаёт модули из активной конфигурации.
+3. Создаёт скрытый объект `JTLSDK` с `DontDestroyOnLoad`. Он даёт SDK `Update`, `OnApplicationFocus`, `OnApplicationPause`, `OnApplicationQuit`. Это единственный MonoBehaviour в рантайме SDK.
+4. Регистрирует в мосте один колбэк для всех ответов JS и забирает события, накопленные на странице до старта Unity.
+5. Вызывает `Initialize` у каждого провайдера. Провайдеры Яндекса и YouTube через мост забирают то, что страница уже предзагрузила: язык, окружение, сейв, каталог, покупки, игрока, флаги, серверное время.
+6. По мере ответов модули переходят в `Ready` или `Failed`.
+7. Когда все модули не `Pending`, `IsReady = true` и вызываются колбэки `WhenReady` в порядке регистрации.
+
+Повторный `Create()` бросает `InvalidOperationException`. Обращение к любому модулю до `Create()` бросает `InvalidOperationException`. Оба правила действуют и в редакторе, и в билде, чтобы ошибка была видна сразу.
+
+### 4.3. Таймаут
+
+`InitializationTimeoutSeconds` (по умолчанию 15). По истечении все модули в `Pending` переходят в `Failed`, `IsReady` становится истинным, игра стартует. Модуль `Data` в `Failed` работает через локальное зеркало (раздел 6.2). Мост продолжает ждать ответы: если площадка ответила позже, модуль переходит в `Ready` и вызывает свои `WhenReady`.
+
+### 4.4. Поведение до готовности
+
+| Вызов | До `Create()` | После `Create()`, модуль `Pending` |
+|---|---|---|
+| `JTLSDK.Ads` | исключение | доступен |
+| `Ads.ShowRewarded(...)` | исключение | колбэк сразу с `AdResult.NotReady` |
+| `Data.GetInt(...)` | исключение | значение по умолчанию + предупреждение в лог |
+| `Data.SetInt(...)` | исключение | игнорируется + ошибка в лог |
+| `Payments.Purchase(...)` | исключение | колбэк сразу с `PurchaseResult.NotReady` |
+| `Gameplay.GameReady()` | исключение | запоминается и отправляется после готовности |
+| `Pause.Set(...)`, `Time.Scale`, `Audio.Volume` | исключение | работают сразу, площадка не нужна |
+
+На стороне JS объект `Module.JTLSDK` создаётся в `jtlsdk.jspre` в момент загрузки страницы, до запуска любого C#. Ни одна функция `.jslib` не обращается к неопределённому объекту. Это закрывает краш Prime `reading data at _primeSDK_data_getInt`.
+
+### 4.5. Пример входной точки
+
+```csharp
+public class Bootstrapper : MonoBehaviour
+{
+    private void Awake()
+    {
+        JTLSDK.Create();
+        JTLSDK.WhenReady(StartGame);
+    }
+
+    private void StartGame()
+    {
+        JTLSDK.Language.Changed += OnLanguageChanged;
+        ApplySettings();
+        LoadFirstScene();
+    }
+
+    private void ApplySettings()
+    {
+        float musicVolume = JTLSDK.Data.GetFloat(SaveKeys.MusicVolume, 0.5f);
+        _audio.SetMusicVolume(musicVolume);
+    }
+}
+```
+
+`Gameplay.GameReady()` вызывается игрой, когда исчез экран загрузки и игрок может нажимать. Не раньше.
+
+---
+
+## 5. Использование в игре
+
+Короткие примеры на каждый модуль. Подробности в разделе 6.
+
+```csharp
+JTLSDK.Ads.ShowRewarded(RewardIds.DoubleMoney, result =>
+{
+    if (result == AdResult.Rewarded)
+    {
+        _wallet.Add(_reward);
+    }
+    else if (result == AdResult.Blocked)
+    {
+        _alerts.Show(AlertIds.DisableAdBlock);
+    }
+});
+
+JTLSDK.Ads.ShowInterstitial();
+
+int money = JTLSDK.Data.GetInt(SaveKeys.Money);
+JTLSDK.Data.SetInt(SaveKeys.Money, money + 100);
+
+JTLSDK.Payments.Granted += OnProductGranted;
+JTLSDK.Payments.Purchase(ProductIds.RemoveAds, result => { });
+
+if (JTLSDK.Payments.TryGetPrice(ProductIds.RemoveAds, out ProductPrice price))
+{
+    _priceLabel.text = price.Formatted;
+}
+
+Language language = JTLSDK.Language.Current;
+JTLSDK.Language.Set(Language.Russian);
+
+JTLSDK.Time.Scale = 0.3f;
+JTLSDK.Audio.Volume = 0.8f;
+
+using (JTLSDK.Pause.Hold(PauseSources.Menu))
+{
+}
+
+JTLSDK.Gameplay.GameReady();
+JTLSDK.Gameplay.Start();
+JTLSDK.Gameplay.Stop();
+
+JTLSDK.Leaderboards.SetScore(LeaderboardIds.Levels, currentLevel);
+
+JTLSDK.Player.Authorize(success => { });
+
+bool tutorialEnabled = JTLSDK.Flags.GetBool(FlagKeys.Tutorial, true);
+
+DateTimeOffset now = JTLSDK.Time.Now;
+
+JTLSDK.Review.Request(sent => { });
+JTLSDK.Shortcut.Request(created => { });
+
+if (JTLSDK.Platform.Supports(Capability.Purchases) == false)
+{
+    _shopButton.gameObject.SetActive(false);
+}
+```
+
+Идентификаторы (`RewardIds`, `ProductIds`, `SaveKeys`, `LeaderboardIds`, `FlagKeys`, `PauseSources`) - константы в коде игры. SDK принимает строки, но игра держит их в одном месте.
+
+Готовый компонент для UI: `CapabilityFilter` (MonoBehaviour) с полем `Capability` и режимом «Скрыть, если не поддерживается» или «Показать, если не поддерживается». Вешается на кнопку магазина, лидерборда, авторизации.
+
+---
+
+## 6. Модули
+
+### 6.1. Реклама
+
+```csharp
+public enum AdResult
+{
+    Shown,
+    Rewarded,
+    Closed,
+    NotShown,
+    Blocked,
+    NotSupported,
+    NotReady,
+    Failed
+}
+
+public interface IAds : IModule
+{
+    bool IsShowing { get; }
+    bool IsInterstitialSupported { get; }
+    bool IsRewardedSupported { get; }
+    bool IsBannerSupported { get; }
+    bool IsBannerVisible { get; }
+
+    event Action Opened;
+    event Action Closed;
+
+    void ShowInterstitial(Action<AdResult> onResult = null);
+    void ShowRewarded(string rewardId, Action<AdResult> onResult);
+    void ShowBanner();
+    void HideBanner();
+}
+```
+
+Результаты:
+
+| Результат | Интерстишл | Rewarded |
+|---|---|---|
+| `Shown` | показан и закрыт | не используется |
+| `Rewarded` | не используется | досмотрен, награду выдавать |
+| `Closed` | не используется | закрыт раньше, награду не выдавать |
+| `NotShown` | площадка не показала: кулдаун, нет заполнения, уже идёт другой показ | то же |
+| `Blocked` | обнаружен блокировщик рекламы | то же |
+| `NotSupported` | у площадки нет формата | то же |
+| `NotReady` | SDK ещё не готов | то же |
+| `Failed` | ошибка площадки | то же |
+
+Общий слой (`AdsService`) гарантирует:
+
+1. Одновременно идёт один показ. Второй вызов сразу получает `NotShown`. Это закрывает двойную награду по двойному клику.
+2. На время показа ставится пауза с источником `Ads` (раздел 6.5). Пауза снимается в `finally`, даже если колбэк игры бросил исключение.
+3. На время показа gameplay останавливается (`Gameplay.Stop`), после показа восстанавливается прежнее состояние.
+4. Колбэк вызывается ровно один раз.
+5. Если включено определение AdBlock, оно выполняется до запроса рекламы.
+
+Частота показов, первый показ, пропуск интерстишла после rewarded - правила площадки. Общий слой их не знает. Они живут в настройках провайдера площадки, значения по умолчанию взяты из требований площадки. Провайдер отвечает `NotShown`, если правило не выполнено.
+
+Настройки провайдера Яндекса:
+
+| Поле | По умолчанию | Смысл |
+|---|---|---|
+| `AdBlockDetection` | вкл | проверка приманкой перед показом |
+| `MinimumInterstitialIntervalSeconds` | 60 | не чаще, чем требует Яндекс; можно только увеличить |
+| `SkipInterstitialAfterRewardedSeconds` | 60 | после rewarded интерстишл пропускается |
+| `StickyBanner` | выкл | показывать sticky-баннер при старте |
+
+Настройки провайдера YouTube: полей нет. Интерстишл и rewarded показывает само приложение YouTube по своим правилам. AdBlock не определяется.
+
+**Определение AdBlock.** Перед показом на страницу добавляется невидимый `<div>` с классами, которые блокировщики прячут (`ad-banner`, `adsbox`). Через 100 мс проверяется `offsetHeight` и `display`. Если элемент скрыт, реклама не запрашивается, результат `Blocked`. Игра показывает своё сообщение «Отключите блокировщик».
+
+**Оверлей «Нажми, чтобы продолжить».** `JTLSDK.Pause.ShowContinuePrompt(Action onContinue = null)`. HTML-оверлей на странице, не Unity UI. Нужен там, где площадка показала свой оверлей (например, уведомление CrazyGames об AdBlock), игра потеряла фокус и стоит на паузе. Клик возвращает фокус и снимает паузу с источником `Platform`. Текст локализован по `Language.Current`.
+
+Id награды: игра передаёт свой `rewardId`. На YouTube он уходит как есть (стабильный id обязателен). На Яндексе не используется.
+
+### 6.2. Сохранения
+
+API как у Prime: ключ-значение.
+
+```csharp
+public enum DataState
+{
+    Pending,
+    Loaded,
+    Empty,
+    Failed
+}
+
+public interface IData : IModule
+{
+    DataState LoadState { get; }
+    bool IsDirty { get; }
+
+    event Action Loaded;
+    event Action<bool> Flushed;
+
+    bool HasKey(string key);
+    int GetInt(string key, int defaultValue = 0);
+    float GetFloat(string key, float defaultValue = 0f);
+    bool GetBool(string key, bool defaultValue = false);
+    string GetString(string key, string defaultValue = "");
+    T GetObject<T>(string key, T defaultValue = null) where T : class;
+
+    void SetInt(string key, int value);
+    void SetFloat(string key, float value);
+    void SetBool(string key, bool value);
+    void SetString(string key, string value);
+    void SetObject<T>(string key, T value) where T : class;
+
+    void DeleteKey(string key);
+    void DeleteAll();
+
+    void Save();
+    void Flush(Action<bool> onFlushed = null);
+}
+```
+
+**Формат.** Один JSON-документ:
+
+```json
+{
+  "format": 1,
+  "revision": 42,
+  "savedAt": "2026-09-21T14:03:11Z",
+  "values": {
+    "Money": 1200,
+    "Level": 27,
+    "MusicVolume": 0.5,
+    "Profile": { "name": "Player", "skins": [1, 4] }
+  }
+}
+```
+
+`SetObject<T>` сериализует объект через `JsonUtility` и кладёт его вложенным JSON, а не строкой. `GetObject<T>` создаёт `new T()` и накладывает JSON через `FromJsonOverwrite`, поэтому поля, которых не было в старом сейве, получают значения по умолчанию. JSON-парсер свой, внутри пакета, без Newtonsoft.
+
+**Где меняются сохранения.**
+
+```text
+игра: Set*(key, value)
+  → память (словарь значений)
+  → IsDirty = true, revision не меняется
+  → таймер отложенной записи (AutosaveDelaySeconds, по умолчанию 2)
+    → Flush: revision++, savedAt, сериализация
+      → провайдер площадки: Яндекс player.setData, YouTube saveData, Editor PlayerPrefs
+      → локальное зеркало (localStorage) с той же ревизией
+      → Flushed(success)
+```
+
+Запись происходит:
+
+- по таймеру после последнего `Set*`;
+- сразу при `Save()`;
+- сразу при паузе площадки, потере фокуса, скрытии вкладки (`visibilitychange`, `pagehide`), выходе из Play Mode;
+- сразу после выдачи покупки, перед consume (раздел 6.3).
+
+Игра обычно не вызывает `Save()`. Он нужен перед действием, после которого потеря прогресса недопустима, например перед переходом на другую страницу.
+
+**Загрузка.**
+
+```text
+Create()
+  → провайдер: загрузить сейв площадки
+  → зеркало: загрузить localStorage
+  → выбрать копию с большей revision
+  → LoadState = Loaded | Empty
+  → Loaded, State = Ready
+```
+
+Если площадка не ответила или ответила ошибкой:
+
+- `LoadState = Failed`, `State = Failed`;
+- значения берутся из зеркала;
+- запись идёт только в зеркало, в облако запись запрещена, чтобы не затереть настоящий сейв;
+- каждые 30 секунд повтор загрузки; при успехе копия с большей ревизией побеждает, и запись в облако разрешается.
+
+«Пусто» и «ошибка» различаются всегда. Пустой сейв - нормальный первый запуск.
+
+**Авторизация.** После `Player.Authorize` успех перезагружает сейв площадки. Копия с большей ревизией побеждает. До перезагрузки запись в облако приостановлена.
+
+**Лимиты.** Провайдер сообщает `MaxBytes` и `RecommendedBytes`. Яндекс: 200 КБ. YouTube: 3 МиБ, рекомендовано 500 КиБ. При превышении `RecommendedBytes` предупреждение в лог. При превышении `MaxBytes` запись не выполняется, `Flushed(false)`, ошибка в лог. В редакторе те же лимиты активной конфигурации.
+
+**Редактор.** Хранилище - `PlayerPrefs`, ключ `JTLSDK.Data`, тот же JSON. Правится в окне «Сохранения» тулкита (раздел 9.9). Зеркало в редакторе - второй ключ `JTLSDK.Data.Mirror`, чтобы проверять слияние.
+
+**Что не делаем.** Никаких partial-классов и глобальных объектов сейва. Игра сама решает, какие ключи ей нужны.
+
+### 6.3. Покупки
+
+```csharp
+public enum ProductType
+{
+    NonConsumable,
+    Consumable
+}
+
+public enum PurchaseResult
+{
+    Purchased,
+    Cancelled,
+    NotSupported,
+    NotReady,
+    Failed
+}
+
+public readonly struct ProductPrice
+{
+    public decimal Value { get; }
+    public string CurrencyCode { get; }
+    public string Formatted { get; }
+    public string CurrencyImageUrl { get; }
+}
+
+public interface IPayments : IModule
+{
+    event Action<string> Granted;
+
+    bool IsPurchased(string productId);
+    bool TryGetPrice(string productId, out ProductPrice price);
+    void Purchase(string productId, Action<PurchaseResult> onResult);
+}
+```
+
+**Каталог** задаётся в тулките (раздел 9.5): id в игре, тип, id на каждой площадке, тестовая цена для редактора. Провайдер получает id площадки, игра работает только со своим.
+
+**Порядок выдачи: сначала выдать, потом consume.**
+
+```text
+Purchase(productId)
+  → провайдер: покупка на площадке
+  → успех: Granted(productId)            игра выдаёт товар и пишет в Data
+  → Data.Flush                            запись сейва
+  → успех записи: провайдер consume       только для Consumable
+  → onResult(Purchased)
+```
+
+Если игра бросила исключение в обработчике `Granted` или запись сейва не удалась, consume не вызывается. При следующем запуске площадка вернёт покупку как незавершённую, и `Granted` вызовется снова. Обработчик `Granted` для расходуемых товаров должен быть «добавить», а не «установить».
+
+**Восстановление.** При инициализации провайдер запрашивает список покупок площадки. Разовые попадают в `IsPurchased`. Расходуемые без consume вызывают `Granted` по одной и проходят тот же путь выдачи. Отдельного `Restore` в API нет, это происходит всегда.
+
+**Готовность.** `Granted` никогда не вызывается до `Data.IsReady`, чтобы игре было куда записать выдачу.
+
+**YouTube.** Покупок нет. Провайдер `Unsupported`, `Purchase` отвечает `NotSupported`, кнопки магазина скрываются через `CapabilityFilter`.
+
+**Редактор.** Прототип держит покупки в `PlayerPrefs` и проходит через тот же `PaymentsService`. Кнопка «Оплатить, игра упала до выдачи» сохраняет покупку без consume, и при следующем запуске Play Mode `Granted` придёт снова.
+
+### 6.4. Язык
+
+Язык - enum с явными номерами. Новые значения добавляются только в конец.
+
+```csharp
+public enum Language
+{
+    English = 0,
+    Russian = 1,
+    Turkish = 2,
+    Spanish = 3,
+    Portuguese = 4,
+    German = 5,
+    French = 6,
+    Italian = 7,
+    Polish = 8,
+    Ukrainian = 9,
+    Belarusian = 10,
+    Kazakh = 11,
+    Uzbek = 12,
+    Azerbaijani = 13,
+    Armenian = 14,
+    Georgian = 15,
+    Romanian = 16,
+    Arabic = 17,
+    Hebrew = 18,
+    Hindi = 19,
+    Indonesian = 20,
+    Japanese = 21,
+    Korean = 22,
+    ChineseSimplified = 23,
+    Vietnamese = 24,
+    Thai = 25
+}
+
+public interface ILanguage : IModule
+{
+    Language Current { get; }
+    IReadOnlyList<Language> Supported { get; }
+
+    event Action<Language> Changed;
+
+    void Set(Language language);
+}
+```
+
+Через мост язык идёт строкой-кодом (BCP-47), а не номером. Разбор в одном месте в C#:
+
+```csharp
+public class LanguageCodes
+{
+    public bool TryParse(string code, out Language language);
+    public string ToCode(Language language);
+}
+```
+
+`TryParse` отрезает регион (`en-US` → `en`), `zh-CN` и `zh-Hans` сводит к `ChineseSimplified`.
+
+**Выбор языка при старте.**
+
+```text
+1. Если включено «Запоминать выбор игрока» и игрок вызывал Set → сохранённый язык.
+2. Иначе код площадки → TryParse.
+3. Если языка нет среди Supported → таблица замен (например Belarusian → Russian).
+4. Если и после замены нет → язык по умолчанию.
+```
+
+`Supported` - пересечение списка языков игры и списка активной конфигурации. `Set` с языком вне `Supported` бросает `ArgumentOutOfRangeException`.
+
+Выбор игрока хранится в локальном хранилище браузера (не в облачном сейве, этого требует YouTube), в редакторе в `PlayerPrefs`.
+
+Переводы остаются в игре. SDK отвечает за выбор языка и событие смены.
+
+### 6.5. Пауза, время, звук, курсор
+
+SDK владеет `Time.timeScale`, `AudioListener.volume`, `AudioListener.pause`, `Cursor.visible`, `Cursor.lockState`. Игра пишет в свойства SDK, а SDK применяет итог с учётом паузы.
+
+```csharp
+public interface IPause : IModule
+{
+    bool IsPaused { get; }
+    IReadOnlyCollection<string> Sources { get; }
+
+    event Action<bool> Changed;
+
+    void Set(string source, bool paused);
+    IDisposable Hold(string source);
+    void ShowContinuePrompt(Action onContinue = null);
+}
+
+public interface ITime : IModule
+{
+    float Scale { get; set; }
+    DateTimeOffset Now { get; }
+    bool IsServerTime { get; }
+}
+
+public interface IAudio : IModule
+{
+    float Volume { get; set; }
+    bool IsPlatformMuted { get; }
+
+    event Action<bool> PlatformMuteChanged;
+}
+
+public interface IDevice : IModule
+{
+    bool IsMobile { get; }
+    DeviceType Type { get; }
+    bool CursorVisible { get; set; }
+    CursorLockMode CursorLock { get; set; }
+}
+```
+
+Источники паузы, которые ставит сам SDK: `Platform` (потеря фокуса, скрытие вкладки, `onPause` YouTube, `game_api_pause` Яндекса), `Ads`, `Purchase`. Игра добавляет свои строки (`Menu`, `Settings`).
+
+Применение:
+
+```text
+Time.timeScale       = IsPaused ? 0 : Scale
+AudioListener.pause  = IsPaused
+AudioListener.volume = (IsPaused || IsPlatformMuted) ? 0 : Volume
+Cursor               = IsPaused ? видимый и свободный : значения игры
+```
+
+Геттеры `Scale`, `Volume`, `CursorVisible` возвращают значение игры, а не применённое. Во время паузы `Time.Scale` читается как 0.3, если игра поставила 0.3. У Prime это непоследовательно, здесь единообразно.
+
+Почему так, на примере: игра включила замедление 0.3 и через секунду по unscaled-таймеру вернёт 1. Открылась реклама. Если бы игра писала `Time.timeScale` напрямую, таймер во время рекламы поставил бы 1, и игра поехала бы под рекламой. А после рекламы SDK вернул бы «то, что было», то есть 0.3, и игра застряла бы в замедлении. С `Sdk.Time.Scale` записанная единица запоминается, применяется после снятия паузы, и оба бага невозможны.
+
+Повторная пауза от того же источника ничего не меняет. Снятие паузы источником, которого нет, ничего не меняет. Игра не может застрять на паузе из-за двойного `onPause`.
+
+`PauseOnFocusLoss` - настройка конфигурации, по умолчанию включена.
+
+### 6.6. Gameplay-события
+
+```csharp
+public interface IGameplay : IModule
+{
+    bool IsGameReady { get; }
+    bool IsPlaying { get; }
+
+    void GameReady();
+    void Start();
+    void Stop();
+}
+```
+
+Машина состояний в общем слое:
+
+- `GameReady()` отправляется один раз; повторные вызовы игнорируются. До готовности SDK запоминается.
+- `Start()` при `IsPlaying == true` игнорируется, `Stop()` при `false` тоже.
+- На время рекламы `Stop()` вызывается автоматически, после рекламы состояние восстанавливается.
+- На время паузы площадки то же самое.
+
+Площадки: Яндекс `LoadingAPI.ready()`, `GameplayAPI.start()/stop()`; YouTube `game.gameReady()`, у start/stop реализации нет.
+
+`firstFrameReady` для YouTube вызывает страница шаблона в момент показа экрана загрузки. Игре ничего делать не нужно.
+
+### 6.7. Лидерборды
+
+```csharp
+public readonly struct LeaderboardEntry
+{
+    public int Rank { get; }
+    public long Score { get; }
+    public string PlayerName { get; }
+    public string AvatarUrl { get; }
+    public bool IsCurrentPlayer { get; }
+}
+
+public readonly struct LeaderboardPage
+{
+    public IReadOnlyList<LeaderboardEntry> Entries { get; }
+    public LeaderboardEntry? CurrentPlayer { get; }
+}
+
+public interface ILeaderboards : IModule
+{
+    bool CanLoad { get; }
+
+    void SetScore(string leaderboardId, long score);
+    void GetPlayerEntry(string leaderboardId, Action<LeaderboardEntry?> onResult);
+    void Load(string leaderboardId, int topCount, int aroundCount, Action<LeaderboardPage> onResult);
+}
+```
+
+Список лидербордов задаётся в тулките: id в игре и id на каждой площадке.
+
+Яндекс: `setScore` только для авторизованных; неавторизованному `SetScore` откладывается до авторизации и отправляется после неё. YouTube: `engagement.sendScore`, один лидерборд, `CanLoad == false`, `Load` возвращает пустую страницу.
+
+### 6.8. Игрок
+
+```csharp
+public interface IPlayer : IModule
+{
+    bool IsAuthorized { get; }
+    string Id { get; }
+    string Name { get; }
+    string AvatarUrl { get; }
+
+    event Action Authorized;
+
+    void Authorize(Action<bool> onResult);
+}
+```
+
+После успешной авторизации: перезагрузка сейва (раздел 6.2), обновление покупок, отправка отложенных очков лидерборда, событие `Authorized`. YouTube: `IsSupported == false`, игрок анонимный.
+
+### 6.9. Флаги (remote config)
+
+```csharp
+public interface IFlags : IModule
+{
+    bool HasKey(string key);
+    bool GetBool(string key, bool defaultValue = false);
+    int GetInt(string key, int defaultValue = 0);
+    float GetFloat(string key, float defaultValue = 0f);
+    string GetString(string key, string defaultValue = "");
+}
+```
+
+Значения по умолчанию задаются в тулките и отдаются, если площадка флаг не прислала. Яндекс: `getFlags()` с этими же значениями как `defaultFlags`. YouTube: только значения по умолчанию.
+
+### 6.10. Серверное время
+
+`JTLSDK.Time.Now` и `JTLSDK.Time.IsServerTime`. Яндекс: `serverTime()` при инициализации, дальше локальный монотонный отсчёт от него. YouTube и редактор: локальные часы, `IsServerTime == false`. Игра решает сама, доверять ли локальному времени для таймеров.
+
+### 6.11. Отзыв и ярлык
+
+```csharp
+public interface IReview : IModule
+{
+    bool CanRequest { get; }
+    void Request(Action<bool> onResult);
+}
+
+public interface IShortcut : IModule
+{
+    bool CanRequest { get; }
+    void Request(Action<bool> onResult);
+}
+```
+
+Яндекс: `feedback.canReview` и `requestReview`; `shortcut.canShowPrompt` и `showPrompt`. YouTube: `IsSupported == false`.
+
+### 6.12. Площадка и устройство
+
+```csharp
+public enum PlatformId
+{
+    Editor = 0,
+    YandexGames = 1,
+    YouTubePlayables = 2
+}
+
+public enum DeviceType
+{
+    Desktop,
+    Mobile,
+    Tablet,
+    TV
+}
+
+public enum Capability
+{
+    Interstitial,
+    Rewarded,
+    Banner,
+    Purchases,
+    Leaderboards,
+    LeaderboardsLoad,
+    Authorization,
+    Flags,
+    ServerTime,
+    Review,
+    Shortcut,
+    PlatformMute
+}
+
+public interface IPlatform : IModule
+{
+    PlatformId Current { get; }
+    string AppId { get; }
+    bool Supports(Capability capability);
+}
+```
+
+В Play Mode `Platform.Current` возвращает площадку активной конфигурации, а `Supports` её возможности. `Editor` в `Current` не бывает при активной конфигурации Яндекса или YouTube; он нужен для проекта без конфигураций.
+
+---
+
+## 7. Мост C# ⇄ JS
+
+Исходники на TypeScript в `Bridge~/src`, сборка в один файл `Runtime/Plugins/WebGL/jtlsdk.jspre`. Файл лежит в репозитории, CI проверяет, что он совпадает со сборкой из исходников.
+
+**C# → JS.** `[DllImport("__Internal")]` функции в `.jslib` вызывают `Module.JTLSDK.<module>.<action>(...)`. Аргументы: числа как есть, строки UTF-8, сложные структуры JSON-строкой. У каждого вызова, который ждёт ответ, есть `requestId`.
+
+**JS → C#.** Один колбэк на всё:
+
+```csharp
+[MonoPInvokeCallback(typeof(BridgeCallback))]
+private static void OnBridgeMessage(int requestId, int code, string payload)
+```
+
+C# регистрирует его при `Create()`. Ответы на запросы приходят с `requestId > 0` и удаляются из таблицы ожидания. События площадки (пауза, возобновление, звук, видимость) приходят с фиксированными отрицательными `requestId`. JS вызывает указатель через `getWasmTableEntry`, затем `wasmTable.get`, затем `dynCall_viii`, смотря что даёт версия Unity. Строки выделяются на стороне JS и освобождаются после возврата.
+
+**Очередь событий.** События, пришедшие до регистрации колбэка (например `onPause` до старта Unity), копятся в JS и отдаются сразу после регистрации.
+
+**Предзагрузка на странице.** Файл `jtlsdk-page.js` подключается шаблоном и запускается параллельно с загрузкой Unity: подключает скрипт площадки, инициализирует SDK площадки, запрашивает язык, окружение, сейв, каталог, покупки, игрока, флаги, серверное время. К моменту `Create()` ответы обычно уже есть, и инициализация занимает один кадр.
+
+**Ошибки.** Каждый ответ несёт код: `0` успех, дальше коды ошибок площадки (`Unavailable`, `InvalidParams`, `SizeLimit`, `Cancelled`, `Unknown`). Ошибка никогда не превращается в «пустую строку» или «ноль».
+
+---
+
+## 8. Площадки
+
+### 8.1. Editor
+
+Провайдеры-прототипы. Работают только в редакторе, лежат в `Runtime` под `UNITY_EDITOR`, в билд не попадают. Реклама и покупки рисуют оверлей во вкладке Game (раздел 10). Сейв в `PlayerPrefs`. Язык, устройство, пауза площадки и её звук переключаются в оверлее вкладки Game. Прототипы проходят через те же общие сервисы, что и площадки.
+
+### 8.2. Yandex Games
+
+| Модуль | Реализация |
+|---|---|
+| Инициализация | `<script src="/sdk.js">` в шаблоне, `YaGames.init()` на странице до старта Unity |
+| Интерстишл | `adv.showFullscreenAdv` |
+| Rewarded | `adv.showRewardedVideo`, награда по `onRewarded` |
+| Баннер | `adv.showBannerAdv` / `hideBannerAdv` (sticky) |
+| Сейвы | `player.getData` / `setData`, лимит 200 КБ |
+| Покупки | `payments.getCatalog`, `purchase`, `getPurchases`, `consumePurchase` после выдачи |
+| Лидерборды | `leaderboards.setLeaderboardScore`, `getLeaderboardPlayerEntry`, `getLeaderboardEntries` |
+| Игрок | `getPlayer`, `auth.openAuthDialog` |
+| Язык | `environment.i18n.lang` |
+| Флаги | `getFlags` |
+| Время | `serverTime()` |
+| Gameplay | `features.LoadingAPI.ready`, `features.GameplayAPI.start/stop` |
+| Пауза | `game_api_pause` / `game_api_resume`, плюс фокус страницы |
+| Отзыв, ярлык | `feedback.*`, `shortcut.*` |
+| Устройство | `deviceInfo` |
+
+### 8.3. YouTube Playables
+
+| Модуль | Реализация |
+|---|---|
+| Инициализация | `<script src="https://www.youtube.com/game_api/v1">` в `<head>` шаблона |
+| `firstFrameReady` | страница, в момент показа экрана загрузки |
+| Gameplay | `game.gameReady()` |
+| Интерстишл | `ads.requestInterstitialAd()` → `Shown`, отказ → `Failed` |
+| Rewarded | `ads.requestRewardedAd(rewardId)` → `true` `Rewarded`, `false` `Closed`, отказ `Failed` |
+| Баннер, покупки, авторизация, отзыв, ярлык, флаги, серверное время | `Unsupported` |
+| Сейвы | `game.loadData` / `saveData`, лимит 3 МиБ; запись до успешной загрузки отклоняется площадкой, SDK её и не делает |
+| Лидерборд | `engagement.sendScore`, только лучший результат, без загрузки |
+| Язык | `system.getLanguage()` |
+| Звук | `system.isAudioEnabled` + `onAudioEnabledChange` → `Audio.IsPlatformMuted` |
+| Пауза | `system.onPause` / `onResume` |
+| Ошибки | `SdkError.errorType` доходит до C# кодом ошибки |
+
+Требования площадки, которые SDK берёт на себя:
+
+- сжатие Unity выключено (пресет конфигурации);
+- проверка размера файлов при сборке: каждый файл меньше 30 МиБ, файлов не больше 8000 (раздел 12);
+- никаких внешних запросов: скачиваемый модуль аналитики на этой конфигурации отключается сам;
+- звук площадки главнее звука игры;
+- `firstFrameReady` раньше `gameReady`, оба вызываются ровно один раз;
+- шаблон поддерживает соотношения сторон от 9:32 до 32:9 и не блокирует ориентацию;
+- шаблон не ставит `devicePixelRatio = 1` по умолчанию.
+
+---
+
+## 9. Тулкит: UI/UX и макеты
+
+### 9.1. Принципы
+
+- Одно окно `Window → JTL SDK`, UI Toolkit. Слева навигация, справа раздел. Ширина не меньше 900 px, окно можно докнуть.
+- В шапке всегда: активная конфигурация, площадка, версия пакета, переключатель RU/EN, значок обновления.
+- Все изменения сохраняются сразу, с Undo. Кнопки «Применить» нет, кроме опасных действий: активация конфигурации, сброс сейва, замена кода анализатором.
+- Каждое поле с подсказкой на языке тулкита. Валидация прямо под полем красным текстом. Ошибки, которые сломают сборку, дублируются в разделе «Сборка» и блокируют кнопку.
+- Никаких модальных окон, кроме подтверждения необратимых действий.
+- Внизу строка состояния: последнее действие и его результат.
+- Стандартная тема редактора, без своей палитры. Отступы 8 px, группы в рамках `Box`, списки на `ListView`.
+- Текст интерфейса, подсказки и сообщения в двух языках. Переключатель хранится в `JTLSDKEditorSettings`.
+
+### 9.2. Каркас и раздел «Конфигурации»
+
+```text
+┌ JTL SDK ───────────────────────────────────────────────────────────────────────┐
+│ Активная: Yandex Games ▾    Пакет 1.0.0  ● есть 1.1.0          [RU] EN          │
+├──────────────┬─────────────────────────────────────────────────────────────────┤
+│ Конфигурации │ Конфигурации                                                    │
+│ Шаблон       │                                                                 │
+│ Языки        │ ┌──────────────────────────────┐ ┌────────────────────────────┐ │
+│ Покупки      │ │ ● Yandex Games     активная  │ │ ○ YouTube Playables        │ │
+│ Лидерборды   │ │   JTLSDK_YANDEX_GAMES        │ │   JTLSDK_YOUTUBE_PLAYABLES │ │
+│ Флаги        │ │   Brotli · Medium · 9 языков │ │   Disabled · High · 1 язык │ │
+│ Сборка       │ │   [Открыть]                  │ │   [Сделать активной]       │ │
+│ Симуляция    │ └──────────────────────────────┘ └────────────────────────────┘ │
+│ Сохранения   │ [+ Новая конфигурация ▾]  Yandex Games / YouTube Playables      │
+│ Анализатор   │                                                                 │
+│ Пакет        │ Общие настройки                                                 │
+│              │  Таймаут инициализации, с   [15   ]                             │
+│              │  Задержка автосохранения, с [2    ]                             │
+│              │  Логирование                 [Ошибки и предупреждения ▾]        │
+├──────────────┴─────────────────────────────────────────────────────────────────┤
+│ Конфигурация Yandex Games применена 14:03. Проект перекомпилирован.            │
+└────────────────────────────────────────────────────────────────────────────────┘
+```
+
+Открытая конфигурация:
+
+```text
+│ Конфигурации › Yandex Games                                   [Сделать активной]│
+│                                                                                 │
+│ Название       [Yandex Games        ]   Площадка  Yandex Games                  │
+│ Define-символ  JTLSDK_YANDEX_GAMES     (только чтение)                          │
+│                                                                                 │
+│ Настройки проекта при активации                    Применять                    │
+│  WebGL Template          JTLSDK                       [x]                       │
+│  Compression Format      [Brotli ▾]                   [x]                       │
+│  Managed Stripping       [Medium ▾]                   [x]                       │
+│  Memory Size, MB         [512   ]                     [ ]                       │
+│                                                                                 │
+│ Модули                                                                          │
+│  Реклама      [Yandex Games Ads ▾]        ▸ AdBlock [x]  Интервал [60] с        │
+│  Сохранения   [Yandex Games Data ▾]       ▸ Лимит 200 КБ                        │
+│  Покупки      [Yandex Games Payments ▾]                                         │
+│  Лидерборды   [Yandex Games Leaderboards ▾]                                     │
+│  Игрок        [Yandex Games Player ▾]                                           │
+│  Язык         [Yandex Games Language ▾]                                         │
+│  Флаги        [Yandex Games Flags ▾]                                            │
+│  Время        [Yandex Games Time ▾]                                             │
+│  Отзыв        [Yandex Games Review ▾]                                           │
+│  Ярлык        [Yandex Games Shortcut ▾]                                         │
+│                                                                                 │
+│ Пауза при потере фокуса  [x]                                                    │
+│ Языки конфигурации       [x] English  [x] Russian  [x] Turkish  ...             │
+│ Шаблон                   [Переопределить ▾]  Логотип, фон, пиксельное соотношение│
+```
+
+Выпадающий список модуля показывает все провайдеры, найденные через `TypeCache`, включая `Unsupported`. Под провайдером раскрываются его поля.
+
+### 9.3. Раздел «Шаблон»
+
+```text
+│ Шаблон WebGL                                            [Превью]  [Сбросить]    │
+│                                                                                 │
+│ Логотип        [logo.png              ▾]   Размер  [160] px   Формат PNG/JPG/GIF│
+│                                                                                 │
+│ Экран загрузки                                                                  │
+│  Фон           (●) Цвет  ( ) Градиент  ( ) Картинка                             │
+│                [■ #1A1A1A]                                                      │
+│  Прогресс-бар  Цвет заполнения [■ #FFFFFF]  Цвет фона [■ #333333]               │
+│                Ширина [40] %   Высота [8] px   Скругление [0] px                │
+│                Положение (●) Под логотипом  ( ) Внизу экрана                    │
+│  Текст         [Загрузка...            ]  показывать [ ]                        │
+│                                                                                 │
+│ Страница                                                                        │
+│  Фон           ( ) Цвет  (●) Градиент  ( ) Картинка                             │
+│                Радиальный [x]  Угол [140]  [■ #2B1B6B] → [■ #0D0A1F]             │
+│  Соотношение   ( ) Свободное  (●) Фиксированное [16/9]  выкл. на мобильных [x]  │
+│                Поля: (●) фон страницы  ( ) цвет [■]                             │
+│                                                                                 │
+│ Рендер                                                                          │
+│  Pixel ratio десктоп  (●) Авто  ( ) Фиксированный [1.0]  ( ) Авто, не выше [2.0]│
+│  Pixel ratio мобильные ( ) Авто  ( ) Фиксированный [1.0]  (●) Авто, не выше [1.5]│
+│  Кнопка полного экрана [ ]                                                      │
+│                                                                                 │
+│ Переопределено в конфигурации YouTube Playables: соотношение сторон, pixel ratio│
+│                                                                                 │
+│ ┌ Превью ────────────────────────────────────────────┐                          │
+│ │            ░░░░░░░░░░░░░░░░░░░░░░░░░░░             │  [Десктоп] [Мобильный]   │
+│ │            ░░░░░░  [ЛОГО]  ░░░░░░░░░░░             │  Прогресс [====----] 55% │
+│ │            ░░░░░░ ████████░░░ ░░░░░░░░             │                          │
+│ └────────────────────────────────────────────────────┘                          │
+```
+
+Общие настройки хранятся в `JTLSDKEditorSettings`, переопределения полей в конфигурации. Превью рисуется тем же CSS, что и шаблон, через `WebView` недоступно, поэтому превью - UI Toolkit-копия разметки с теми же значениями.
+
+### 9.4. Раздел «Языки»
+
+```text
+│ Языки                                                                           │
+│                                                                                 │
+│ Языки игры                                                                      │
+│  [x] English   [x] Russian   [x] Turkish   [ ] Spanish   [ ] Portuguese         │
+│  [ ] German    [ ] French    [ ] Italian   [ ] Polish    [ ] Ukrainian          │
+│  ...                                                                            │
+│                                                                                 │
+│ Язык по умолчанию   [English ▾]                                                 │
+│ Запоминать выбор игрока  [x]                                                    │
+│                                                                                 │
+│ Замены (язык площадки → язык игры)                              [+ Добавить]    │
+│  Belarusian  → [Russian ▾]                                          [x]         │
+│  Kazakh      → [Russian ▾]                                          [x]         │
+│  Ukrainian   → [Russian ▾]                                          [x]         │
+│  Uzbek       → [Russian ▾]                                          [x]         │
+│                                                                                 │
+│ Языки на конфигурациях                                                          │
+│  Yandex Games       [x] English [x] Russian [x] Turkish                         │
+│  YouTube Playables  [x] English [ ] Russian [ ] Turkish                         │
+│                                                                                 │
+│ Play Mode                                                                       │
+│  Стартовый язык  [Russian ▾]   (меняется в углу вкладки Game)                   │
+```
+
+### 9.5. Раздел «Покупки»
+
+```text
+│ Покупки                                                          [+ Товар]      │
+│                                                                                 │
+│ ┌ remove_ads ───────────────────────────────────────────────────────────────┐   │
+│ │ Id в игре    [remove_ads      ]   Тип  [Разовая ▾]                        │   │
+│ │ Yandex Games [remove_ads_yg   ]                                           │   │
+│ │ Тестовая цена [49] [YAN ▾]        (для редактора)                          │   │
+│ │                                                                 [Удалить] │   │
+│ └───────────────────────────────────────────────────────────────────────────┘   │
+│ ┌ coins_1000 ───────────────────────────────────────────────────────────────┐   │
+│ │ Id в игре    [coins_1000      ]   Тип  [Расходуемая ▾]                    │   │
+│ │ Yandex Games [coins_1000      ]                                           │   │
+│ │ Тестовая цена [15] [YAN ▾]                                                 │   │
+│ └───────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                 │
+│ ⚠ На конфигурации YouTube Playables покупки не поддерживаются.                  │
+│ [Сгенерировать ProductIds.cs]  → Assets/Scripts/Generated/ProductIds.cs         │
+```
+
+Генерация констант необязательна, но избавляет от опечаток в строках.
+
+### 9.6. Разделы «Лидерборды» и «Флаги»
+
+```text
+│ Лидерборды                                                       [+ Лидерборд]  │
+│  Id в игре [levels    ]  Yandex Games [levels_board]  YouTube [единственный]    │
+│                                                                                 │
+│ Флаги                                                            [+ Флаг]       │
+│  Ключ [tutorial_enabled]  Тип [bool ▾]  По умолчанию [x]                        │
+│  Ключ [ads_interval    ]  Тип [int  ▾]  По умолчанию [60]                       │
+```
+
+### 9.7. Раздел «Сборка»
+
+```text
+│ Сборка                                                                          │
+│                                                                                 │
+│ Конфигурация      Yandex Games (активная)                                       │
+│ Development Build [ ]   Плашка номера сборки показывается только в Development  │
+│                                                                                 │
+│ Вывод             (●) Папка  ( ) ZIP                                            │
+│ Путь              [~/Builds/SmashAndHit                          ] [Выбрать]    │
+│ Имя               [{product}_{configuration}_b{build}] → SmashAndHit_YandexGames_b43│
+│ Номер сборки      42  → следующая 43   [Изменить]                               │
+│ После сборки      [x] Открыть папку   [x] Строка в консоль                      │
+│                                                                                 │
+│ Проверки перед сборкой                                                          │
+│  ✔ Define-символ соответствует конфигурации                                     │
+│  ✔ WebGL Template = JTLSDK                                                      │
+│  ✔ Compression Format = Brotli                                                  │
+│  ✔ JTLSDKSettings.asset есть в Resources                                        │
+│                                                                                 │
+│ Проверки после сборки (YouTube Playables)                                       │
+│  каждый файл < 30 МиБ · файлов ≤ 8000 · сжатие выключено · нет внешних скриптов │
+│                                                                                 │
+│                                                              [Собрать]          │
+```
+
+### 9.8. Раздел «Симуляция»
+
+```text
+│ Симуляция (Play Mode)                                                           │
+│                                                                                 │
+│ Площадка в Play Mode   Yandex Games (по активной конфигурации)                  │
+│ Устройство             [Десктоп ▾]                                              │
+│ Задержка инициализации [0.0] с    Имитировать ошибку инициализации [ ]          │
+│                                                                                 │
+│ Реклама                                                                         │
+│  Спрашивать результат  (●) Каждый раз  ( ) Использовать выбранное:              │
+│   Интерстишл [Показана ▾]   Rewarded [Награда ▾]                                │
+│  Длительность показа   [1.0] с                                                  │
+│                                                                                 │
+│ Покупки                                                                         │
+│  Спрашивать результат  (●) Каждый раз  ( ) Использовать выбранное: [Оплачена ▾] │
+│                                                                                 │
+│ Игрок                                                                           │
+│  Авторизован [ ]   Имя [Тестовый игрок]   Id [editor-player]                    │
+│                                                                                 │
+│ Сейвы                                                                           │
+│  Имитировать ошибку загрузки [ ]   Пустой сейв при старте [ ]                   │
+│                                                                                 │
+│ Оверлей во вкладке Game  [x]                                                    │
+```
+
+### 9.9. Раздел «Сохранения»
+
+```text
+│ Сохранения (редактор)                  Ревизия 42 · 1.8 КБ из 200 КБ · Loaded   │
+│                                                                                 │
+│ Поиск [money            ]                                       [+ Ключ]        │
+│ ┌──────────────────┬────────┬──────────────────────────────────────┬─────────┐  │
+│ │ Ключ             │ Тип    │ Значение                             │         │  │
+│ ├──────────────────┼────────┼──────────────────────────────────────┼─────────┤  │
+│ │ Money            │ int    │ [1200        ]                       │ [x]     │  │
+│ │ Level            │ int    │ [27          ]                       │ [x]     │  │
+│ │ MusicVolume      │ float  │ [0.5         ]                       │ [x]     │  │
+│ │ Profile          │ object │ ▸ { "name": "Player", "skins": [1,4] }│ [x]     │  │
+│ └──────────────────┴────────┴──────────────────────────────────────┴─────────┘  │
+│                                                                                 │
+│ [Сбросить всё]  [Экспорт JSON]  [Импорт JSON]  [Открыть JSON]                   │
+│ Зеркало: ревизия 41   [Показать]   [Сделать зеркало новее] (проверка слияния)    │
+```
+
+Работает и в Play Mode: правка значения сразу видна игре, а `Set*` из игры сразу виден в таблице.
+
+### 9.10. Раздел «Пакет»
+
+```text
+│ Пакет                                                                           │
+│                                                                                 │
+│ JTL SDK   установлено 1.0.0   доступно 1.1.0        [Обновить до 1.1.0]         │
+│  Показывать пре-релизы [ ]                                                      │
+│  ▸ 1.1.0  (14.10.2026)                                                          │
+│    • Добавлен провайдер баннера для Yandex Games                                 │
+│    • Исправлено ...                                                             │
+│  ▸ 1.0.1  (02.10.2026)                                                          │
+│                                                                                 │
+│ Модули                                                                          │
+│  Yandex Metrica   1.0.0   не установлен      [Установить]                       │
+│  CrazyGames       0.9.0   не установлен      [Установить]   пре-релиз           │
+│                                                                                 │
+│ Проверено 14:02   [Проверить сейчас]                                            │
+```
+
+### 9.11. Раздел «Анализатор»
+
+```text
+│ Анализатор API                                            [Сканировать]         │
+│                                                                                 │
+│ Папки  [Assets/Game/Scripts]  исключить [Assets/Plugins]                        │
+│                                                                                 │
+│ 7 мест                                                                          │
+│  Assets/Game/.../GlobalTimeScaler.cs:23   Time.timeScale = 0.3f                 │
+│     → JTLSDK.Time.Scale = 0.3f                            [Открыть] [Заменить]  │
+│  Assets/Game/.../SettingHandler.cs:41     AudioListener.volume = v              │
+│     → JTLSDK.Audio.Volume = v                             [Открыть] [Заменить]  │
+│  Assets/Game/.../SavesService.cs:88       PlayerPrefs.GetInt("Level")           │
+│     → JTLSDK.Data.GetInt("Level")                         [Открыть] [Заменить]  │
+│                                                                                 │
+│ [Заменить все простые]  (только однозначные замены, с подтверждением)           │
+```
+
+---
+
+## 10. Симуляция в редакторе
+
+### 10.1. Оверлей во вкладке Game
+
+В правом верхнем углу вкладки Game, поверх картинки игры, только в Play Mode и только в редакторе:
+
+```text
+┌ JTL SDK ───────────────────────────┐
+│ Язык      [Russian ▾]              │
+│ Устройство[Десктоп ▾]              │
+│ Пауза площадки   [ ]               │
+│ Звук площадки выкл. [ ]  (YouTube) │
+│ Yandex Games · готов · рев. 42     │
+└────────────────────────────────────┘
+```
+
+Смена языка вызывает `Language.Changed`. Пауза площадки ставит источник `Platform`. Переключатель звука меняет `Audio.IsPlatformMuted` и есть только на конфигурациях с `Capability.PlatformMute`. Панель сворачивается в значок.
+
+### 10.2. Оверлеи прототипов
+
+Появляются поверх игры, игра при этом на паузе через `Ads`/`Purchase`. Кнопки крупные, под каждой написано, что получит код игры.
+
+Rewarded:
+
+```text
+┌──────────────────────────────────────────────────────────┐
+│  Rewarded · double_money · Yandex Games                  │
+│  Игра на паузе. Выбери результат.                        │
+│                                                          │
+│  [ Досмотрел, выдать награду ]     AdResult.Rewarded     │
+│  [ Закрыл раньше, без награды ]    AdResult.Closed       │
+│  [ Реклама недоступна ]            AdResult.NotShown     │
+│  [ Ошибка показа ]                 AdResult.Failed       │
+│                                                          │
+│  [ ] Запомнить до конца Play Mode                        │
+└──────────────────────────────────────────────────────────┘
+```
+
+Интерстишл:
+
+```text
+│  [ Показана и закрыта ]            AdResult.Shown        │
+│  [ Площадка не показала ]          AdResult.NotShown     │
+│  [ Ошибка показа ]                 AdResult.Failed       │
+```
+
+Покупка:
+
+```text
+┌──────────────────────────────────────────────────────────┐
+│  Покупка · coins_1000 · 15 YAN                           │
+│                                                          │
+│  [ Оплатить ]                      Granted + Purchased   │
+│  [ Оплатить, игра упала до выдачи ] Granted при след. запуске│
+│  [ Отменить ]                      PurchaseResult.Cancelled│
+│  [ Ошибка оплаты ]                 PurchaseResult.Failed  │
+└──────────────────────────────────────────────────────────┘
+```
+
+Оверлей «Нажми, чтобы продолжить» и плашка Development-сборки в редакторе рисуются тем же UI Toolkit, в билде это HTML на странице.
+
+---
+
+## 11. Шаблон WebGL
+
+За основу берётся шаблон PluginYG2 (CC0), переписывается по стилю проекта и без инициализации площадки внутри `index.html`. Шаблон отвечает за экран загрузки, запуск Unity, подключение `jtlsdk-page.js` и вставку площадки.
+
+Файлы:
+
+```text
+Assets/WebGLTemplates/JTLSDK/
+  index.html
+  jtlsdk-page.js          предзагрузка, firstFrameReady, плашка, оверлей продолжения
+  TemplateData/
+    style.css
+    logo.png              копируется из настроек тулкита
+    background.jpg        если выбран фон-картинка
+```
+
+Значения из тулкита попадают в шаблон через переменные Unity (`PlayerSettings.SetTemplateCustomValue`) перед сборкой. Правки `index.html` после сборки нет.
+
+| Переменная | Источник |
+|---|---|
+| `JTLSDK_LOGO`, `JTLSDK_LOGO_SIZE` | Шаблон › Логотип |
+| `JTLSDK_LOADER_BACKGROUND` | Шаблон › Экран загрузки › Фон (готовый CSS) |
+| `JTLSDK_PAGE_BACKGROUND` | Шаблон › Страница › Фон |
+| `JTLSDK_PROGRESS_*` | цвета, размеры, положение прогресс-бара |
+| `JTLSDK_ASPECT_RATIO`, `JTLSDK_ASPECT_MOBILE_OFF` | соотношение сторон |
+| `JTLSDK_DPR_DESKTOP`, `JTLSDK_DPR_MOBILE` | `auto`, число или `max:2.0` |
+| `JTLSDK_PLATFORM_HEAD` | вставка площадки: `<script src="/sdk.js">` или `game_api/v1` |
+| `JTLSDK_BUILD_NUMBER`, `JTLSDK_DEV_BADGE` | раздел «Сборка» |
+
+Особенности YouTube в шаблоне: скрипт площадки первым в `<head>`, `firstFrameReady` сразу после показа экрана загрузки, поля под любое соотношение сторон, без блокировки ориентации, без `preventDefault` на Esc.
+
+---
+
+## 12. Сборка
+
+Кнопка «Собрать» в тулките или меню `JTL SDK → Build`.
+
+1. Проверки перед сборкой (раздел 9.7). Красная проверка блокирует сборку.
+2. Подстановка переменных шаблона, копирование картинок.
+3. Номер сборки увеличивается и записывается в `JTLSDKEditorSettings`.
+4. `BuildPipeline.BuildPlayer` в папку `{path}/{name}`.
+5. Проверки после сборки для конфигурации: размер файлов, количество, сжатие, внешние скрипты в `index.html`.
+6. При выводе ZIP папка архивируется, папка удаляется.
+7. Строка в консоль: `JTL SDK build 43 · Yandex Games · 12.4 MB · ~/Builds/SmashAndHit/SmashAndHit_YandexGames_b43.zip`.
+8. Открыть папку в Finder, если отмечено.
+
+Плашка `DEV · b43 · Yandex Games · v1.3.0` в углу страницы только при `Development Build`. Это HTML-элемент, в Unity-сцене её нет.
+
+---
+
+## 13. Пакет, модули и обновления
+
+**Источник версий** - GitHub Releases репозитория `meepifiev/JTLSDK`, публичный API без токена. Проверка раз при старте редактора, кеш на сутки в `UserSettings`. Кнопка «Проверить сейчас».
+
+**Обновление** - `Client.Add("https://github.com/meepifiev/JTLSDK.git?path=Packages/com.jtlstudio.sdk#v1.1.0")`. Откат на любой релиз тем же способом.
+
+**Скачиваемые модули** описаны в `modules.json` в корне репозитория:
+
+```json
+{
+  "modules": [
+    {
+      "id": "yandex-metrica",
+      "name": "Yandex Metrica",
+      "package": "com.jtlstudio.sdk.yandexmetrica",
+      "repository": "meepifiev/JTLSDK-YandexMetrica",
+      "requires": ">=1.0.0"
+    }
+  ]
+}
+```
+
+Модуль - отдельный UPM-пакет со своими релизами. Установка `Client.Add` по тегу, удаление `Client.Remove`. Модуль зависит от `com.jtlstudio.sdk` и проверяет минимальную версию.
+
+**Аналитика (Yandex Metrica)** - первый скачиваемый модуль: `JTLSDK.Analytics.Report(string eventName)` и перегрузка с параметрами. На конфигурации YouTube Playables модуль отключается сам, потому что внешние запросы запрещены.
+
+---
+
+## 14. Анализатор API
+
+Сканирует `.cs` в выбранных папках `Assets` (по умолчанию всё, кроме `Packages` и `Plugins`) и находит:
+
+| Шаблон | Замена |
+|---|---|
+| `Time.timeScale` | `JTLSDK.Time.Scale` |
+| `AudioListener.volume` | `JTLSDK.Audio.Volume` |
+| `AudioListener.pause` | пауза через `JTLSDK.Pause` |
+| `Cursor.visible`, `Cursor.lockState` | `JTLSDK.Device.CursorVisible`, `CursorLock` |
+| `PlayerPrefs.*` | `JTLSDK.Data.*` |
+| `Application.OpenURL` | предупреждение: на YouTube внешние ссылки запрещены |
+
+Результат - список с файлом, строкой, найденным кодом и предлагаемой заменой. «Заменить» правит одну строку. «Заменить все простые» правит только однозначные случаи (присваивание и чтение) после подтверждения со списком файлов. Проект должен быть под VCS, тулкит это проверяет и предупреждает.
+
+---
+
+## 15. Разработка SDK
+
+**Стиль кода.** В репозитории лежит `.claude/CODE_STYLE.md` студии. Исключение одно: фасад `JTLSDK` - статический класс, единственный в пакете. Комментариев в коде нет, имена без сокращений.
+
+**Тесты.**
+
+- EditMode: общие сервисы с фейковыми провайдерами. Единственный показ рекламы за раз, снятие паузы при исключении в колбэке, слияние сейвов по ревизии, запрет записи в облако при `Failed`, выдача до consume и повтор `Granted`, выбор языка, машина состояний gameplay, `WhenReady` в порядке регистрации.
+- PlayMode: демо-сцена в `Assets` проходит полный цикл на конфигурации Editor.
+- Ручная матрица перед релизом: черновик на Яндексе, McPlay для YouTube, три версии Unity.
+
+**CI (GitHub Actions).**
+
+- `ci.yml`: на каждый push и PR собрать `Bridge~` (Node 20, `tsc`), сравнить результат с `jtlsdk.jspre` в репозитории, прогнать EditMode-тесты на 2021.3.45f2.
+- `release.yml`: на тег `v*` проверить, что `package.json` совпадает с тегом, создать GitHub Release с текстом из `CHANGELOG.md`.
+- Матрица версий Unity (2022.3, 6000.0) запускается вручную и раз в неделю.
+
+**Версии.** SemVer. `package.json` и тег совпадают. `CHANGELOG.md` ведётся вручную.
+
+**Демо-сцена** в `Assets/Demo`: кнопки на каждый модуль, вывод результата на экран. Она же используется как ручной тест на площадках.
+
+---
+
+## 16. План работ
+
+| Этап | Содержание | Результат |
+|---|---|---|
+| 1 | Фасад, модули, общие сервисы, Editor-провайдеры, `JTLSDKSettings`, конфигурации, define-символы | игра запускается в Play Mode на прототипах |
+| 2 | Тулкит: конфигурации, языки, покупки, лидерборды, флаги, симуляция, сохранения, оверлей Game | всё настраивается без инспектора |
+| 3 | Мост на TypeScript, шаблон, провайдеры Яндекса | черновик на Яндексе проходит модерацию |
+| 4 | Провайдеры YouTube, проверки лимитов, `firstFrameReady` | McPlay проходит |
+| 5 | Раздел «Сборка», плашка, zip, нумерация | сборка одной кнопкой |
+| 6 | Обновления, `modules.json`, модуль Yandex Metrica, анализатор API | пакет обновляется из тулкита |
+| 7 | CI, тесты, документация RU/EN, релиз 1.0.0 | тег `v1.0.0` |
+| 8 | Перевод IJ-SmashAndHit: замена Prime на main, слияние ветки yt | одна ветка игры |
+
+---
+
+## 17. Открытые вопросы
+
+1. Локальное зеркало сейва (раздел 6.2): оставить как описано или упростить до одной копии площадки.
+2. «Запоминать выбор игрока» для языка: включено по умолчанию или выключено.
+3. Язык тулкита по умолчанию: по языку системы или всегда русский.
+4. `CurrencyImageUrl` в цене: нужен ли значок валюты Яндекса в UI игры.
+5. Нужна ли в первой версии генерация констант (`ProductIds.cs`, `LeaderboardIds.cs`) или достаточно строк.
