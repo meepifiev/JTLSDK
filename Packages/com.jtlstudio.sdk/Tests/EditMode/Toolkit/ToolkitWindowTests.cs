@@ -12,7 +12,8 @@ namespace JTLStudio.SDK.Tests.Toolkit
 {
     public class ToolkitWindowTests
     {
-        private const int NavigationItemCount = 20;
+        private const int NavigationItemCount = 21;
+        private const int ConfigurationsItemIndex = 1;
         private const string RussianConfigurations = "Конфигурации";
         private const string EnglishConfigurations = "Configurations";
         private const string KeyAttributePattern = "(?:^|\\s)(?:[a-z]+-)?key=\"([^\"]+)\"";
@@ -64,11 +65,11 @@ namespace JTLStudio.SDK.Tests.Toolkit
             _window.Navigate(ToolkitSectionId.Configurations);
             _window.SetLanguage(ToolkitLanguage.Russian);
             Assert.AreEqual(ToolkitLanguage.Russian, _window.Language);
-            Assert.AreEqual(RussianConfigurations, _window.NavigationItems[0].Text);
+            Assert.AreEqual(RussianConfigurations, _window.NavigationItems[ConfigurationsItemIndex].Text);
             Assert.Greater(_window.CurrentSectionRoot.childCount, 0);
             _window.SetLanguage(ToolkitLanguage.English);
             Assert.AreEqual(ToolkitLanguage.English, _window.Language);
-            Assert.AreEqual(EnglishConfigurations, _window.NavigationItems[0].Text);
+            Assert.AreEqual(EnglishConfigurations, _window.NavigationItems[ConfigurationsItemIndex].Text);
         }
 
         [Test]

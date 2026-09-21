@@ -27,6 +27,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             RegisterSaves();
             RegisterPackageManager();
             RegisterAnalyzer();
+            RegisterHome();
         }
 
         public ToolkitLanguage Language { get; set; } = ToolkitLanguage.English;
@@ -63,8 +64,53 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             _entries[key] = new LocalizedText(english, russian);
         }
 
+        private void RegisterHome()
+        {
+            Add("home.title", "Build Once.", "Собери один раз.");
+            Add("home.titleAccent", "Publish Across Platforms.", "Публикуй везде.");
+            Add("home.description", "Export your Unity game to Yandex Games, YouTube Playables and more — with one streamlined workflow.", "Выгружай Unity-игру в Яндекс Игры, YouTube Playables и не только — в одном простом процессе.");
+            Add("home.start", "Get Started", "Начать");
+            Add("home.tagline", "SAME GAME|MORE PLAYERS|BIGGER OPPORTUNITIES", "ОДНА ИГРА|БОЛЬШЕ ИГРОКОВ|БОЛЬШЕ ВОЗМОЖНОСТЕЙ");
+            Add("home.recentBuilds", "Recent Builds", "Последние сборки");
+            Add("home.openBuild", "Open Build page", "Открыть сборку");
+            Add("home.noBuilds", "No builds yet.", "Сборок пока нет.");
+            Add("home.columnName", "NAME", "ИМЯ");
+            Add("home.columnPlatform", "TARGET PLATFORM", "ПЛОЩАДКА");
+            Add("home.columnSize", "SIZE", "РАЗМЕР");
+            Add("home.columnStatus", "STATUS", "СТАТУС");
+            Add("home.columnDate", "DATE", "ДАТА");
+            Add("home.size", "{0} MB", "{0} МБ");
+            Add("home.success", "Success", "Успешно");
+            Add("home.failed", "Failed", "Ошибка");
+            Add("home.today", "Today, {0}", "Сегодня, {0}");
+            Add("home.yesterday", "Yesterday, {0}", "Вчера, {0}");
+            Add("home.reveal", "Show in folder", "Показать в папке");
+            Add("home.activeTarget", "Active Target", "Активная цель");
+            Add("home.noTarget", "Create a configuration for a portal to build.", "Создай конфигурацию площадки, чтобы собрать игру.");
+            Add("home.createConfiguration", "Create configuration", "Создать конфигурацию");
+            Add("home.tabs", "Build Settings|Player Settings", "Сборка|Проект");
+            Add("home.platformConfiguration", "Platform Configuration", "Настройки платформы");
+            Add("home.buildTarget", "Build Target", "Платформа");
+            Add("home.compression", "Compression Format", "Сжатие");
+            Add("home.outputSettings", "Output Settings", "Вывод");
+            Add("home.buildFolder", "Build Folder", "Папка сборки");
+            Add("home.openFolder", "Open Folder", "Открыть папку");
+            Add("home.reset", "Reset", "Сбросить");
+            Add("home.buildFileName", "Build File Name", "Имя сборки");
+            Add("home.outputs", "folder|zip", "папка|zip");
+            Add("home.productSettings", "Product", "Продукт");
+            Add("home.productName", "Product Name", "Название");
+            Add("home.companyName", "Company Name", "Компания");
+            Add("home.version", "Version", "Версия");
+            Add("home.runtimeSettings", "Runtime", "Рантайм");
+            Add("home.stripping", "Managed Stripping", "Стриппинг");
+            Add("home.advanced", "Advanced", "Расширенные");
+            Add("home.buildProject", "Build Project", "Собрать проект");
+        }
+
         private void RegisterShell()
         {
+            Add("nav.home", "Home", "Главная");
             Add("nav.configurations", "Configurations", "Конфигурации");
             Add("nav.simulation", "Simulation", "Симуляция");
             Add("nav.template", "Template", "Шаблон");
@@ -85,7 +131,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.gameEvents", "Game events", "Игровые события");
             Add("nav.review", "Review", "Отзыв");
             Add("nav.gameLabel", "Game label", "Ярлык игры");
-            Add("nav.features", "Features", "Возможности");
+            Add("nav.features", "FEATURES", "ВОЗМОЖНОСТИ");
             Add("nav.pause", "Pause", "Пауза");
             Add("nav.audio", "Audio", "Звук");
             Add("nav.platform", "Platform", "Площадка");

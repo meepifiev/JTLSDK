@@ -58,6 +58,42 @@ namespace JTLStudio.SDK.Editor.Configuration
             AssetDatabase.SaveAssets();
         }
 
+        public WebCompression CurrentCompression()
+        {
+            switch (PlayerSettings.WebGL.compressionFormat)
+            {
+                case WebGLCompressionFormat.Gzip:
+                    return WebCompression.Gzip;
+
+                case WebGLCompressionFormat.Brotli:
+                    return WebCompression.Brotli;
+
+                default:
+                    return WebCompression.Disabled;
+            }
+        }
+
+        public StrippingLevel CurrentStripping()
+        {
+            switch (PlayerSettings.GetManagedStrippingLevel(_target))
+            {
+                case ManagedStrippingLevel.Minimal:
+                    return StrippingLevel.Minimal;
+
+                case ManagedStrippingLevel.Low:
+                    return StrippingLevel.Low;
+
+                case ManagedStrippingLevel.Medium:
+                    return StrippingLevel.Medium;
+
+                case ManagedStrippingLevel.High:
+                    return StrippingLevel.High;
+
+                default:
+                    return StrippingLevel.Disabled;
+            }
+        }
+
         private WebGLCompressionFormat ToUnity(WebCompression compression)
         {
             switch (compression)

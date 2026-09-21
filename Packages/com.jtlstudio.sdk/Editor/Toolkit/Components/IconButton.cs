@@ -6,7 +6,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
     {
         public const string GhostVariant = "ghost";
         public const string SecondaryVariant = "secondary";
-        public const int DefaultSize = 28;
+        public const int DefaultSize = 30;
         private const string ClassName = "jtl-icon-button";
         private const string VariantPrefix = "jtl-icon-button--";
 

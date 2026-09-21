@@ -10,6 +10,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
     {
         private readonly SettingsAssetService _assets = new SettingsAssetService();
         private readonly PlatformPresentation _platforms = new PlatformPresentation();
+        private readonly PlayerSettingsPresetService _presets = new PlayerSettingsPresetService();
 
         public event Action Changed;
 
@@ -112,6 +113,14 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
             change();
             Save(target);
             NotifyChanged();
+        }
+
+        public void ApplyPreset(SdkConfiguration configuration)
+        {
+            if (configuration != null && configuration == Active)
+            {
+                _presets.Apply(configuration.PlayerSettings);
+            }
         }
 
         public void NotifyChanged()

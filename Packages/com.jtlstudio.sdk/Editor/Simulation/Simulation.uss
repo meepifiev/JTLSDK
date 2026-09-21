@@ -22,24 +22,24 @@
     height: 18px;
     margin: 0;
     padding: 0 8px;
-    background-color: #1C1C20;
+    background-color: #17223A;
     border-width: 1px;
-    border-color: #33333A;
+    border-color: #2A3A5C;
     border-radius: 4px;
-    color: #D2D2D6;
+    color: #C9D3E6;
     font-size: 11px;
     -unity-text-align: middle-center;
 }
 
 .jtl-overlay-button:hover {
-    background-color: #26262B;
-    border-color: #43434C;
+    background-color: #1E2B45;
+    border-color: #3A4E76;
 }
 
 .jtl-overlay-button--open {
-    background-color: #1A2430;
-    border-color: #2E4A6B;
-    color: #F2F2F3;
+    background-color: #16233F;
+    border-color: #2E4A80;
+    color: #E9EEF8;
 }
 
 .jtl-overlay-panel {
@@ -48,9 +48,9 @@
     right: 300px;
     width: 240px;
     padding: 10px 10px 6px 10px;
-    background-color: rgba(14, 14, 16, 0.96);
+    background-color: rgba(10, 15, 28, 0.96);
     border-width: 1px;
-    border-color: #33333A;
+    border-color: #2A3A5C;
     border-radius: 6px;
 }
 
@@ -63,7 +63,7 @@
 
 .jtl-overlay-label {
     flex-grow: 1;
-    color: #9A9AA3;
+    color: #93A2BF;
     font-size: 11px;
 }
 
@@ -78,10 +78,10 @@
 
 .jtl-overlay-row .unity-base-popup-field__input,
 .jtl-overlay-row .unity-base-text-field__input {
-    background-color: #1C1C20;
-    border-color: #26262B;
+    background-color: #17223A;
+    border-color: #1E2B45;
     border-radius: 6px;
-    color: #F2F2F3;
+    color: #E9EEF8;
     min-height: 24px;
 }
 
@@ -96,12 +96,12 @@
     margin: 0;
     background-color: transparent;
     border-width: 0;
-    color: #9A9AA3;
+    color: #93A2BF;
     font-size: 14px;
 }
 
 .jtl-icon-button:hover {
-    color: #F2F2F3;
+    color: #E9EEF8;
 }
 
 .jtl-request-dim {
@@ -118,21 +118,21 @@
 .jtl-request-card {
     width: 420px;
     padding: 16px;
-    background-color: #151518;
+    background-color: #111A2C;
     border-width: 1px;
-    border-color: #33333A;
+    border-color: #2A3A5C;
     border-radius: 8px;
 }
 
 .jtl-request-title {
-    color: #F2F2F3;
+    color: #E9EEF8;
     font-size: 15px;
     -unity-font-style: bold;
     margin-bottom: 4px;
 }
 
 .jtl-request-caption {
-    color: #9A9AA3;
+    color: #93A2BF;
     font-size: 12px;
     margin-bottom: 10px;
 }
@@ -142,48 +142,48 @@
     align-items: flex-start;
     padding: 8px 12px;
     margin: 0 0 8px 0;
-    background-color: #1C1C20;
+    background-color: #17223A;
     border-width: 1px;
-    border-color: #26262B;
+    border-color: #1E2B45;
     border-radius: 6px;
 }
 
 .jtl-request-option:hover {
-    border-color: #33333A;
+    border-color: #2A3A5C;
 }
 
 .jtl-request-option--primary {
-    background-color: #3E6B9D;
-    border-color: #4C7DB5;
+    background-color: #2B6CF6;
+    border-color: #2B6CF6;
 }
 
 .jtl-request-option--primary:hover {
-    background-color: #345C89;
+    background-color: #215AD6;
 }
 
 .jtl-request-option__label {
-    color: #F2F2F3;
+    color: #E9EEF8;
     font-size: 13px;
     -unity-font-style: bold;
 }
 
 .jtl-request-option__result {
-    color: #9A9AA3;
+    color: #93A2BF;
     font-size: 11px;
 }
 
 .jtl-request-option--primary .jtl-request-option__result {
-    color: #C7D8EA;
+    color: #C9D8F5;
 }
 
 
 .jtl-request-remember {
     margin-top: 2px;
-    color: #F2F2F3;
+    color: #E9EEF8;
     font-size: 13px;
 }
 
 .jtl-request-remember .unity-toggle__text {
-    color: #F2F2F3;
+    color: #E9EEF8;
     margin-left: 6px;
 }

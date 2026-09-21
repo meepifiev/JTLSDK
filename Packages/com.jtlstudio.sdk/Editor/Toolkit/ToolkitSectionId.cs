@@ -22,6 +22,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         GameLabel = 17,
         Pause = 18,
         Audio = 19,
-        Platform = 20
+        Platform = 20,
+        Home = 21
     }
 }

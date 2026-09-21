@@ -101,6 +101,7 @@ namespace JTLStudio.SDK.Editor.Build
 
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
+                Record(folder, platform, 0, false);
                 return new BuildResult(false, folder, 0, stopwatch.Elapsed.TotalSeconds, new List<BuildCheck>(), FirstError(report));
             }
 
@@ -119,12 +120,19 @@ namespace JTLStudio.SDK.Editor.Build
 
             UnityEngine.Debug.Log("[JTL SDK] Build " + buildNumber + " · " + configurationName + " · " + (bytes / 1048576f).ToString("0.0", CultureInfo.InvariantCulture) + " MB · " + Path.GetFullPath(output));
 
+            Record(output, platform, bytes, true);
+
             if (settings.OpenFolderAfterBuild)
             {
                 EditorUtility.RevealInFinder(output);
             }
 
             return new BuildResult(true, output, bytes, stopwatch.Elapsed.TotalSeconds, postChecks, "");
+        }
+
+        private void Record(string output, PlatformId platform, long bytes, bool success)
+        {
+            BuildHistory.instance.Add(new BuildRecord(Path.GetFileName(output), output, platform, bytes, success, DateTime.Now));
         }
 
         private string FirstError(BuildReport report)

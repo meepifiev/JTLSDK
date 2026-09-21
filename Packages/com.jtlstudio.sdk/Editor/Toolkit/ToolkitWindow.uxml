@@ -7,6 +7,7 @@
             </ui:VisualElement>
             <ui:ScrollView name="navigation" class="jtl-sidebar__nav" mode="Vertical" horizontal-scroller-visibility="Hidden">
                 <ui:VisualElement class="jtl-nav-group">
+                    <jtl:NavigationItem section="Home" icon="home" text-key="nav.home" />
                     <jtl:NavigationItem section="Configurations" icon="configurations" text-key="nav.configurations" />
                     <jtl:NavigationItem section="Simulation" icon="simulation" text-key="nav.simulation" />
                     <jtl:NavigationItem section="Template" icon="template" text-key="nav.template" />

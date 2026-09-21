@@ -40,12 +40,12 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             left.AddToClassList("jtl-basis");
             left.Add(CreatePlayModeCard());
             left.Add(CreateAdsCard());
-            left.Add(CreatePurchasesCard());
+            left.Add(CreatePlayerCard());
             body.Add(left);
 
             VisualElement right = Column(12);
             right.AddToClassList("jtl-basis");
-            right.Add(CreatePlayerCard());
+            right.Add(CreatePurchasesCard());
             right.Add(CreateSavesCard());
             body.Add(right);
         }

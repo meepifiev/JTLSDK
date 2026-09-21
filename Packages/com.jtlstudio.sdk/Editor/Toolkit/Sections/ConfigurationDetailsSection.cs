@@ -321,6 +321,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private void SaveConfiguration()
         {
             Context.Project.Save(_configuration);
+            Context.Project.ApplyPreset(_configuration);
             Context.Project.NotifyChanged();
         }
 

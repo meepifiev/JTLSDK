@@ -33,7 +33,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private readonly Dictionary<ToolkitSectionId, ToolkitSection> _sections = new Dictionary<ToolkitSectionId, ToolkitSection>();
         private readonly List<NavigationItem> _navigationItems = new List<NavigationItem>();
         [SerializeField] private ToolkitLanguage _language = ToolkitLanguage.English;
-        [SerializeField] private ToolkitSectionId _section = ToolkitSectionId.Configurations;
+        [SerializeField] private ToolkitSectionId _section = ToolkitSectionId.Home;
         private int _buildAttempts;
         private ToolkitContext _context;
         private VisualElement _root;
@@ -179,7 +179,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
             CreateSections();
             _root.RegisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
             LocalizeShell();
-            Navigate(_sections.ContainsKey(_section) ? _section : ToolkitSectionId.Configurations);
+            Navigate(_sections.ContainsKey(_section) ? _section : ToolkitSectionId.Home);
         }
 
         private void ScheduleBuild()
@@ -208,6 +208,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private void CreateSections()
         {
             _sections.Clear();
+            Register(new HomeSection(_context));
             Register(new ConfigurationsSection(_context));
             Register(new ConfigurationDetailsSection(_context));
             Register(new SimulationSection(_context));

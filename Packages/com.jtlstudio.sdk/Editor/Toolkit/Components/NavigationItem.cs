@@ -29,16 +29,23 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
             }
         }
 
-        private readonly Icon _icon = new Icon();
+        private const int IconSize = 15;
+
+        private readonly VisualElement _tile = new VisualElement();
+        private readonly Icon _icon = new Icon { Size = IconSize };
         private readonly Label _label = new Label();
 
         public NavigationItem()
         {
             AddToClassList(ClassName);
+            _tile.AddToClassList("jtl-nav-item__tile");
+            _tile.pickingMode = PickingMode.Ignore;
             _icon.AddToClassList("jtl-nav-item__icon");
+            _icon.pickingMode = PickingMode.Ignore;
             _label.AddToClassList("jtl-nav-item__label");
             _label.pickingMode = PickingMode.Ignore;
-            Add(_icon);
+            _tile.Add(_icon);
+            Add(_tile);
             Add(_label);
             focusable = true;
             this.AddManipulator(new Clickable(OnClicked));
