@@ -8,6 +8,7 @@ namespace JTLStudio.SDK.Editor.Simulation
     {
         private readonly GameViewHost _host;
         private readonly SimulationSession _session;
+        private readonly SimulationTexts _texts = new SimulationTexts();
         private readonly Queue<Action> _pending = new Queue<Action>();
         private AdResult? _rememberedInterstitial;
         private AdResult? _rememberedRewarded;
@@ -73,40 +74,41 @@ namespace JTLStudio.SDK.Editor.Simulation
 
             if (request.IsRewarded)
             {
-                title = "Rewarded · " + request.RewardId + " · " + request.Platform;
-                options.Add(AdOption("Watched, grant reward", AdResult.Rewarded, true, request));
-                options.Add(AdOption("Closed early, no reward", AdResult.Closed, false, request));
-                options.Add(AdOption("Ad unavailable", AdResult.NotShown, false, request));
-                options.Add(AdOption("Show failed", AdResult.Failed, false, request));
+                title = "JTLSDK.Ads.ShowRewarded(\"" + request.RewardId + "\")";
+                options.Add(AdOption("rewardedWatched", AdResult.Rewarded, "rewardedWatchedHint", true, request));
+                options.Add(AdOption("rewardedClosed", AdResult.Closed, "rewardedClosedHint", false, request));
+                options.Add(AdOption("adNotShown", AdResult.NotShown, "adNotShownHint", false, request));
+                options.Add(AdOption("adFailed", AdResult.Failed, "adFailedHint", false, request));
             }
             else
             {
-                title = "Interstitial · " + request.Platform;
-                options.Add(AdOption("Shown and closed", AdResult.Shown, true, request));
-                options.Add(AdOption("Ad unavailable", AdResult.NotShown, false, request));
-                options.Add(AdOption("Show failed", AdResult.Failed, false, request));
+                title = "JTLSDK.Ads.ShowInterstitial()";
+                options.Add(AdOption("interstitialShown", AdResult.Shown, "interstitialShownHint", true, request));
+                options.Add(AdOption("adNotShown", AdResult.NotShown, "interstitialNotShownHint", false, request));
+                options.Add(AdOption("adFailed", AdResult.Failed, "interstitialFailedHint", false, request));
             }
 
-            ShowOverlay(title, "Game is paused. Choose the result.", options, (option, remember) => OnAdChosen(request, option, remember));
+            ShowOverlay(title, _texts.Get("chooseAd"), options, (option, remember) => OnAdChosen(request, option, remember));
         }
 
         private void ShowPurchaseOverlay(PrototypePurchaseRequest request)
         {
-            string title = "Purchase · " + request.ProductId + (string.IsNullOrEmpty(request.PriceText) ? "" : " · " + request.PriceText);
+            string title = "JTLSDK.Payments.Purchase(\"" + request.ProductId + "\")" + (string.IsNullOrEmpty(request.PriceText) ? "" : " · " + request.PriceText);
+            string granted = "Granted(\"" + request.ProductId + "\")";
             List<PrototypeRequestOption> options = new List<PrototypeRequestOption>
             {
-                new PrototypeRequestOption("Pay", "Granted + PurchaseResult.Purchased", true, () => request.Complete(PurchaseResult.Purchased)),
-                new PrototypeRequestOption("Pay, game crashed before grant", "Granted on next launch", false, request.CompleteAsCrashBeforeGrant),
-                new PrototypeRequestOption("Cancel", "PurchaseResult.Cancelled", false, () => request.Complete(PurchaseResult.Cancelled)),
-                new PrototypeRequestOption("Payment failed", "PurchaseResult.Failed", false, () => request.Complete(PurchaseResult.Failed))
+                new PrototypeRequestOption(_texts.Get("purchasePaid"), granted + " → onResult(PurchaseResult.Purchased)", _texts.Get("purchasePaidHint"), true, () => request.Complete(PurchaseResult.Purchased)),
+                new PrototypeRequestOption(_texts.Get("purchaseCrash"), "onResult(PurchaseResult.Failed) → " + granted + " on next launch", _texts.Get("purchaseCrashHint"), false, request.CompleteAsCrashBeforeGrant),
+                new PrototypeRequestOption(_texts.Get("purchaseCancelled"), "onResult(PurchaseResult.Cancelled)", _texts.Get("purchaseCancelledHint"), false, () => request.Complete(PurchaseResult.Cancelled)),
+                new PrototypeRequestOption(_texts.Get("purchaseFailed"), "onResult(PurchaseResult.Failed)", _texts.Get("purchaseFailedHint"), false, () => request.Complete(PurchaseResult.Failed))
             };
 
-            ShowOverlay(title, "Game is paused. Choose the result.", options, (option, remember) => OnPurchaseChosen(request, option, remember));
+            ShowOverlay(title, _texts.Get("choosePurchase"), options, (option, remember) => OnPurchaseChosen(request, option, remember));
         }
 
-        private PrototypeRequestOption AdOption(string label, AdResult result, bool primary, PrototypeAdRequest request)
+        private PrototypeRequestOption AdOption(string labelKey, AdResult result, string hintKey, bool primary, PrototypeAdRequest request)
         {
-            return new PrototypeRequestOption(label, "AdResult." + result, primary, () => request.Complete(result));
+            return new PrototypeRequestOption(_texts.Get(labelKey), "onResult(AdResult." + result + ")", _texts.Get(hintKey), primary, () => request.Complete(result));
         }
 
         private void OnAdChosen(PrototypeAdRequest request, PrototypeRequestOption option, bool remember)
@@ -115,7 +117,7 @@ namespace JTLStudio.SDK.Editor.Simulation
 
             if (remember)
             {
-                AdResult result = (AdResult)Enum.Parse(typeof(AdResult), option.Result.Substring("AdResult.".Length));
+                AdResult result = ParseAdResult(option.Callback);
 
                 if (request.IsRewarded)
                 {
@@ -144,22 +146,32 @@ namespace JTLStudio.SDK.Editor.Simulation
             ShowNext();
         }
 
+        private AdResult ParseAdResult(string callback)
+        {
+            const string prefix = "onResult(AdResult.";
+            int start = callback.IndexOf(prefix, StringComparison.Ordinal) + prefix.Length;
+            int end = callback.IndexOf(')', start);
+            return (AdResult)Enum.Parse(typeof(AdResult), callback.Substring(start, end - start));
+        }
+
         private Action<PrototypePurchaseRequest> RememberPurchase(PrototypeRequestOption option)
         {
-            switch (option.Result)
+            if (option.Callback.Contains("on next launch"))
             {
-                case "Granted on next launch":
-                    return request => request.CompleteAsCrashBeforeGrant();
-
-                case "PurchaseResult.Cancelled":
-                    return request => request.Complete(PurchaseResult.Cancelled);
-
-                case "PurchaseResult.Failed":
-                    return request => request.Complete(PurchaseResult.Failed);
-
-                default:
-                    return request => request.Complete(PurchaseResult.Purchased);
+                return request => request.CompleteAsCrashBeforeGrant();
             }
+
+            if (option.Callback.Contains("Cancelled"))
+            {
+                return request => request.Complete(PurchaseResult.Cancelled);
+            }
+
+            if (option.Callback.Contains("Failed"))
+            {
+                return request => request.Complete(PurchaseResult.Failed);
+            }
+
+            return request => request.Complete(PurchaseResult.Purchased);
         }
 
         private void Enqueue(Action show)
@@ -186,7 +198,7 @@ namespace JTLStudio.SDK.Editor.Simulation
         private void ShowOverlay(string title, string caption, IReadOnlyList<PrototypeRequestOption> options, Action<PrototypeRequestOption, bool> onChosen)
         {
             HideOverlay();
-            _overlay = new PrototypeRequestOverlay(title, caption, options, onChosen);
+            _overlay = new PrototypeRequestOverlay(title, caption, _texts.Get("remember"), options, onChosen);
             _host.Attach(_overlay);
         }
 

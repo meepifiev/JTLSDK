@@ -177,6 +177,21 @@
     color: #C7D8EA;
 }
 
+.jtl-request-option__hint {
+    color: #9A9AA3;
+    font-size: 11px;
+    white-space: normal;
+    margin-top: 2px;
+}
+
+.jtl-request-option--primary .jtl-request-option__hint {
+    color: #E4ECF5;
+}
+
+.jtl-request-card {
+    width: 460px;
+}
+
 .jtl-request-remember {
     margin-top: 2px;
     color: #F2F2F3;

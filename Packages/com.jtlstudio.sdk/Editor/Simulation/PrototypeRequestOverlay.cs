@@ -8,7 +8,7 @@ namespace JTLStudio.SDK.Editor.Simulation
     {
         private readonly Toggle _rememberToggle;
 
-        public PrototypeRequestOverlay(string title, string caption, IReadOnlyList<PrototypeRequestOption> options, Action<PrototypeRequestOption, bool> onChosen)
+        public PrototypeRequestOverlay(string title, string caption, string rememberText, IReadOnlyList<PrototypeRequestOption> options, Action<PrototypeRequestOption, bool> onChosen)
         {
             if (options == null)
             {
@@ -34,7 +34,7 @@ namespace JTLStudio.SDK.Editor.Simulation
             captionLabel.AddToClassList("jtl-request-caption");
             card.Add(captionLabel);
 
-            _rememberToggle = new Toggle("Remember until Play Mode ends");
+            _rememberToggle = new Toggle(rememberText);
             _rememberToggle.AddToClassList("jtl-request-remember");
 
             foreach (PrototypeRequestOption option in options)
@@ -49,10 +49,18 @@ namespace JTLStudio.SDK.Editor.Simulation
 
                 Label label = new Label(option.Label);
                 label.AddToClassList("jtl-request-option__label");
-                Label result = new Label(option.Result);
-                result.AddToClassList("jtl-request-option__result");
+                Label callback = new Label(option.Callback);
+                callback.AddToClassList("jtl-request-option__result");
                 button.Add(label);
-                button.Add(result);
+                button.Add(callback);
+
+                if (string.IsNullOrEmpty(option.Hint) == false)
+                {
+                    Label hint = new Label(option.Hint);
+                    hint.AddToClassList("jtl-request-option__hint");
+                    button.Add(hint);
+                }
+
                 card.Add(button);
             }
 
