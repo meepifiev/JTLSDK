@@ -18,7 +18,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
             new ModuleSlot("module.time", "_timeProvider", typeof(ITimeProvider)),
             new ModuleSlot("module.gameplay", "_gameplay", typeof(IGameplayProvider)),
             new ModuleSlot("module.review", "_review", typeof(IReviewProvider)),
-            new ModuleSlot("module.shortcut", "_shortcut", typeof(IShortcutProvider))
+            new ModuleSlot("module.shortcut", "_shortcut", typeof(IShortcutProvider)),
+            new ModuleSlot("module.analytics", "_analytics", typeof(IAnalyticsProvider))
         };
 
         public IReadOnlyList<ModuleSlot> All => _slots;

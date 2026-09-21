@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using JTLStudio.SDK.Providers;
 
 namespace JTLStudio.SDK.Editor.Configuration
 {
     public class ConfigurationValidator
     {
+        private readonly ProviderPlatformRules _platformRules = new ProviderPlatformRules();
+
         public IReadOnlyList<string> Validate(SdkConfiguration configuration)
         {
             List<string> issues = new List<string>();
@@ -29,7 +32,32 @@ namespace JTLStudio.SDK.Editor.Configuration
                 issues.Add("The configuration has no languages.");
             }
 
+            foreach (IProvider provider in Providers(configuration))
+            {
+                if (provider != null && _platformRules.IsAvailable(provider.GetType(), configuration.Platform) == false)
+                {
+                    issues.Add(provider.GetType().Name + " is not available on " + configuration.Platform + ".");
+                }
+            }
+
             return issues;
+        }
+
+        private IEnumerable<IProvider> Providers(SdkConfiguration configuration)
+        {
+            yield return configuration.PlatformProvider;
+            yield return configuration.Ads;
+            yield return configuration.Data;
+            yield return configuration.Payments;
+            yield return configuration.LanguageProvider;
+            yield return configuration.Player;
+            yield return configuration.Leaderboards;
+            yield return configuration.Flags;
+            yield return configuration.TimeProvider;
+            yield return configuration.Gameplay;
+            yield return configuration.Review;
+            yield return configuration.Shortcut;
+            yield return configuration.Analytics;
         }
     }
 }

@@ -5,6 +5,7 @@ using JTLStudio.SDK.Providers;
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YandexGames)]
     public class YandexGamesDataProvider : BridgeProviderBase, IDataProvider
     {
         private const int PlatformLimitBytes = 200 * 1024;

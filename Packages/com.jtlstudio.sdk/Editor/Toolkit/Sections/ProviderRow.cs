@@ -37,7 +37,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         {
             SerializedProperty property = _serialized.FindProperty(_slot.PropertyName);
             Type currentType = CurrentType();
-            IReadOnlyList<Type> providers = _context.Providers.ProvidersFor(_slot.ProviderInterface);
+            IReadOnlyList<Type> providers = _context.Providers.ProvidersFor(_slot.ProviderInterface, _configuration.Platform);
             List<SerializedProperty> fields = Fields(property);
             bool expanded = fields.Count > 0 && _context.ExpandedProviders.Contains(ExpansionKey);
 

@@ -5,6 +5,7 @@ using JTLStudio.SDK.Providers;
 namespace JTLStudio.SDK.YouTubePlayables
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YouTubePlayables)]
     public class YouTubePlayablesDataProvider : BridgeProviderBase, IDataProvider
     {
         private const int PlatformLimitBytes = 3 * 1024 * 1024;

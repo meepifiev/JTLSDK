@@ -1504,7 +1504,7 @@ Assets/WebGLTemplates/JTLSDK/
 
 **Обновление** - `Client.Add("https://github.com/meepifiev/JTLSDK.git?path=Packages/com.jtlstudio.sdk#v1.1.0")`. Откат на любой релиз тем же способом.
 
-**Скачиваемые модули** описаны в `modules.json` в корне репозитория:
+**Скачиваемые модули** описаны в `modules.json` в корне репозитория. Тулкит читает его с `main` через `raw.githubusercontent.com`.
 
 ```json
 {
@@ -1513,16 +1513,20 @@ Assets/WebGLTemplates/JTLSDK/
       "id": "yandex-metrica",
       "name": "Yandex Metrica",
       "package": "com.jtlstudio.sdk.yandexmetrica",
-      "repository": "meepifiev/JTLSDK-YandexMetrica",
-      "requires": ">=1.0.0"
+      "repository": "meepifiev/JTLSDK",
+      "path": "Modules/com.jtlstudio.sdk.yandexmetrica",
+      "requires": "0.1.0",
+      "platforms": ["YandexGames"]
     }
   ]
 }
 ```
 
-Модуль - отдельный UPM-пакет со своими релизами. Установка `Client.Add` по тегу, удаление `Client.Remove`. Модуль зависит от `com.jtlstudio.sdk` и проверяет минимальную версию.
+Модуль - отдельный UPM-пакет. Он лежит в своём репозитории или в папке `Modules/` этого репозитория, тогда в записи указан `path`. Установка - `Client.Add` по git-ссылке с тегом последнего релиза, удаление - `Client.Remove`. Кнопка «Установить» неактивна, если установленный JTL SDK ниже `requires`.
 
-**Аналитика (Yandex Metrica)** - первый скачиваемый модуль: `JTLSDK.Analytics.Report(string eventName)` и перегрузка с параметрами. На конфигурации YouTube Playables модуль отключается сам, потому что внешние запросы запрещены.
+Модуль ничего не регистрирует в рантайме. Он добавляет провайдер для слота ядра, и провайдер выбирают в конфигурации, как любой другой. Атрибут `[ProviderPlatforms(...)]` ограничивает площадки: тулкит не предлагает такой провайдер в чужой конфигурации, а валидатор сборки считает его ошибкой.
+
+**Аналитика** - слот ядра `JTLSDK.Analytics`: `Report(string eventName)` и `Report(string eventName, IReadOnlyDictionary<string, object> parameters)`. Без модуля слот `Unsupported` и события молча игнорируются. В редакторе прототип пишет события в консоль. Первый провайдер - модуль Yandex Metrica: `reachGoal` с параметрами, счётчик и флаги `webvisor`, `clickmap`, `trackLinks`, `accurateTrackBounce` в конфигурации. Скрипт Метрики подгружается при инициализации, а на YouTube Playables провайдер недоступен и в рантайме не запускается.
 
 ---
 
@@ -1605,5 +1609,9 @@ Assets/WebGLTemplates/JTLSDK/
 | 21.09.2026 | Шаблон WebGL в первой версии лежит в пакете (`Editor/Template~/JTLSDK`) и ставится тулкитом в `Assets/WebGLTemplates/JTLSDK`. Перенос в отдельный репозиторий остаётся в плане. |
 | 21.09.2026 | Настройки шаблона и сборки хранятся в `ProjectSettings/JTLSDKEditorSettings.asset` (`ScriptableSingleton`): они общие для проекта и не нужны в рантайме. |
 | 21.09.2026 | Скрипт площадки в `<head>` подставляет сборка через переменную шаблона `JTLSDK_PLATFORM_HEAD`: `/sdk.js` для Яндекса, `game_api/v1` для YouTube. |
+| 21.09.2026 | Unity не принимает значения незарегистрированных переменных шаблона. Сервис шаблона сам находит `{{{ JTLSDK_* }}}` в файлах шаблона и регистрирует их через `PlayerSettings.templateCustomKeys`, затем проверяет каждое значение. |
+| 21.09.2026 | Модуль - это провайдер для слота ядра, а не рантайм-регистрация. Аналитика стала слотом ядра, Yandex Metrica - первым модулем. |
+| 21.09.2026 | Модули можно держать в папке `Modules/` репозитория JTLSDK и ставить по git-ссылке с `path`. Отдельный репозиторий для модуля не обязателен. |
+| 21.09.2026 | Атрибут `[ProviderPlatforms]` ограничивает провайдер площадками. Провайдеры Яндекса и YouTube помечены им. |
 
 Открытых вопросов нет.

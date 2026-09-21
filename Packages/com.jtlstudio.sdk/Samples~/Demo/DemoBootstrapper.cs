@@ -131,6 +131,12 @@ namespace JTLStudio.SDK.Samples.Demo
                 JTLSDK.Shortcut.Request(created => Log("Shortcut: " + created));
             }
 
+            if (Button("Report event"))
+            {
+                JTLSDK.Analytics.Report("demo_button", new Dictionary<string, object> { { "money", JTLSDK.Data.GetInt(MoneyKey) } });
+                Log("Analytics: " + JTLSDK.Analytics.State);
+            }
+
             if (Button(_menuPause == null ? "Pause (Menu)" : "Resume (Menu)"))
             {
                 ToggleMenuPause();

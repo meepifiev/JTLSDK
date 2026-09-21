@@ -5,6 +5,7 @@ using JTLStudio.SDK.Providers;
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YandexGames)]
     public class YandexGamesGameplayProvider : BridgeProviderBase, IGameplayProvider
     {
         public void Initialize(Action<ProviderState> onInitialized)

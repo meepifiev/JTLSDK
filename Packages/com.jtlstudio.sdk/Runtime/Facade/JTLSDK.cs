@@ -27,6 +27,7 @@ namespace JTLStudio.SDK
         public static IDevice Device => Instance.Device;
         public static IReview Review => Instance.Review;
         public static IShortcut Shortcut => Instance.Shortcut;
+        public static IAnalytics Analytics => Instance.Analytics;
 
         internal static SdkInstance Current => _instance;
 

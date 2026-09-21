@@ -19,6 +19,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         Time = 14,
         Gameplay = 15,
         Review = 16,
-        Shortcut = 17
+        Shortcut = 17,
+        Analytics = 18
     }
 }

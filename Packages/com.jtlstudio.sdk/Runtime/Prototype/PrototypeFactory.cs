@@ -110,6 +110,16 @@ namespace JTLStudio.SDK.Prototype
             return new PrototypeReviewProvider();
         }
 
+        public IAnalyticsProvider Analytics(IAnalyticsProvider configured)
+        {
+            if (configured is UnsupportedAnalyticsProvider)
+            {
+                return configured;
+            }
+
+            return new PrototypeAnalyticsProvider();
+        }
+
         public IShortcutProvider Shortcut(IShortcutProvider configured)
         {
             if (configured is UnsupportedShortcutProvider)

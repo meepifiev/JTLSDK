@@ -4,6 +4,7 @@
     "references": [
         "JTLStudio.SDK",
         "JTLStudio.SDK.Editor",
+        "JTLStudio.SDK.YandexGames",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

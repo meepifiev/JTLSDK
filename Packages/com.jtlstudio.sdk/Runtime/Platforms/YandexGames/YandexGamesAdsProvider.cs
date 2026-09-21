@@ -6,6 +6,7 @@ using UnityEngine;
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YandexGames)]
     public class YandexGamesAdsProvider : BridgeProviderBase, IAdsProvider
     {
         [SerializeField] private bool _adBlockDetection = true;

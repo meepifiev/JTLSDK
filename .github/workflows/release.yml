@@ -30,6 +30,11 @@ jobs:
           mkdir -p dist
           cd Packages
           zip -qr "../dist/com.jtlstudio.sdk-${GITHUB_REF_NAME#v}.zip" com.jtlstudio.sdk -x "com.jtlstudio.sdk/Bridge~/node_modules/*"
+          cd ../Modules
+          for module in */; do
+            name="${module%/}"
+            zip -qr "../dist/${name}-${GITHUB_REF_NAME#v}.zip" "$name"
+          done
       - name: Publish release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

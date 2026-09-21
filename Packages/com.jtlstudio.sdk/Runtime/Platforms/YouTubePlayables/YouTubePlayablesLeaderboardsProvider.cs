@@ -6,6 +6,7 @@ using JTLStudio.SDK.Providers;
 namespace JTLStudio.SDK.YouTubePlayables
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YouTubePlayables)]
     public class YouTubePlayablesLeaderboardsProvider : BridgeProviderBase, ILeaderboardsProvider
     {
         public bool SupportsLoad => false;

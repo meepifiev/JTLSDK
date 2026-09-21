@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using JTLStudio.SDK.Editor.Configuration;
 using JTLStudio.SDK.Editor.Toolkit.Components;
 using JTLStudio.SDK.Editor.Updates;
 using UnityEditor;
@@ -13,15 +14,15 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
     public class PackageManagerSection : ToolkitSection
     {
         private const string SdkRepository = "meepifiev/JTLSDK";
-        private const string TemplateRepository = "meepifiev/JTLSDK-WebGLTemplate";
         private const string PackagePath = "Packages/com.jtlstudio.sdk";
         private const string PackageGitUrl = "https://github.com/meepifiev/JTLSDK.git?path=Packages/com.jtlstudio.sdk#";
-        private const string TemplateFolder = "Assets/WebGLTemplates/JTLSDK";
         private const string PreReleasePreference = "JTLSDK.Package.ShowPreReleases";
 
         private readonly GitHubReleases _github = new GitHubReleases();
+        private readonly ModuleCatalog _catalog = new ModuleCatalog();
+        private readonly TemplateService _template = new TemplateService();
         private ReleaseCheckResult _sdkReleases;
-        private ReleaseCheckResult _templateReleases;
+        private ModuleCatalogResult _modules;
         private bool _checking;
         private string _checkedAt;
 
@@ -158,24 +159,17 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             row.Add(new Icon("template", 20, "secondary"));
             VisualElement text = Column(2);
             text.Add(TextLabel(Context.Text("package.webglTemplate"), "jtl-text"));
-            bool installed = Directory.Exists(TemplateFolder);
-            string state;
-
-            if (_templateReleases != null && _templateReleases.IsRepositoryMissing)
-            {
-                state = Context.Text("package.templateNotPublished");
-            }
-            else
-            {
-                state = installed ? Context.Text("package.templateInstalled", TemplateFolder) : Context.Text("package.templateMissing");
-            }
-
-            text.Add(TextLabel(state, "jtl-text--caption"));
+            bool installed = _template.IsInstalled;
+            text.Add(TextLabel(installed ? Context.Text("package.templateInstalled", TemplateService.TemplateFolder) : Context.Text("package.templateMissing"), "jtl-text--caption"));
             row.Add(text);
             row.Add(Spacer());
-            ReleaseInfo latest = Latest(_templateReleases);
-            ToolkitButton install = new ToolkitButton { Label = Context.Text(installed ? "package.update" : "package.install"), Variant = ToolkitButton.SecondaryVariant };
-            install.SetEnabled(latest != null);
+            ToolkitButton install = new ToolkitButton { Label = Context.Text(installed ? "template.reinstall" : "package.install"), Variant = ToolkitButton.SecondaryVariant };
+            install.clicked += () =>
+            {
+                _template.Install();
+                Context.Report(StatusKind.Success, "template.installedTo", TemplateService.TemplateFolder);
+                Render();
+            };
             row.Add(install);
             card.Add(row);
             return card;
@@ -184,8 +178,72 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private VisualElement CreateModulesCard()
         {
             Card card = new Card { TitleKey = "package.modules", Spacing = 8 };
-            card.Add(Localized("package.noModules", "jtl-text--secondary"));
+
+            if (_modules == null)
+            {
+                card.Add(Localized("package.checking", "jtl-text--secondary"));
+                return card;
+            }
+
+            if (_modules.IsSuccess == false)
+            {
+                card.Add(TextLabel(Context.Text("package.modulesFailed", _modules.Error), "jtl-text--secondary"));
+                return card;
+            }
+
+            if (_modules.Modules.Count == 0)
+            {
+                card.Add(Localized("package.noModules", "jtl-text--secondary"));
+                return card;
+            }
+
+            foreach (ModuleDefinition module in _modules.Modules)
+            {
+                card.Add(CreateModuleRow(module));
+            }
+
             return card;
+        }
+
+        private VisualElement CreateModuleRow(ModuleDefinition module)
+        {
+            VisualElement row = Row(10);
+            row.Add(new Icon("package", 20, "secondary"));
+            VisualElement text = Column(2);
+            text.Add(TextLabel(module.Name, "jtl-text"));
+            PackageInfo installed = PackageInfo.FindForAssetPath("Packages/" + module.Package);
+            bool compatible = string.IsNullOrEmpty(module.Requires) || _github.CompareVersions(InstalledVersion, module.Requires) >= 0;
+            string state = installed != null ? Context.Text("package.installedFormat", installed.version) : Context.Text("package.notInstalled");
+
+            if (compatible == false)
+            {
+                state += " · " + Context.Text("package.requiresFormat", module.Requires);
+            }
+
+            if (module.Platforms.Count > 0)
+            {
+                state += " · " + string.Join(", ", module.Platforms);
+            }
+
+            text.Add(TextLabel(state, "jtl-text--caption"));
+            row.Add(text);
+            row.Add(Spacer());
+
+            if (installed != null)
+            {
+                bool embedded = installed.source == PackageSource.Embedded || installed.source == PackageSource.Local;
+                ToolkitButton remove = new ToolkitButton { Label = Context.Text("package.remove"), Variant = ToolkitButton.GhostVariant };
+                remove.SetEnabled(embedded == false);
+                remove.clicked += () => RemoveModule(module);
+                row.Add(remove);
+                return row;
+            }
+
+            ToolkitButton install = new ToolkitButton { Label = Context.Text("package.install"), Variant = ToolkitButton.SecondaryVariant };
+            install.SetEnabled(compatible);
+            install.clicked += () => InstallModule(module);
+            row.Add(install);
+            return row;
         }
 
         private string SdkStateText(ReleaseInfo latest, bool updateAvailable)
@@ -264,11 +322,31 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                 _sdkReleases = result;
                 Finish();
             });
-            _github.Fetch(TemplateRepository, result =>
+            _catalog.Fetch(result =>
             {
-                _templateReleases = result;
+                _modules = result;
                 Finish();
             });
+        }
+
+        private void InstallModule(ModuleDefinition module)
+        {
+            ReleaseInfo latest = module.Repository == SdkRepository ? Latest(_sdkReleases) : null;
+            Client.Add(_catalog.GitUrl(module, latest == null ? "" : latest.Tag));
+            Context.Report(StatusKind.Info, "package.installing", module.Name);
+        }
+
+        private void RemoveModule(ModuleDefinition module)
+        {
+            bool confirmed = EditorUtility.DisplayDialog(module.Name, Context.Text("package.removeMessage", module.Name), Context.Text("package.remove"), Context.Text("details.cancel"));
+
+            if (confirmed == false)
+            {
+                return;
+            }
+
+            Client.Remove(module.Package);
+            Context.Report(StatusKind.Info, "package.removing", module.Name);
         }
 
         private void UpdateSdk(ReleaseInfo release)

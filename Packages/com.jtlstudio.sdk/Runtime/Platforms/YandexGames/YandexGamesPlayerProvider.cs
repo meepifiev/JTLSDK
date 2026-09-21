@@ -5,6 +5,7 @@ using JTLStudio.SDK.Providers;
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YandexGames)]
     public class YandexGamesPlayerProvider : BridgeProviderBase, IPlayerProvider
     {
         public bool IsAuthorized { get; private set; }

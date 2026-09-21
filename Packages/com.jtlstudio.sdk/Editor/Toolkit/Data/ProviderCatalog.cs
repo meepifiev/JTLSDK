@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using JTLStudio.SDK.Editor.Configuration;
 using UnityEditor;
 
 namespace JTLStudio.SDK.Editor.Toolkit.Data
@@ -14,6 +15,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
         private const string TestsMarker = ".Tests";
 
         private readonly Dictionary<Type, List<Type>> _cache = new Dictionary<Type, List<Type>>();
+        private readonly ProviderPlatformRules _platformRules = new ProviderPlatformRules();
 
         public IReadOnlyList<Type> ProvidersFor(Type providerInterface)
         {
@@ -35,6 +37,21 @@ namespace JTLStudio.SDK.Editor.Toolkit.Data
             providers.Sort((left, right) => Order(left).CompareTo(Order(right)) != 0 ? Order(left).CompareTo(Order(right)) : string.CompareOrdinal(left.Name, right.Name));
             _cache[providerInterface] = providers;
             return providers;
+        }
+
+        public IReadOnlyList<Type> ProvidersFor(Type providerInterface, PlatformId platform)
+        {
+            List<Type> available = new List<Type>();
+
+            foreach (Type type in ProvidersFor(providerInterface))
+            {
+                if (_platformRules.IsAvailable(type, platform))
+                {
+                    available.Add(type);
+                }
+            }
+
+            return available;
         }
 
         public string DisplayName(Type providerType)

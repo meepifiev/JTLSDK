@@ -6,6 +6,7 @@ using UnityEngine;
 namespace JTLStudio.SDK.YandexGames
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YandexGames)]
     public class YandexGamesPlatformProvider : BridgeProviderBase, IPlatformProvider
     {
         [SerializeField] private string _appId = "";

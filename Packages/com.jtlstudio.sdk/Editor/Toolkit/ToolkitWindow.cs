@@ -184,6 +184,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
             Register(new ModuleSection(_context, ToolkitSectionId.Gameplay, "nav.gameplay", "_gameplay"));
             Register(new ModuleSection(_context, ToolkitSectionId.Review, "nav.review", "_review"));
             Register(new ModuleSection(_context, ToolkitSectionId.Shortcut, "nav.shortcut", "_shortcut"));
+            Register(new ModuleSection(_context, ToolkitSectionId.Analytics, "nav.analytics", "_analytics"));
         }
 
         private void Register(ToolkitSection section)

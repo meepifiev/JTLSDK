@@ -85,7 +85,15 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.gameplay", "Gameplay", "Геймплей");
             Add("nav.review", "Review", "Отзыв");
             Add("nav.shortcut", "Shortcut", "Ярлык");
+            Add("nav.analytics", "Analytics", "Аналитика");
             Add("module.providers", "Providers", "Провайдеры");
+            Add("package.notInstalled", "Not installed", "Не установлен");
+            Add("package.requiresFormat", "requires JTL SDK {0}", "нужен JTL SDK {0}");
+            Add("package.modulesFailed", "Module list unavailable: {0}", "Список модулей недоступен: {0}");
+            Add("package.remove", "Remove", "Удалить");
+            Add("package.removeMessage", "Remove {0} from the project?", "Удалить {0} из проекта?");
+            Add("package.installing", "Installing {0}…", "Установка {0}…");
+            Add("package.removing", "Removing {0}…", "Удаление {0}…");
             Add("build.title", "Build", "Сборка");
             Add("build.settings", "Build settings", "Настройки сборки");
             Add("build.configuration", "Configuration", "Конфигурация");
@@ -166,6 +174,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("module.gameplay", "Gameplay", "Геймплей");
             Add("module.review", "Review", "Отзыв");
             Add("module.shortcut", "Shortcut", "Ярлык");
+            Add("module.analytics", "Analytics", "Аналитика");
             Add("topbar.noConfiguration", "No configuration", "Нет конфигурации");
             Add("topbar.packageVersion", "Package", "Пакет");
             Add("topbar.manageConfigurations", "Manage configurations", "Управлять конфигурациями");
@@ -257,7 +266,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("package.webglTemplate", "WebGL Template", "WebGL-шаблон");
             Add("package.templateInstalled", "Installed in {0}", "Установлен в {0}");
             Add("package.templateMissing", "Not installed", "Не установлен");
-            Add("package.templateNotPublished", "Template repository is not published yet", "Репозиторий шаблона ещё не опубликован");
             Add("package.noModules", "No modules published yet.", "Модули пока не опубликованы.");
         }
 

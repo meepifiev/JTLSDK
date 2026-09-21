@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - "Packages/**"
+      - "Modules/**"
       - "ProjectSettings/**"
       - ".github/workflows/tests.yml"
   pull_request:
     paths:
       - "Packages/**"
+      - "Modules/**"
       - "ProjectSettings/**"
   workflow_dispatch:
 

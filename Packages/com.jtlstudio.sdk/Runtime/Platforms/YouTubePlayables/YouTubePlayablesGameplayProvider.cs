@@ -5,6 +5,7 @@ using JTLStudio.SDK.Providers;
 namespace JTLStudio.SDK.YouTubePlayables
 {
     [Serializable]
+    [ProviderPlatforms(PlatformId.YouTubePlayables)]
     public class YouTubePlayablesGameplayProvider : BridgeProviderBase, IGameplayProvider
     {
         public void Initialize(Action<ProviderState> onInitialized)

@@ -31,6 +31,7 @@
                     <jtl:NavigationItem section="Gameplay" icon="gameplay" text-key="nav.gameplay" />
                     <jtl:NavigationItem section="Review" icon="review" text-key="nav.review" />
                     <jtl:NavigationItem section="Shortcut" icon="shortcut" text-key="nav.shortcut" />
+                    <jtl:NavigationItem section="Analytics" icon="analytics" text-key="nav.analytics" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="jtl-sidebar__footer">
