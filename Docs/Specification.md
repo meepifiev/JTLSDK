@@ -1275,8 +1275,8 @@ public static class FlagKeys
 │ Development Build [ ]   Плашка номера сборки показывается только в Development  │
 │                                                                                 │
 │ Вывод             (●) Папка  ( ) ZIP                                            │
-│ Путь              [~/Builds/SmashAndHit                          ] [Выбрать]    │
-│ Имя               [{product}_{configuration}_b{build}] → SmashAndHit_YandexGames_b43│
+│ Путь              [~/Builds/MyGame                               ] [Выбрать]    │
+│ Имя               [{product}_{configuration}_b{build}] → MyGame_YandexGames_b43     │
 │ Номер сборки      42  → следующая 43   [Изменить]                               │
 │ После сборки      [x] Открыть папку   [x] Строка в консоль                      │
 │                                                                                 │
@@ -1491,7 +1491,7 @@ Assets/WebGLTemplates/JTLSDK/
 4. `BuildPipeline.BuildPlayer` в папку `{path}/{name}`.
 5. Проверки после сборки для конфигурации: размер файлов, количество, сжатие, внешние скрипты в `index.html`.
 6. При выводе ZIP папка архивируется, папка удаляется.
-7. Строка в консоль: `JTL SDK build 43 · Yandex Games · 12.4 MB · ~/Builds/SmashAndHit/SmashAndHit_YandexGames_b43.zip`.
+7. Строка в консоль: `JTL SDK build 43 · Yandex Games · 12.4 MB · ~/Builds/MyGame/MyGame_YandexGames_b43.zip`.
 8. Открыть папку в Finder, если отмечено.
 
 Плашка `DEV · b43 · Yandex Games · v1.3.0` в углу страницы только при `Development Build`. Это HTML-элемент, в Unity-сцене её нет.
@@ -1580,7 +1580,6 @@ Assets/WebGLTemplates/JTLSDK/
 | 5 | Раздел «Сборка», плашка, zip, нумерация | сборка одной кнопкой |
 | 6 | Обновления, `modules.json`, модуль Yandex Metrica, анализатор API | пакет обновляется из тулкита |
 | 7 | CI, тесты, документация RU/EN, релиз 1.0.0 | тег `v1.0.0` |
-| 8 | Перевод IJ-SmashAndHit: замена Prime на main, слияние ветки yt | одна ветка игры |
 
 ---
 
@@ -1613,6 +1612,7 @@ Assets/WebGLTemplates/JTLSDK/
 | 21.09.2026 | Модуль - это провайдер для слота ядра, а не рантайм-регистрация. Аналитика стала слотом ядра, Yandex Metrica - первым модулем. |
 | 21.09.2026 | Модули можно держать в папке `Modules/` репозитория JTLSDK и ставить по git-ссылке с `path`. Отдельный репозиторий для модуля не обязателен. |
 | 21.09.2026 | Атрибут `[ProviderPlatforms]` ограничивает провайдер площадками. Провайдеры Яндекса и YouTube помечены им. |
+| 21.09.2026 | IJ-SmashAndHit на JTL SDK не переводится. Пункт убран из плана. |
 | 21.09.2026 | Восстановление расходуемых покупок ждёт первого обработчика `Granted`, а покупка без обработчика не списывается. Раньше покупка, восстановленная до подписки игры, списывалась без выдачи. |
 | 21.09.2026 | EditMode-тесты проходят на 2021.3.45f2, 2022.3.62f2 и 6000.3.8f1. Настройки площадки пишутся через `NamedBuildTarget`, фон превью - через `BackgroundPropertyHelper` на 2022.2+. На Unity 6 остаются предупреждения об устаревших `UxmlFactory`/`UxmlTraits`: переход на `[UxmlElement]` ломает 2021.3, поэтому он отложен до поднятия минимальной версии. |
 
