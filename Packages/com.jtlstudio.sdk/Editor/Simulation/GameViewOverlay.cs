@@ -161,7 +161,21 @@ namespace JTLStudio.SDK.Editor.Simulation
             }
             else
             {
-                _languageChoices.AddRange((Language[])Enum.GetValues(typeof(Language)));
+                JTLSDKSettings settings = Resources.Load<JTLSDKSettings>(JTLSDKSettings.ResourcePath);
+
+                if (settings != null && settings.SupportedLanguages.Count > 0)
+                {
+                    _languageChoices.AddRange(settings.SupportedLanguages);
+                }
+                else
+                {
+                    _languageChoices.AddRange((Language[])Enum.GetValues(typeof(Language)));
+                }
+
+                if (_languageChoices.Contains(current) == false && _languageChoices.Count > 0)
+                {
+                    current = _languageChoices[0];
+                }
             }
 
             List<string> names = new List<string>();

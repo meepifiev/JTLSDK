@@ -9,26 +9,8 @@ namespace JTLStudio.SDK.Editor.Simulation
 
         static SimulationBootstrap()
         {
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-
-            if (EditorApplication.isPlayingOrWillChangePlaymode && EditorApplication.isPlaying)
-            {
-                StartSession();
-            }
-        }
-
-        private static void OnPlayModeStateChanged(PlayModeStateChange change)
-        {
-            switch (change)
-            {
-                case PlayModeStateChange.EnteredPlayMode:
-                    StartSession();
-                    break;
-
-                case PlayModeStateChange.ExitingPlayMode:
-                    StopSession();
-                    break;
-            }
+            EditorApplication.delayCall += StartSession;
+            AssemblyReloadEvents.beforeAssemblyReload += StopSession;
         }
 
         private static void StartSession()
