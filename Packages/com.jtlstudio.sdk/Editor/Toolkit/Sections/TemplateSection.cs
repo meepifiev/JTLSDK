@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using JTLStudio.SDK.Editor.Configuration;
 using JTLStudio.SDK.Editor.Toolkit.Components;
@@ -11,17 +12,28 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
     public class TemplateSection : ToolkitSection
     {
         private const int LabelWidth = FieldRow.DefaultLabelWidth;
+        private const int ControlWidth = 240;
+        private const int SwatchWidth = 160;
+        private const int NumberWidth = 96;
         private const int PreviewWidth = 400;
+        private const int PreviewPadding = 34;
+        private const int MobilePreviewWidth = 240;
         private const int DesktopPreviewHeight = 250;
-        private const int MobilePreviewHeight = 520;
+        private const int MobilePreviewHeight = 460;
         private const int ColumnGap = 12;
-        private const int NumberWidth = 90;
-        private const int CompactNumberWidth = 72;
         private const int MinimumSettingsWidth = 440;
+        private const int GradientResolution = 160;
+        private const float PreviewScale = 0.5f;
 
         private readonly TemplateService _template = new TemplateService();
         private bool _mobilePreview;
         private float _previewProgress = 0.55f;
+        private Texture2D _gradient;
+        private VisualElement _frame;
+        private VisualElement _logo;
+        private VisualElement _track;
+        private VisualElement _fill;
+        private Label _loadingText;
 
         public TemplateSection(ToolkitContext context) : base(context)
         {
@@ -34,6 +46,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         protected override string TemplateName => "TemplateSection";
 
         private JTLSDKEditorSettings Settings => JTLSDKEditorSettings.instance;
+
+        private int FrameWidth => _mobilePreview ? MobilePreviewWidth : PreviewWidth;
+
+        private int FrameHeight => _mobilePreview ? MobilePreviewHeight : DesktopPreviewHeight;
 
         protected override void OnRendered()
         {
@@ -50,22 +66,24 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             }
 
             VisualElement body = Require<VisualElement>("template-body");
-            VisualElement left = Column(12);
-            left.AddToClassList("jtl-basis");
-            left.style.minWidth = 0;
-            left.Add(CreateLogoCard());
-            left.Add(CreateLoaderCard());
-            left.Add(CreateBackgroundCard("template.pageBackground", Settings.PageBackground));
-            left.Add(CreateCanvasCard());
-            body.Add(left);
+            VisualElement settings = Column(12);
+            settings.AddToClassList("jtl-basis");
+            settings.style.minWidth = 0;
+            settings.Add(CreateLogoCard());
+            settings.Add(CreateBackgroundCard("template.loadingScreen", Settings.LoaderBackground));
+            settings.Add(CreateProgressCard());
+            settings.Add(CreateBackgroundCard("template.pageBackground", Settings.PageBackground));
+            settings.Add(CreateCanvasCard());
+            body.Add(settings);
             VisualElement preview = CreatePreviewCard();
             body.Add(preview);
-            body.RegisterCallback<GeometryChangedEvent>(geometryEvent => ArrangeColumns(body, left, preview));
+            body.RegisterCallback<GeometryChangedEvent>(geometryEvent => ArrangeColumns(body, settings, preview));
+            RefreshPreview();
         }
 
         private void ArrangeColumns(VisualElement body, VisualElement settings, VisualElement preview)
         {
-            bool stacked = body.resolvedStyle.width < MinimumSettingsWidth + ColumnGap + PreviewWidth + 34;
+            bool stacked = body.resolvedStyle.width < MinimumSettingsWidth + ColumnGap + PreviewWidth + PreviewPadding;
             FlexDirection direction = stacked ? FlexDirection.Column : FlexDirection.Row;
 
             if (body.resolvedStyle.flexDirection == direction)
@@ -79,67 +97,41 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             settings.style.alignSelf = stacked ? Align.Stretch : Align.Auto;
             preview.style.marginLeft = stacked ? 0 : ColumnGap;
             preview.style.marginTop = stacked ? ColumnGap : 0;
-            preview.style.alignSelf = Align.FlexStart;
         }
 
         private VisualElement CreateLogoCard()
         {
             Card card = new Card { TitleKey = "template.logo" };
-            card.Add(Field("template.logoFile", TextureInput(Settings.Logo, texture => Settings.Logo = texture)));
-            card.Add(Field("template.logoSize", IntegerInput(Settings.LogoSize, "unit.px", value => Settings.LogoSize = value)));
-            return card;
-        }
+            card.Add(Field("template.logoSource", Segments("template.logoModes", (int)Settings.LogoMode, index => Rebuild(() => Settings.LogoMode = (LogoMode)index))));
 
-        private VisualElement CreateLoaderCard()
-        {
-            Card card = new Card { TitleKey = "template.loadingScreen" };
-            AddBackgroundFields(card, Settings.LoaderBackground);
-            card.Add(Field("template.progressFill", ColorInput(Settings.ProgressFill, color => Settings.ProgressFill = color)));
-            card.Add(Field("template.progressTrack", ColorInput(Settings.ProgressTrack, color => Settings.ProgressTrack = color)));
+            if (Settings.LogoMode == LogoMode.Custom)
+            {
+                card.Add(Field("template.logoFile", TextureInput(Settings.Logo, texture => Settings.Logo = texture)));
+            }
 
-            VisualElement size = Row(8);
-            size.style.flexWrap = Wrap.Wrap;
-            size.Add(IntegerInput(Settings.ProgressWidthPercent, "unit.percent", value => Settings.ProgressWidthPercent = value, CompactNumberWidth));
-            size.Add(IntegerInput(Settings.ProgressHeight, "unit.px", value => Settings.ProgressHeight = value, CompactNumberWidth));
-            size.Add(IntegerInput(Settings.ProgressRadius, "unit.px", value => Settings.ProgressRadius = value, CompactNumberWidth));
-            card.Add(Field("template.progressSize", size));
+            if (Settings.LogoMode != LogoMode.None)
+            {
+                card.Add(Field("template.logoSize", IntegerInput(() => Settings.LogoSize, value => Settings.LogoSize = value, "unit.px")));
+            }
 
-            RadioGroup position = new RadioGroup();
-            position.SetChoices(Context.Localization.GetList("template.positions"));
-            position.Index = Settings.ProgressAtBottom ? 1 : 0;
-            position.IndexChanged += index => Change(() => Settings.ProgressAtBottom = index == 1);
-            card.Add(Field("template.progressPosition", position));
-            card.Add(Field("template.loadingText", TextInput(Settings.LoadingText, value => Settings.LoadingText = value)));
             return card;
         }
 
         private VisualElement CreateBackgroundCard(string titleKey, TemplateBackground background)
         {
             Card card = new Card { TitleKey = titleKey };
-            AddBackgroundFields(card, background);
-            return card;
-        }
-
-        private void AddBackgroundFields(Card card, TemplateBackground background)
-        {
-            RadioGroup kind = new RadioGroup();
-            kind.SetChoices(Context.Localization.GetList("template.backgroundKinds"));
-            kind.Index = (int)background.Kind;
-            kind.IndexChanged += index => Change(() => background.Kind = (BackgroundKind)index);
-            card.Add(Field("template.background", kind));
+            card.Add(Field("template.background", Segments("template.backgroundKinds", (int)background.Kind, index => Rebuild(() => background.Kind = (BackgroundKind)index))));
 
             switch (background.Kind)
             {
                 case BackgroundKind.Gradient:
                     card.Add(Field("template.gradientFrom", ColorInput(background.GradientFrom, color => background.GradientFrom = color)));
                     card.Add(Field("template.gradientTo", ColorInput(background.GradientTo, color => background.GradientTo = color)));
-                    SwitchToggle radial = new SwitchToggle(background.Radial);
-                    radial.ValueChanged += value => Change(() => background.Radial = value);
-                    card.Add(Field("template.radial", radial));
+                    card.Add(Field("template.gradientShape", Segments("template.gradientShapes", background.Radial ? 1 : 0, index => Rebuild(() => background.Radial = index == 1))));
 
                     if (background.Radial == false)
                     {
-                        card.Add(Field("template.angle", IntegerInput(background.Angle, "unit.deg", value => background.Angle = value)));
+                        card.Add(Field("template.angle", IntegerInput(() => background.Angle, value => background.Angle = value, "unit.deg")));
                     }
 
                     break;
@@ -153,53 +145,69 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
                     card.Add(Field("template.backgroundColor", ColorInput(background.Color, color => background.Color = color)));
                     break;
             }
+
+            return card;
+        }
+
+        private VisualElement CreateProgressCard()
+        {
+            Card card = new Card { TitleKey = "template.progressBar" };
+            card.Add(Field("template.fill", ColorInput(Settings.ProgressFill, color => Settings.ProgressFill = color)));
+            card.Add(Field("template.track", ColorInput(Settings.ProgressTrack, color => Settings.ProgressTrack = color)));
+            card.Add(Field("template.progressWidth", IntegerInput(() => Settings.ProgressWidthPercent, value => Settings.ProgressWidthPercent = value, "unit.percent")));
+            card.Add(Field("template.progressHeight", IntegerInput(() => Settings.ProgressHeight, value => Settings.ProgressHeight = value, "unit.px")));
+            card.Add(Field("template.progressRadius", IntegerInput(() => Settings.ProgressRadius, value => Settings.ProgressRadius = value, "unit.px")));
+            card.Add(Field("template.progressPosition", Segments("template.positions", Settings.ProgressAtBottom ? 1 : 0, index => Update(() => Settings.ProgressAtBottom = index == 1))));
+            card.Add(Field("template.loadingText", TextInput(Settings.LoadingText, value => Settings.LoadingText = value)));
+            return card;
         }
 
         private VisualElement CreateCanvasCard()
         {
             Card card = new Card { TitleKey = "template.canvas" };
-            SwitchToggle fixedAspect = new SwitchToggle(Settings.FixedAspect);
-            fixedAspect.ValueChanged += value => Change(() => Settings.FixedAspect = value);
-            card.Add(Field("template.fixedAspect", fixedAspect));
+            card.Add(Field("template.fixedAspect", Switch(Settings.FixedAspect, value => Rebuild(() => Settings.FixedAspect = value))));
 
             if (Settings.FixedAspect)
             {
                 TextField ratio = TextInput(Settings.AspectRatio, value => Settings.AspectRatio = value);
-                ratio.style.width = 110;
-                ratio.style.flexGrow = 0;
+                ratio.style.maxWidth = NumberWidth;
                 card.Add(Field("template.aspectRatio", ratio));
-                SwitchToggle mobile = new SwitchToggle(Settings.FreeAspectOnMobile);
-                mobile.ValueChanged += value => Change(() => Settings.FreeAspectOnMobile = value);
-                card.Add(Field("template.freeOnMobile", mobile));
+                card.Add(Field("template.freeOnMobile", Switch(Settings.FreeAspectOnMobile, value => Update(() => Settings.FreeAspectOnMobile = value))));
             }
 
-            card.Add(Field("template.pixelRatioDesktop", PixelRatioInput(Settings.DesktopPixelRatioMode, Settings.DesktopPixelRatio, mode => Settings.DesktopPixelRatioMode = mode, value => Settings.DesktopPixelRatio = value)));
-            card.Add(Field("template.pixelRatioMobile", PixelRatioInput(Settings.MobilePixelRatioMode, Settings.MobilePixelRatio, mode => Settings.MobilePixelRatioMode = mode, value => Settings.MobilePixelRatio = value)));
-            SwitchToggle fullscreen = new SwitchToggle(Settings.FullscreenButton);
-            fullscreen.ValueChanged += value => Change(() => Settings.FullscreenButton = value);
-            card.Add(Field("template.fullscreenButton", fullscreen));
+            card.Add(Field("template.pixelRatioDesktop", PixelRatioInput(Settings.DesktopPixelRatioMode, () => Settings.DesktopPixelRatio, mode => Settings.DesktopPixelRatioMode = mode, value => Settings.DesktopPixelRatio = value)));
+            card.Add(Field("template.pixelRatioMobile", PixelRatioInput(Settings.MobilePixelRatioMode, () => Settings.MobilePixelRatio, mode => Settings.MobilePixelRatioMode = mode, value => Settings.MobilePixelRatio = value)));
+            card.Add(Field("template.fullscreenButton", Switch(Settings.FullscreenButton, value => Update(() => Settings.FullscreenButton = value))));
             return card;
         }
 
-        private VisualElement PixelRatioInput(PixelRatioMode mode, float value, Action<PixelRatioMode> assignMode, Action<float> assignValue)
+        private VisualElement PixelRatioInput(PixelRatioMode mode, Func<float> read, Action<PixelRatioMode> assignMode, Action<float> assignValue)
         {
             VisualElement row = Row(8);
+            row.style.flexGrow = 1;
+            row.style.minWidth = 0;
             Dropdown modes = new Dropdown();
-            modes.style.width = 170;
-            modes.choices = new System.Collections.Generic.List<string>(Context.Localization.GetList("template.pixelRatioModes"));
+            modes.style.width = 180;
+            modes.style.flexShrink = 1;
+            modes.style.minWidth = 0;
+            modes.choices = new List<string>(Context.Localization.GetList("template.pixelRatioModes"));
             modes.index = (int)mode;
-            modes.RegisterValueChangedCallback(_ => Change(() => assignMode((PixelRatioMode)modes.index)));
+            modes.RegisterValueChangedCallback(changeEvent => Rebuild(() => assignMode((PixelRatioMode)modes.index)));
             row.Add(modes);
 
             if (mode != PixelRatioMode.Auto)
             {
-                NumberFieldWithUnit number = new NumberFieldWithUnit { Width = 80 };
-                number.Value = value.ToString("0.##", CultureInfo.InvariantCulture);
+                NumberFieldWithUnit number = new NumberFieldWithUnit { Width = 72 };
+                number.Value = read().ToString("0.##", CultureInfo.InvariantCulture);
                 number.Input.RegisterCallback<FocusOutEvent>(focusEvent =>
                 {
-                    if (float.TryParse(number.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsed))
+                    bool valid = float.TryParse(number.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsed);
+                    number.Error = valid == false;
+
+                    if (valid)
                     {
-                        Change(() => assignValue(parsed));
+                        Update(() => assignValue(parsed));
+                        number.Value = read().ToString("0.##", CultureInfo.InvariantCulture);
                     }
                 });
                 row.Add(number);
@@ -211,8 +219,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
         private VisualElement CreatePreviewCard()
         {
             Card card = new Card { TitleKey = "template.preview" };
-            card.style.width = PreviewWidth + 34;
+            card.style.width = PreviewWidth + PreviewPadding;
             card.style.flexShrink = 0;
+            card.style.alignSelf = Align.FlexStart;
             card.style.marginLeft = ColumnGap;
 
             SegmentedControl device = new SegmentedControl();
@@ -225,80 +234,131 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             };
             card.Header.Add(device);
 
-            VisualElement frame = new VisualElement();
-            frame.AddToClassList("jtl-template-preview");
-            int width = _mobilePreview ? 240 : PreviewWidth;
-            frame.style.width = width;
-            frame.style.height = _mobilePreview ? MobilePreviewHeight : DesktopPreviewHeight;
-            frame.style.alignSelf = Align.Center;
-            frame.style.backgroundColor = PreviewColor(Settings.LoaderBackground);
+            _frame = new VisualElement();
+            _frame.AddToClassList("jtl-template-preview");
+            _frame.style.width = FrameWidth;
+            _frame.style.height = FrameHeight;
+            _frame.style.alignSelf = Align.Center;
 
-            if (Settings.LoaderBackground.Kind == BackgroundKind.Image && Settings.LoaderBackground.Image != null)
-            {
-                frame.style.backgroundImage = Settings.LoaderBackground.Image;
-                SetScaleMode(frame, ScaleMode.ScaleAndCrop);
-            }
+            _logo = new VisualElement();
+            SetScaleMode(_logo, ScaleMode.ScaleToFit);
+            _frame.Add(_logo);
 
-            VisualElement logo = new VisualElement();
-            float logoWidth = Mathf.Min(Settings.LogoSize, width * 0.6f);
-            logo.style.width = logoWidth;
-            logo.style.height = Settings.Logo == null ? logoWidth * 0.5f : logoWidth * Settings.Logo.height / Mathf.Max(1f, Settings.Logo.width);
-            SetScaleMode(logo, ScaleMode.ScaleToFit);
+            _track = new VisualElement();
+            _track.AddToClassList("jtl-template-preview__track");
+            _fill = new VisualElement();
+            _fill.style.height = Length.Percent(100);
+            _track.Add(_fill);
+            _frame.Add(_track);
 
-            if (Settings.Logo != null)
-            {
-                logo.style.backgroundImage = Settings.Logo;
-            }
-            else
-            {
-                logo.AddToClassList("jtl-template-preview__logo-placeholder");
-            }
-
-            frame.Add(logo);
-
-            VisualElement track = new VisualElement();
-            track.style.width = Length.Percent(Settings.ProgressWidthPercent);
-            track.style.height = Settings.ProgressHeight;
-            track.style.backgroundColor = Settings.ProgressTrack;
-            SetRadius(track, Settings.ProgressRadius);
-            track.style.marginTop = 16;
-
-            if (Settings.ProgressAtBottom)
-            {
-                track.style.position = Position.Absolute;
-                track.style.bottom = 24;
-            }
-
-            VisualElement fill = new VisualElement();
-            fill.style.width = Length.Percent(_previewProgress * 100f);
-            fill.style.height = Length.Percent(100);
-            fill.style.backgroundColor = Settings.ProgressFill;
-            SetRadius(fill, Settings.ProgressRadius);
-            track.Add(fill);
-            frame.Add(track);
-
-            if (string.IsNullOrEmpty(Settings.LoadingText) == false)
-            {
-                Label text = TextLabel(Settings.LoadingText, "jtl-text");
-                text.style.marginTop = 10;
-                frame.Add(text);
-            }
-
-            card.Add(frame);
+            _loadingText = TextLabel("", "jtl-text");
+            _loadingText.style.marginTop = 10;
+            _frame.Add(_loadingText);
+            card.Add(_frame);
 
             Slider progress = new Slider(0f, 1f) { value = _previewProgress };
+            progress.style.flexGrow = 1;
             progress.RegisterValueChangedCallback(changeEvent =>
             {
                 _previewProgress = changeEvent.newValue;
-                fill.style.width = Length.Percent(_previewProgress * 100f);
+                _fill.style.width = Length.Percent(_previewProgress * 100f);
             });
-            card.Add(Field("template.progress", progress));
+            FieldRow progressRow = new FieldRow("template.progress", 96);
+            progressRow.Add(progress);
+            card.Add(progressRow);
             return card;
         }
 
-        private Color PreviewColor(TemplateBackground background)
+        private void RefreshPreview()
         {
-            return background.Kind == BackgroundKind.Gradient ? Color.Lerp(background.GradientFrom, background.GradientTo, 0.5f) : background.Color;
+            if (_frame == null)
+            {
+                return;
+            }
+
+            ApplyBackground(_frame, Settings.LoaderBackground, FrameWidth, FrameHeight);
+
+            Texture2D logo = _template.LogoTexture(Settings);
+            _logo.style.display = Settings.LogoMode == LogoMode.None ? DisplayStyle.None : DisplayStyle.Flex;
+            float logoWidth = Mathf.Min(Settings.LogoSize * PreviewScale, FrameWidth * 0.6f);
+            _logo.style.width = logoWidth;
+            _logo.style.height = logo == null ? logoWidth * 0.5f : logoWidth * logo.height / Mathf.Max(1f, logo.width);
+            _logo.style.backgroundImage = logo;
+            _logo.EnableInClassList("jtl-template-preview__logo-placeholder", logo == null);
+
+            _track.style.width = Length.Percent(Settings.ProgressWidthPercent);
+            _track.style.height = Mathf.Max(1, Settings.ProgressHeight);
+            _track.style.backgroundColor = Settings.ProgressTrack;
+            _track.style.position = Settings.ProgressAtBottom ? Position.Absolute : Position.Relative;
+            _track.style.bottom = Settings.ProgressAtBottom ? new StyleLength(24f) : new StyleLength(StyleKeyword.Auto);
+            _track.style.marginTop = Settings.ProgressAtBottom ? 0 : 16;
+            SetRadius(_track, Settings.ProgressRadius);
+            _fill.style.width = Length.Percent(_previewProgress * 100f);
+            _fill.style.backgroundColor = Settings.ProgressFill;
+            SetRadius(_fill, Settings.ProgressRadius);
+
+            _loadingText.text = Settings.LoadingText;
+            _loadingText.style.display = string.IsNullOrEmpty(Settings.LoadingText) ? DisplayStyle.None : DisplayStyle.Flex;
+        }
+
+        private void ApplyBackground(VisualElement target, TemplateBackground background, int width, int height)
+        {
+            target.style.backgroundColor = background.Color;
+            target.style.backgroundImage = StyleKeyword.None;
+
+            if (background.Kind == BackgroundKind.Gradient)
+            {
+                target.style.backgroundImage = GradientTexture(background, width, height);
+                SetScaleMode(target, ScaleMode.StretchToFill);
+                return;
+            }
+
+            if (background.Kind == BackgroundKind.Image && background.Image != null)
+            {
+                target.style.backgroundImage = background.Image;
+                SetScaleMode(target, ScaleMode.ScaleAndCrop);
+            }
+        }
+
+        private Texture2D GradientTexture(TemplateBackground background, int width, int height)
+        {
+            int textureWidth = GradientResolution;
+            int textureHeight = Mathf.Max(1, Mathf.RoundToInt(GradientResolution * height / (float)Mathf.Max(1, width)));
+
+            if (_gradient == null || _gradient.width != textureWidth || _gradient.height != textureHeight)
+            {
+                if (_gradient != null)
+                {
+                    UnityEngine.Object.DestroyImmediate(_gradient);
+                }
+
+                _gradient = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false)
+                {
+                    wrapMode = TextureWrapMode.Clamp,
+                    filterMode = FilterMode.Bilinear,
+                    hideFlags = HideFlags.HideAndDontSave
+                };
+            }
+
+            float radians = background.Angle * Mathf.Deg2Rad;
+            Vector2 direction = new Vector2(Mathf.Sin(radians), Mathf.Cos(radians));
+            float halfLength = Mathf.Max(0.0001f, (Mathf.Abs(textureWidth * direction.x) + Mathf.Abs(textureHeight * direction.y)) * 0.5f);
+            float radius = Mathf.Max(0.0001f, Mathf.Sqrt(textureWidth * textureWidth + textureHeight * textureHeight) * 0.5f);
+            Color[] pixels = new Color[textureWidth * textureHeight];
+
+            for (int y = 0; y < textureHeight; y++)
+            {
+                for (int x = 0; x < textureWidth; x++)
+                {
+                    Vector2 point = new Vector2(x + 0.5f - textureWidth * 0.5f, y + 0.5f - textureHeight * 0.5f);
+                    float position = background.Radial ? point.magnitude / radius : (Vector2.Dot(point, direction) / halfLength + 1f) * 0.5f;
+                    pixels[y * textureWidth + x] = Color.Lerp(background.GradientFrom, background.GradientTo, Mathf.Clamp01(position));
+                }
+            }
+
+            _gradient.SetPixels(pixels);
+            _gradient.Apply(false);
+            return _gradient;
         }
 
         private void SetScaleMode(VisualElement element, ScaleMode mode)
@@ -328,47 +388,55 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             return row;
         }
 
+        private SegmentedControl Segments(string choicesKey, int index, Action<int> onChanged)
+        {
+            SegmentedControl control = new SegmentedControl();
+            control.SetChoices(Context.Localization.GetList(choicesKey));
+            control.Index = index;
+            control.IndexChanged += onChanged;
+            return control;
+        }
+
+        private SwitchToggle Switch(bool value, Action<bool> onChanged)
+        {
+            SwitchToggle toggle = new SwitchToggle(value);
+            toggle.ValueChanged += onChanged;
+            return toggle;
+        }
+
         private ObjectField TextureInput(Texture2D value, Action<Texture2D> assign)
         {
             ObjectField field = new ObjectField { objectType = typeof(Texture2D), allowSceneObjects = false, value = value };
             field.AddToClassList("jtl-object-field");
-            field.style.maxWidth = 240;
+            field.style.maxWidth = ControlWidth;
             field.style.flexGrow = 1;
             field.style.flexShrink = 1;
             field.style.minWidth = 0;
-            field.RegisterValueChangedCallback(changeEvent => Change(() => assign(changeEvent.newValue as Texture2D)));
+            field.RegisterValueChangedCallback(changeEvent => Update(() => assign(changeEvent.newValue as Texture2D)));
             return field;
         }
 
-        private ColorField ColorInput(Color value, Action<Color> assign)
+        private ColorSwatchField ColorInput(Color value, Action<Color> assign)
         {
-            ColorField field = new ColorField { value = value, showAlpha = false };
-            field.AddToClassList("jtl-color-field");
-            field.style.maxWidth = 160;
-            field.style.flexGrow = 1;
-            field.style.flexShrink = 1;
-            field.style.minWidth = 0;
-            field.RegisterCallback<FocusOutEvent>(focusEvent => Change(() => assign(field.value)));
-            field.RegisterValueChangedCallback(changeEvent =>
-            {
-                assign(changeEvent.newValue);
-                Settings.Persist();
-            });
+            ColorSwatchField field = new ColorSwatchField { Value = value };
+            field.style.width = SwatchWidth;
+            field.ValueChanged += color => Update(() => assign(color));
             return field;
         }
 
-        private NumberFieldWithUnit IntegerInput(int value, string unitKey, Action<int> assign, int width = NumberWidth)
+        private NumberFieldWithUnit IntegerInput(Func<int> read, Action<int> assign, string unitKey)
         {
-            NumberFieldWithUnit field = new NumberFieldWithUnit { UnitKey = unitKey, Width = width };
-            field.Value = value.ToString(CultureInfo.InvariantCulture);
+            NumberFieldWithUnit field = new NumberFieldWithUnit { UnitKey = unitKey, Width = NumberWidth };
+            field.Value = read().ToString(CultureInfo.InvariantCulture);
             field.Input.RegisterCallback<FocusOutEvent>(focusEvent =>
             {
                 bool valid = int.TryParse(field.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed);
                 field.Error = valid == false;
 
-                if (valid && parsed != value)
+                if (valid)
                 {
-                    Change(() => assign(parsed));
+                    Update(() => assign(parsed));
+                    field.Value = read().ToString(CultureInfo.InvariantCulture);
                 }
             });
             return field;
@@ -380,13 +448,8 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             field.AddToClassList("jtl-field");
             field.AddToClassList("jtl-grow");
             field.style.minWidth = 0;
-            field.RegisterCallback<FocusOutEvent>(focusEvent =>
-            {
-                if (field.value != value)
-                {
-                    Change(() => assign(field.value));
-                }
-            });
+            field.style.maxWidth = ControlWidth;
+            field.RegisterCallback<FocusOutEvent>(focusEvent => Update(() => assign(field.value)));
             return field;
         }
 
@@ -397,7 +460,14 @@ namespace JTLStudio.SDK.Editor.Toolkit.Sections
             Render();
         }
 
-        private void Change(Action change)
+        private void Update(Action change)
+        {
+            change();
+            Settings.Persist();
+            RefreshPreview();
+        }
+
+        private void Rebuild(Action change)
         {
             change();
             Settings.Persist();

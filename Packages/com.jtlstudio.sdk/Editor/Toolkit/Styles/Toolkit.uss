@@ -388,8 +388,43 @@
     border-bottom-right-radius: var(--jtl-radius-field);
 }
 
-.jtl-object-field,
-.jtl-color-field {
+.jtl-root .jtl-object-field {
     margin: 0;
     height: 28px;
+}
+
+.jtl-root .jtl-object-field > .unity-object-field__input {
+    height: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0 0 0 8px;
+    border-width: 1px;
+    border-color: var(--jtl-border);
+    border-radius: 6px;
+    background-color: var(--jtl-field-bg);
+}
+
+.jtl-root .jtl-object-field > .unity-object-field__input:hover {
+    border-color: var(--jtl-border-strong);
+}
+
+.jtl-root .jtl-object-field .unity-object-field-display__label {
+    font-size: 13px;
+    color: var(--jtl-text);
+    margin-left: 4px;
+}
+
+.jtl-root .jtl-object-field .unity-object-field__selector {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    border-width: 0;
+    border-left-width: 1px;
+    border-left-color: var(--jtl-border);
+    border-radius: 0;
+    background-color: transparent;
+}
+
+.jtl-root .jtl-template-preview__track {
+    overflow: hidden;
 }

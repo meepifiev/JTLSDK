@@ -130,6 +130,16 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("template.reinstall", "Reinstall", "Переустановить");
             Add("template.installedTo", "Template installed to {0}.", "Шаблон установлен в {0}.");
             Add("template.logo", "Logo", "Логотип");
+            Add("template.logoSource", "Source", "Источник");
+            Add("template.logoModes", "JTL SDK|Custom|None", "JTL SDK|Свой|Без логотипа");
+            Add("template.gradientShape", "Shape", "Форма");
+            Add("template.gradientShapes", "Linear|Radial", "Линейный|Радиальный");
+            Add("template.progressBar", "Progress bar", "Прогресс-бар");
+            Add("template.fill", "Fill", "Заполнение");
+            Add("template.track", "Track", "Фон полосы");
+            Add("template.progressWidth", "Width", "Ширина");
+            Add("template.progressHeight", "Height", "Высота");
+            Add("template.progressRadius", "Corner radius", "Скругление");
             Add("template.logoFile", "Image", "Картинка");
             Add("template.logoSize", "Width", "Ширина");
             Add("template.loadingScreen", "Loading screen", "Экран загрузки");

@@ -1,3 +1,5 @@
+using System;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -5,8 +7,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
 {
     public class ColorSwatchField : VisualElement
     {
-        public const int DefaultWidth = 120;
+        public const int DefaultWidth = 140;
         private const string ClassName = "jtl-swatch";
+        private const string HexPrefix = "#";
 
         public new class UxmlFactory : UxmlFactory<ColorSwatchField, UxmlTraits>
         {
@@ -26,33 +29,91 @@ namespace JTLStudio.SDK.Editor.Toolkit.Components
             }
         }
 
-        private readonly VisualElement _swatch = new VisualElement();
-        private readonly Label _hex = new Label();
-        private string _value;
+        private readonly ColorField _picker = new ColorField { showAlpha = false, showEyeDropper = false };
+        private readonly TextField _hex = new TextField { maxLength = 7 };
 
         public ColorSwatchField()
         {
             AddToClassList(ClassName);
             AddToClassList("jtl-field-box");
-            _swatch.AddToClassList("jtl-swatch__color");
+            style.width = DefaultWidth;
+            _picker.AddToClassList("jtl-swatch__color");
             _hex.AddToClassList("jtl-swatch__hex");
-            Add(_swatch);
+            Add(_picker);
             Add(_hex);
+            _picker.RegisterValueChangedCallback(OnPickerChanged);
+            _hex.RegisterCallback<FocusOutEvent>(focusEvent => CommitHex());
+            _hex.RegisterCallback<KeyDownEvent>(OnHexKeyDown);
+        }
+
+        public event Action<Color> ValueChanged;
+
+        public Color Value
+        {
+            get => _picker.value;
+            set
+            {
+                Color opaque = new Color(value.r, value.g, value.b, 1f);
+                _picker.SetValueWithoutNotify(opaque);
+                _hex.SetValueWithoutNotify(ToHex(opaque));
+            }
         }
 
         public string Hex
         {
-            get => _value;
+            get => ToHex(Value);
             set
             {
-                _value = value;
-                _hex.text = value;
-
                 if (ColorUtility.TryParseHtmlString(value, out Color color))
                 {
-                    _swatch.style.backgroundColor = color;
+                    Value = color;
                 }
             }
+        }
+
+        private void OnPickerChanged(ChangeEvent<Color> changeEvent)
+        {
+            _hex.SetValueWithoutNotify(ToHex(changeEvent.newValue));
+            ValueChanged?.Invoke(changeEvent.newValue);
+        }
+
+        private void OnHexKeyDown(KeyDownEvent keyEvent)
+        {
+            if (keyEvent.keyCode == KeyCode.Return || keyEvent.keyCode == KeyCode.KeypadEnter)
+            {
+                CommitHex();
+            }
+        }
+
+        private void CommitHex()
+        {
+            string text = _hex.value.Trim();
+
+            if (text.StartsWith(HexPrefix) == false)
+            {
+                text = HexPrefix + text;
+            }
+
+            if (ColorUtility.TryParseHtmlString(text, out Color color) == false)
+            {
+                _hex.SetValueWithoutNotify(ToHex(_picker.value));
+                return;
+            }
+
+            color.a = 1f;
+
+            if (color == _picker.value)
+            {
+                _hex.SetValueWithoutNotify(ToHex(color));
+                return;
+            }
+
+            _picker.value = color;
+        }
+
+        private string ToHex(Color color)
+        {
+            return HexPrefix + ColorUtility.ToHtmlStringRGB(color);
         }
     }
 }

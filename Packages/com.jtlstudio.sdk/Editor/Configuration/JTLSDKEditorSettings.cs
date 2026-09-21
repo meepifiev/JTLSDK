@@ -6,15 +6,16 @@ namespace JTLStudio.SDK.Editor.Configuration
     [FilePath("ProjectSettings/JTLSDKEditorSettings.asset", FilePathAttribute.Location.ProjectFolder)]
     public class JTLSDKEditorSettings : ScriptableSingleton<JTLSDKEditorSettings>
     {
+        [SerializeField] private LogoMode _logoMode = LogoMode.Default;
         [SerializeField] private Texture2D _logo;
         [SerializeField] private int _logoSize = 160;
-        [SerializeField] private TemplateBackground _loaderBackground = new TemplateBackground();
-        [SerializeField] private TemplateBackground _pageBackground = new TemplateBackground { Kind = BackgroundKind.Color, Color = new Color(0.055f, 0.055f, 0.063f) };
-        [SerializeField] private Color _progressFill = Color.white;
-        [SerializeField] private Color _progressTrack = new Color(0.2f, 0.2f, 0.2f);
+        [SerializeField] private TemplateBackground _loaderBackground = new TemplateBackground { Kind = BackgroundKind.Gradient, Radial = true, GradientFrom = new Color(0.063f, 0.133f, 0.247f), GradientTo = new Color(0.024f, 0.031f, 0.051f) };
+        [SerializeField] private TemplateBackground _pageBackground = new TemplateBackground { Kind = BackgroundKind.Color, Color = new Color(0.024f, 0.031f, 0.051f) };
+        [SerializeField] private Color _progressFill = new Color(0.184f, 0.549f, 1f);
+        [SerializeField] private Color _progressTrack = new Color(0.106f, 0.141f, 0.2f);
         [SerializeField] private int _progressWidthPercent = 40;
-        [SerializeField] private int _progressHeight = 8;
-        [SerializeField] private int _progressRadius;
+        [SerializeField] private int _progressHeight = 6;
+        [SerializeField] private int _progressRadius = 3;
         [SerializeField] private bool _progressAtBottom;
         [SerializeField] private string _loadingText = "";
         [SerializeField] private bool _fixedAspect;
@@ -32,6 +33,7 @@ namespace JTLStudio.SDK.Editor.Configuration
         [SerializeField] private bool _developmentBuild;
         [SerializeField] private bool _openFolderAfterBuild = true;
 
+        public LogoMode LogoMode { get => _logoMode; set => _logoMode = value; }
         public Texture2D Logo { get => _logo; set => _logo = value; }
         public int LogoSize { get => _logoSize; set => _logoSize = Mathf.Max(16, value); }
         public TemplateBackground LoaderBackground => _loaderBackground;

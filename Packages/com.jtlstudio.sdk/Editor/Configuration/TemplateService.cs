@@ -17,6 +17,8 @@ namespace JTLStudio.SDK.Editor.Configuration
 
         private const string PackagePath = "Packages/com.jtlstudio.sdk";
         private const string PackageTemplateFolder = "Editor/Template~/JTLSDK";
+        public const string DefaultLogoPath = "Packages/com.jtlstudio.sdk/Editor/Toolkit/Icons/Brand/jtlsdk-template-logo.png";
+
         private const string LogoFile = "logo.png";
         private const string LoaderBackgroundFile = "loader-background.png";
         private const string PageBackgroundFile = "page-background.png";
@@ -55,7 +57,7 @@ namespace JTLStudio.SDK.Editor.Configuration
             PlayerSettings.WebGL.template = TemplateSetting;
             RegisterVariables();
             string dataFolder = Path.Combine(TemplateFolder, "TemplateData");
-            bool hasLogo = CopyTexture(settings.Logo, Path.Combine(dataFolder, LogoFile));
+            bool hasLogo = CopyTexture(LogoTexture(settings), Path.Combine(dataFolder, LogoFile));
             CopyTexture(settings.LoaderBackground.Image, Path.Combine(dataFolder, LoaderBackgroundFile));
             CopyTexture(settings.PageBackground.Image, Path.Combine(dataFolder, PageBackgroundFile));
 
@@ -189,6 +191,23 @@ namespace JTLStudio.SDK.Editor.Configuration
             }
         }
 
+        public Texture2D DefaultLogo => AssetDatabase.LoadAssetAtPath<Texture2D>(DefaultLogoPath);
+
+        public Texture2D LogoTexture(JTLSDKEditorSettings settings)
+        {
+            switch (settings.LogoMode)
+            {
+                case LogoMode.Custom:
+                    return settings.Logo;
+
+                case LogoMode.Default:
+                    return DefaultLogo;
+
+                default:
+                    return null;
+            }
+        }
+
         private bool CopyTexture(Texture2D texture, string destination)
         {
             if (texture == null)
@@ -196,7 +215,8 @@ namespace JTLStudio.SDK.Editor.Configuration
                 return false;
             }
 
-            string source = AssetDatabase.GetAssetPath(texture);
+            string assetPath = AssetDatabase.GetAssetPath(texture);
+            string source = string.IsNullOrEmpty(assetPath) ? "" : FileUtil.GetPhysicalPath(assetPath);
 
             if (string.IsNullOrEmpty(source) || File.Exists(source) == false)
             {
