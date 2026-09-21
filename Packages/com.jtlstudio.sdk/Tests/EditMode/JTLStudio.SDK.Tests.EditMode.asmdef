@@ -3,6 +3,7 @@
     "rootNamespace": "JTLStudio.SDK.Tests",
     "references": [
         "JTLStudio.SDK",
+        "JTLStudio.SDK.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
