@@ -22,10 +22,17 @@ namespace JTLStudio.SDK.Editor.Build
 
             _bridges.Register();
 
-            if (_template.IsSelected)
+            if (_template.IsSelected == false)
             {
-                _template.PrepareAssets(JTLSDKEditorSettings.instance);
+                return;
             }
+
+            if (_template.IsOutdated)
+            {
+                _template.Update();
+            }
+
+            _template.PrepareAssets(JTLSDKEditorSettings.instance);
         }
 
         public void OnPostprocessBuild(BuildReport report)

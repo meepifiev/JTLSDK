@@ -40,18 +40,48 @@ namespace JTLStudio.SDK.Editor.Configuration
 
         public void Install()
         {
-            UnityEditor.PackageManager.PackageInfo package = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(PackagePath);
-            string root = package == null ? Path.GetFullPath(PackagePath) : package.resolvedPath;
-            string source = Path.Combine(root, PackageTemplateFolder);
-
-            if (Directory.Exists(source) == false)
-            {
-                throw new DirectoryNotFoundException(PackageTemplateFolder);
-            }
-
-            Copy(source, TemplateFolder);
+            Copy(PackageTemplatePath(), TemplateFolder);
             AssetDatabase.Refresh();
             PlayerSettings.WebGL.template = TemplateSetting;
+            RemoveLegacyVariables();
+        }
+
+        public bool IsOutdated
+        {
+            get
+            {
+                if (IsInstalled == false)
+                {
+                    return false;
+                }
+
+                string source = PackageTemplatePath();
+
+                foreach (string file in PackageFiles(source))
+                {
+                    string target = Path.Combine(TemplateFolder, RelativePath(source, file));
+
+                    if (File.Exists(target) == false || SameContent(file, target) == false)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        public void Update()
+        {
+            string source = PackageTemplatePath();
+
+            foreach (string file in PackageFiles(source))
+            {
+                string target = Path.Combine(TemplateFolder, RelativePath(source, file));
+                Directory.CreateDirectory(Path.GetDirectoryName(target));
+                File.Copy(file, target, true);
+            }
+
             RemoveLegacyVariables();
         }
 
@@ -327,19 +357,76 @@ namespace JTLStudio.SDK.Editor.Configuration
             return true;
         }
 
+        private string PackageTemplatePath()
+        {
+            UnityEditor.PackageManager.PackageInfo package = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(PackagePath);
+            string root = package == null ? Path.GetFullPath(PackagePath) : package.resolvedPath;
+            string source = Path.Combine(root, PackageTemplateFolder);
+
+            if (Directory.Exists(source) == false)
+            {
+                throw new DirectoryNotFoundException(PackageTemplateFolder);
+            }
+
+            return source;
+        }
+
+        private List<string> PackageFiles(string source)
+        {
+            List<string> files = new List<string>();
+
+            foreach (string file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
+            {
+                string name = Path.GetFileNameWithoutExtension(file);
+                bool prepared = Path.GetFileName(Path.GetDirectoryName(file)) == DataFolder && (name == LogoName || name == LoaderBackgroundName || name == PageBackgroundName);
+
+                if (file.EndsWith(MetaExtension, StringComparison.OrdinalIgnoreCase) == false && prepared == false)
+                {
+                    files.Add(file);
+                }
+            }
+
+            return files;
+        }
+
+        private bool SameContent(string first, string second)
+        {
+            byte[] left = File.ReadAllBytes(first);
+            byte[] right = File.ReadAllBytes(second);
+
+            if (left.Length != right.Length)
+            {
+                return false;
+            }
+
+            for (int index = 0; index < left.Length; index++)
+            {
+                if (left[index] != right[index])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private string RelativePath(string source, string file)
+        {
+            return file.Substring(source.Length).TrimStart('/', '\\');
+        }
+
         private void Copy(string source, string destination)
         {
             Directory.CreateDirectory(destination);
 
             foreach (string file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
             {
-                if (file.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
+                if (file.EndsWith(MetaExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                string relative = file.Substring(source.Length).TrimStart('/', '\\');
-                string target = Path.Combine(destination, relative);
+                string target = Path.Combine(destination, RelativePath(source, file));
                 Directory.CreateDirectory(Path.GetDirectoryName(target));
                 File.Copy(file, target, true);
             }
