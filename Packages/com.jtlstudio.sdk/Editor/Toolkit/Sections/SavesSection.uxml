@@ -1,0 +1,133 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
+    <ui:VisualElement class="jtl-column jtl-vstack-16">
+        <jtl:SectionHeader title-key="saves.title" description-key="saves.description">
+            <jtl:ToolkitButton name="toggle-state" text-key="saves.showEmpty" variant="ghost" compact="true" />
+        </jtl:SectionHeader>
+        <ui:VisualElement name="filled" class="jtl-column jtl-vstack-16">
+            <ui:VisualElement class="jtl-row jtl-hstack-12">
+                <jtl:LocalizedLabel key="saves.revision" class="jtl-text--secondary" />
+                <ui:Label text="·" class="jtl-text--secondary jtl-text--muted" />
+                <jtl:LocalizedLabel key="saves.size" class="jtl-text--secondary" />
+                <ui:Label text="·" class="jtl-text--secondary jtl-text--muted" />
+                <jtl:Badge text-key="badge.loaded" variant="success" />
+                <ui:VisualElement class="jtl-spacer" />
+                <ui:VisualElement class="jtl-row jtl-hstack-8">
+                    <jtl:SearchField placeholder-key="saves.searchPlaceholder" width="220" />
+                    <jtl:ToolkitButton text-key="saves.addKey" icon="plus" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <jtl:Card spacing="8">
+                <ui:VisualElement class="jtl-table">
+                    <ui:VisualElement class="jtl-table__row jtl-table__row--head">
+                        <ui:VisualElement class="jtl-table__cell" style="width: 190px;">
+                            <jtl:LocalizedLabel key="saves.columnKey" class="jtl-table__heading" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell" style="width: 90px;">
+                            <jtl:LocalizedLabel key="saves.columnType" class="jtl-table__heading" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
+                            <jtl:LocalizedLabel key="saves.columnValue" class="jtl-table__heading" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="jtl-table__row">
+                        <ui:VisualElement class="jtl-table__cell" style="width: 190px;">
+                            <ui:Label text="Money" class="jtl-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell" style="width: 90px;">
+                            <ui:Label text="int" class="jtl-text--secondary" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
+                            <ui:TextField value="1200" class="jtl-field" style="width: 160px;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
+                            <jtl:IconButton icon="delete" size="24" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="jtl-table__row">
+                        <ui:VisualElement class="jtl-table__cell" style="width: 190px;">
+                            <ui:Label text="Level" class="jtl-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell" style="width: 90px;">
+                            <ui:Label text="int" class="jtl-text--secondary" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
+                            <ui:TextField value="27" class="jtl-field" style="width: 160px;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
+                            <jtl:IconButton icon="delete" size="24" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="jtl-table__row">
+                        <ui:VisualElement class="jtl-table__cell" style="width: 190px;">
+                            <ui:Label text="MusicVolume" class="jtl-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell" style="width: 90px;">
+                            <ui:Label text="float" class="jtl-text--secondary" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow">
+                            <ui:TextField value="0.5" class="jtl-field jtl-field--focused" style="width: 160px;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
+                            <jtl:IconButton icon="delete" size="24" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="jtl-table__row">
+                        <ui:VisualElement class="jtl-table__cell" style="width: 190px;">
+                            <ui:Label text="Profile" class="jtl-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell" style="width: 90px;">
+                            <ui:Label text="object" class="jtl-text--secondary" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--grow jtl-hstack-8">
+                            <jtl:Icon icon="chevron-up" size="14" tone="muted" />
+                            <jtl:LocalizedLabel key="saves.profileFields" class="jtl-text--secondary" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="jtl-table__cell jtl-table__cell--last" style="width: 28px;">
+                            <jtl:IconButton icon="delete" size="24" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement style="padding: 6px 0 10px 190px;">
+                        <ui:VisualElement class="jtl-code">
+                            <ui:Label class="jtl-code__text" text="{&#10;  &quot;name&quot;: &quot;Test player&quot;,&#10;  &quot;level&quot;: 27,&#10;  &quot;skins&quot;: [&quot;default&quot;, &quot;neon&quot;],&#10;  &quot;lastSeen&quot;: &quot;2026-09-21T14:02:00Z&quot;&#10;}" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-row jtl-hstack-8">
+                    <jtl:ToolkitButton text-key="saves.resetAll" variant="danger" />
+                    <ui:VisualElement class="jtl-spacer" />
+                    <jtl:ToolkitButton text-key="saves.exportJson" />
+                    <jtl:ToolkitButton text-key="saves.importJson" />
+                    <jtl:ToolkitButton text-key="saves.openJson" icon="open-external" variant="ghost" />
+                </ui:VisualElement>
+            </jtl:Card>
+        </ui:VisualElement>
+        <ui:VisualElement name="empty" class="jtl-column jtl-vstack-16">
+            <ui:VisualElement class="jtl-row jtl-hstack-12">
+                <jtl:LocalizedLabel key="saves.noRevision" class="jtl-text--secondary" />
+                <ui:Label text="·" class="jtl-text--secondary jtl-text--muted" />
+                <jtl:LocalizedLabel key="saves.sizeEmpty" class="jtl-text--secondary" />
+                <ui:Label text="·" class="jtl-text--secondary jtl-text--muted" />
+                <jtl:Badge text-key="badge.empty" variant="neutral" />
+                <ui:VisualElement class="jtl-spacer" />
+                <ui:VisualElement class="jtl-row jtl-hstack-8">
+                    <jtl:SearchField placeholder-key="saves.searchPlaceholder" width="220" />
+                    <jtl:ToolkitButton text-key="saves.addKey" icon="plus" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <jtl:Card spacing="12">
+                <jtl:EmptyState icon="saves" title-key="saves.emptyTitle" description-key="saves.emptyDescription" min-height="320" class="jtl-empty--plain">
+                    <jtl:ToolkitButton text-key="saves.addKey" icon="plus" />
+                    <jtl:ToolkitButton text-key="saves.importJson" variant="ghost" />
+                </jtl:EmptyState>
+            </jtl:Card>
+            <ui:VisualElement class="jtl-row jtl-hstack-8">
+                <jtl:ToolkitButton text-key="saves.resetAll" variant="danger" />
+                <ui:VisualElement class="jtl-spacer" />
+                <jtl:ToolkitButton text-key="saves.exportJson" />
+                <jtl:ToolkitButton text-key="saves.importJson" />
+                <jtl:ToolkitButton text-key="saves.openJson" icon="open-external" variant="ghost" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

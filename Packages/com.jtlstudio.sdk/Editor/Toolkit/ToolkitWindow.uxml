@@ -1,0 +1,69 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
+    <ui:VisualElement name="root" class="jtl-root">
+        <ui:VisualElement name="sidebar" class="jtl-sidebar">
+            <ui:VisualElement class="jtl-sidebar__brand-spacer" />
+            <ui:VisualElement class="jtl-sidebar__brand">
+                <ui:VisualElement class="jtl-brand__mark">
+                    <ui:Label text="J" class="jtl-brand__mark-glyph" />
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-brand__text">
+                    <ui:Label text="JTL SDK" class="jtl-brand__title" />
+                    <jtl:LocalizedLabel key="brand.caption" class="jtl-brand__caption" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="navigation" class="jtl-sidebar__nav">
+                <ui:VisualElement class="jtl-nav-group">
+                    <jtl:NavigationItem section="Configurations" icon="configurations" text-key="nav.configurations" />
+                    <jtl:NavigationItem section="Simulation" icon="simulation" text-key="nav.simulation" />
+                    <jtl:NavigationItem section="Template" icon="template" text-key="nav.template" />
+                    <jtl:NavigationItem section="Build" icon="build" text-key="nav.build" />
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-nav-separator" />
+                <ui:VisualElement class="jtl-nav-group">
+                    <jtl:NavigationItem section="PackageManager" icon="package" text-key="nav.packageManager" />
+                    <jtl:NavigationItem section="Analyzer" icon="analyzer" text-key="nav.analyzer" />
+                </ui:VisualElement>
+                <ui:VisualElement class="jtl-nav-separator" />
+                <jtl:LocalizedLabel key="nav.modules" class="jtl-nav-heading" />
+                <ui:VisualElement class="jtl-nav-group">
+                    <jtl:NavigationItem section="Languages" icon="languages" text-key="nav.languages" />
+                    <jtl:NavigationItem section="Purchases" icon="purchases" text-key="nav.purchases" />
+                    <jtl:NavigationItem section="Leaderboards" icon="leaderboards" text-key="nav.leaderboards" />
+                    <jtl:NavigationItem section="Flags" icon="flags" text-key="nav.flags" />
+                    <jtl:NavigationItem section="Saves" icon="saves" text-key="nav.saves" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="jtl-sidebar__footer">
+                <ui:Label name="version" text="v0.1.0" class="jtl-sidebar__version" />
+                <ui:VisualElement name="documentation-link" class="jtl-sidebar__link">
+                    <jtl:Icon icon="documentation" />
+                    <jtl:LocalizedLabel key="nav.documentation" class="jtl-sidebar__link-label" />
+                </ui:VisualElement>
+                <ui:VisualElement name="support-link" class="jtl-sidebar__link">
+                    <jtl:Icon icon="support" />
+                    <jtl:LocalizedLabel key="nav.support" class="jtl-sidebar__link-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="main" class="jtl-main">
+            <ui:VisualElement name="top-bar" class="jtl-top-bar">
+                <jtl:LocalizedLabel key="topbar.activeConfiguration" class="jtl-top-bar__label" />
+                <ui:Button name="configuration-button" class="jtl-button jtl-button--dropdown jtl-top-bar__configuration">
+                    <jtl:PortalMark portal="yandex" size="16" />
+                    <ui:Label text="Yandex Games" class="jtl-button__label" />
+                    <jtl:Icon icon="chevron-down" tone="muted" class="jtl-button__trailing" />
+                </ui:Button>
+                <ui:VisualElement class="jtl-top-bar__spacer" />
+                <ui:VisualElement class="jtl-pill jtl-top-bar__pill">
+                    <ui:VisualElement class="jtl-pill__dot" />
+                    <jtl:LocalizedLabel key="topbar.package" class="jtl-pill__text" />
+                </ui:VisualElement>
+                <jtl:SegmentedControl name="language-switch" choices="EN|RU" index="0" class="jtl-top-bar__language" />
+                <jtl:IconButton name="settings-button" icon="settings" class="jtl-top-bar__icon-button" />
+                <jtl:IconButton name="help-button" icon="help" />
+            </ui:VisualElement>
+            <ui:ScrollView name="content" class="jtl-content" mode="Vertical" horizontal-scroller-visibility="Hidden" />
+            <jtl:StatusBar name="status-bar" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,68 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:jtl="JTLStudio.SDK.Editor.Toolkit.Components">
+    <ui:VisualElement class="jtl-column jtl-vstack-16">
+        <jtl:SectionHeader title-key="build.title" description-key="build.description">
+            <jtl:ToolkitButton name="toggle-state" text-key="build.showBlocked" variant="ghost" compact="true" />
+        </jtl:SectionHeader>
+        <ui:VisualElement class="jtl-row jtl-row--stretch jtl-hstack-12">
+            <jtl:Card title-key="build.settings" spacing="12" class="jtl-basis">
+                <jtl:FieldRow label-key="build.configuration" label-width="190">
+                    <ui:VisualElement class="jtl-field-box jtl-read-only" style="width: 280px;">
+                        <jtl:PortalMark portal="yandex" size="16" />
+                        <ui:Label text="Yandex Games" class="jtl-read-only__text" />
+                        <jtl:Badge text-key="badge.active" variant="success" />
+                    </ui:VisualElement>
+                </jtl:FieldRow>
+                <jtl:FieldRow label-key="build.developmentBuild" label-width="190" note-key="build.developmentNote">
+                    <jtl:SwitchToggle value="true" />
+                </jtl:FieldRow>
+                <jtl:FieldRow label-key="build.output" label-width="190">
+                    <jtl:RadioGroup choices-key="build.outputTypes" index="0" gap="20" />
+                </jtl:FieldRow>
+                <jtl:FieldRow label-key="build.path" label-width="190">
+                    <ui:TextField value="Builds/YandexGames" class="jtl-field jtl-grow" />
+                    <jtl:ToolkitButton text-key="build.browse" icon="folder" />
+                </jtl:FieldRow>
+                <jtl:FieldRow label-key="build.namePattern" label-width="190" note-key="build.nameResolves">
+                    <ui:TextField value="{product}_{configuration}_b{build}" class="jtl-field jtl-grow" />
+                </jtl:FieldRow>
+                <jtl:FieldRow label-key="build.buildNumber" label-width="190">
+                    <ui:Label text="42" class="jtl-text" />
+                    <jtl:Icon icon="arrow-right" size="14" tone="muted" />
+                    <jtl:LocalizedLabel key="build.next" class="jtl-text" />
+                    <ui:VisualElement class="jtl-spacer" />
+                    <jtl:ToolkitButton text-key="build.edit" icon="edit" variant="ghost" compact="true" />
+                </jtl:FieldRow>
+                <jtl:FieldRow label-key="build.afterBuild" label-width="190">
+                    <jtl:Checkbox label-key="build.openFolder" value="true" class="jtl-mr-12" />
+                    <jtl:Checkbox label-key="build.writeLog" value="true" />
+                </jtl:FieldRow>
+            </jtl:Card>
+            <ui:VisualElement class="jtl-column jtl-vstack-12" style="width: 380px; flex-shrink: 0;">
+                <jtl:Card name="pre-build-card" title-key="build.preBuildChecks" badge-key="badge.passed4" badge-variant="success" spacing="8">
+                    <ui:VisualElement class="jtl-column">
+                        <jtl:CheckRow text-key="build.checkTarget" state="pass" />
+                        <jtl:CheckRow text-key="build.checkTemplate" state="pass" />
+                        <jtl:CheckRow name="compression-check" text-key="build.checkCompression" state="pass" />
+                        <jtl:CheckRow text-key="build.checkLanguages" state="pass" />
+                    </ui:VisualElement>
+                    <jtl:InlineMessage name="blocked-message" text-key="build.blockedHint" variant="error" class="jtl-pt-2" />
+                </jtl:Card>
+                <jtl:Card title-key="build.postBuildChecks" caption-key="build.postBuildCaption" spacing="8">
+                    <ui:VisualElement class="jtl-column">
+                        <jtl:CheckRow text-key="build.checkFileSize" state="pending" />
+                        <jtl:CheckRow text-key="build.checkFileCount" state="pending" />
+                        <jtl:CheckRow text-key="build.checkCompressionDisabled" state="pending" />
+                        <jtl:CheckRow text-key="build.checkNoExternal" state="pending" />
+                    </ui:VisualElement>
+                    <jtl:LocalizedLabel key="build.postBuildNote" class="jtl-text--caption jtl-text--wrap" />
+                </jtl:Card>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="jtl-row jtl-hstack-10">
+            <jtl:LocalizedLabel key="build.outputPath" class="jtl-text--caption" />
+            <ui:VisualElement class="jtl-spacer" />
+            <jtl:ToolkitButton text-key="build.cleanOutput" variant="ghost" />
+            <jtl:ToolkitButton name="build-button" text-key="build.build" variant="primary" style="width: 120px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
