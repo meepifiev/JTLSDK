@@ -19,9 +19,9 @@ Then open `JTL SDK › Toolkit`.
 | Section | What it does |
 |---|---|
 | Configurations | One configuration per portal. The active one applies its define symbol and Player Settings preset. One build is one configuration. |
+| Build | Active configuration picker, its build and player settings, checks, output path, ZIP or folder, build number, development badge, recent builds. |
 | Simulation | Portal answers in the editor: device, initialization delay and failure, ads, purchases, player, saves. |
 | Template | Loading screen, logo, background, progress bar, aspect ratio, pixel ratio. |
-| Build | Checks, output path, ZIP or folder, build number, development badge. |
 | Package Manager | SDK updates from GitHub Releases, the template, modules. |
 | Code Analyzer | Finds `Time.timeScale`, `AudioListener`, `PlayerPrefs`, `Cursor` and `Application.OpenURL` in game code and replaces them with SDK calls. |
 | Modules | The provider of every module in every configuration. Products, leaderboards, flags and languages are declared here. |

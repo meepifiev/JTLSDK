@@ -212,21 +212,8 @@
     flex-shrink: 0;
 }
 
-.jtl-root .jtl-top-bar__label {
-    font-size: 12px;
-    color: var(--jtl-text-secondary);
-    margin-right: 10px;
-}
 
-.jtl-root .jtl-top-bar__configuration {
-    width: 190px;
-    min-width: 190px;
-    margin-right: 10px;
-}
 
-.jtl-root .jtl-top-bar__configuration .jtl-portal-mark {
-    margin-right: 6px;
-}
 
 .jtl-root .jtl-top-bar__spacer {
     flex-grow: 1;
@@ -452,18 +439,18 @@
     overflow: hidden;
 }
 
-.jtl-root .jtl-home {
+.jtl-root .jtl-build {
     flex-direction: row;
     align-items: stretch;
 }
 
-.jtl-root .jtl-home__main {
+.jtl-root .jtl-build__main {
     flex-grow: 1;
     flex-basis: 0;
     min-width: 0;
 }
 
-.jtl-root .jtl-home-hero {
+.jtl-root .jtl-build-hero {
     height: 282px;
     flex-shrink: 0;
     overflow: hidden;
@@ -471,18 +458,18 @@
     border-color: #22365C;
     border-radius: 16px;
     background-color: #103058;
-    background-image: url("../Icons/Brand/home-hero.png");
+    background-image: url("../Icons/Brand/build-hero.png");
     -unity-background-scale-mode: scale-and-crop;
 }
 
-.jtl-root .jtl-home-hero__glass {
+.jtl-root .jtl-build-hero__glass {
     position: absolute;
     width: 120px;
     border-width: 1px;
     border-radius: 16px;
 }
 
-.jtl-root .jtl-home-hero__glass--back {
+.jtl-root .jtl-build-hero__glass--back {
     right: 78px;
     top: 36px;
     height: 150px;
@@ -490,7 +477,7 @@
     background-color: rgba(20, 52, 110, 0.16);
 }
 
-.jtl-root .jtl-home-hero__glass--front {
+.jtl-root .jtl-build-hero__glass--front {
     right: 52px;
     top: 26px;
     height: 158px;
@@ -498,14 +485,14 @@
     background-color: rgba(20, 52, 110, 0.1);
 }
 
-.jtl-root .jtl-home-hero__content {
+.jtl-root .jtl-build-hero__content {
     flex-grow: 1;
     flex-direction: row;
     align-items: center;
     padding: 20px 22px;
 }
 
-.jtl-root .jtl-home-hero__copy {
+.jtl-root .jtl-build-hero__copy {
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 0;
@@ -513,7 +500,7 @@
     align-items: flex-start;
 }
 
-.jtl-root .jtl-home-hero__title {
+.jtl-root .jtl-build-hero__title {
     font-size: 25px;
     -unity-font-style: bold;
     letter-spacing: -0.5px;
@@ -521,12 +508,12 @@
     white-space: normal;
 }
 
-.jtl-root .jtl-home-hero__title--accent {
+.jtl-root .jtl-build-hero__title--accent {
     color: var(--jtl-accent);
     margin-bottom: 13px;
 }
 
-.jtl-root .jtl-home-hero__description {
+.jtl-root .jtl-build-hero__description {
     max-width: 330px;
     font-size: 12.5px;
     color: #AFC2E2;
@@ -534,25 +521,25 @@
     margin-bottom: 16px;
 }
 
-.jtl-root .jtl-button.jtl-home-hero__start {
+.jtl-root .jtl-button.jtl-build-hero__start {
     height: 38px;
     min-height: 38px;
     padding: 0 18px;
     border-radius: 10px;
 }
 
-.jtl-root .jtl-home-hero__start .jtl-button__label {
+.jtl-root .jtl-build-hero__start .jtl-button__label {
     -unity-font-style: bold;
 }
 
-.jtl-root .jtl-home-hero__platforms {
+.jtl-root .jtl-build-hero__platforms {
     flex-direction: column;
     align-items: flex-end;
     flex-shrink: 0;
     margin-left: 16px;
 }
 
-.jtl-root .jtl-home-tile {
+.jtl-root .jtl-build-tile {
     width: 108px;
     flex-direction: column;
     align-items: center;
@@ -561,17 +548,17 @@
     border-width: 1px;
     border-color: rgba(150, 190, 255, 0.34);
     border-radius: 16px;
-    background-image: url("../Icons/Brand/home-tile.png");
+    background-image: url("../Icons/Brand/build-tile.png");
     -unity-background-scale-mode: stretch-to-fill;
     transition-property: border-color;
     transition-duration: 0.1s;
 }
 
-.jtl-root .jtl-home-tile:hover {
+.jtl-root .jtl-build-tile:hover {
     border-color: rgba(150, 190, 255, 0.7);
 }
 
-.jtl-root .jtl-home-tile__name {
+.jtl-root .jtl-build-tile__name {
     margin-top: 10px;
     font-size: 12px;
     -unity-font-style: bold;
@@ -580,12 +567,12 @@
     -unity-text-align: middle-center;
 }
 
-.jtl-root .jtl-home-hero__tagline {
+.jtl-root .jtl-build-hero__tagline {
     align-items: flex-end;
     margin-top: 8px;
 }
 
-.jtl-root .jtl-home-hero__tagline-line {
+.jtl-root .jtl-build-hero__tagline-line {
     font-size: 9px;
     -unity-font-style: bold;
     letter-spacing: 0.9px;
@@ -593,41 +580,32 @@
     -unity-text-align: middle-right;
 }
 
-.jtl-root .jtl-home-builds {
+.jtl-root .jtl-build-history {
     flex-grow: 1;
     padding: 16px 18px;
 }
 
-.jtl-root .jtl-home-link {
-    font-size: 12px;
-    color: var(--jtl-accent);
-    cursor: link;
-}
 
-.jtl-root .jtl-home-link:hover {
-    color: #7FA9FF;
-}
-
-.jtl-root .jtl-home-builds__line {
+.jtl-root .jtl-build-history__line {
     flex-direction: row;
     align-items: center;
 }
 
-.jtl-root .jtl-home-builds__head {
+.jtl-root .jtl-build-history__head {
     height: 24px;
 }
 
-.jtl-root .jtl-home-builds__row {
+.jtl-root .jtl-build-history__row {
     height: 44px;
     border-top-width: 1px;
     border-top-color: var(--jtl-border);
 }
 
-.jtl-root .jtl-home-builds__row--first {
+.jtl-root .jtl-build-history__row--first {
     border-top-width: 0;
 }
 
-.jtl-root .jtl-home-builds__cell {
+.jtl-root .jtl-build-history__cell {
     flex-direction: row;
     align-items: center;
     flex-shrink: 0;
@@ -636,45 +614,45 @@
     overflow: hidden;
 }
 
-.jtl-root .jtl-home-builds__cell--name {
+.jtl-root .jtl-build-history__cell--name {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
 }
 
-.jtl-root .jtl-home-builds__cell--platform {
+.jtl-root .jtl-build-history__cell--platform {
     width: 170px;
 }
 
-.jtl-root .jtl-home-builds__cell--size {
+.jtl-root .jtl-build-history__cell--size {
     width: 80px;
 }
 
-.jtl-root .jtl-home-builds__cell--status {
+.jtl-root .jtl-build-history__cell--status {
     width: 92px;
 }
 
-.jtl-root .jtl-home-builds__cell--date {
+.jtl-root .jtl-build-history__cell--date {
     width: 116px;
 }
 
-.jtl-root .jtl-home-builds__cell--action {
+.jtl-root .jtl-build-history__cell--action {
     width: 26px;
     margin-right: 0;
 }
 
-.jtl-root .jtl-home-builds--compact .jtl-home-builds__cell--size,
-.jtl-root .jtl-home-builds--compact .jtl-home-builds__cell--date {
+.jtl-root .jtl-build-history--compact .jtl-build-history__cell--size,
+.jtl-root .jtl-build-history--compact .jtl-build-history__cell--date {
     display: none;
 }
 
-.jtl-root .jtl-home-builds__heading {
+.jtl-root .jtl-build-history__heading {
     font-size: 10.5px;
     letter-spacing: 0.6px;
     color: var(--jtl-text-muted);
 }
 
-.jtl-root .jtl-home-builds__text {
+.jtl-root .jtl-build-history__text {
     flex-shrink: 1;
     min-width: 0;
     font-size: 13px;
@@ -682,27 +660,28 @@
     text-overflow: ellipsis;
 }
 
-.jtl-root .jtl-home-builds__dot {
+.jtl-root .jtl-build-history__dot {
     width: 7px;
     height: 7px;
     border-radius: 4px;
     flex-shrink: 0;
 }
 
-.jtl-root .jtl-home-builds__dot--success {
+.jtl-root .jtl-build-history__dot--success {
     background-color: var(--jtl-success);
 }
 
-.jtl-root .jtl-home-builds__dot--error {
+.jtl-root .jtl-build-history__dot--error {
     background-color: var(--jtl-error);
 }
 
-.jtl-root .jtl-home-builds__empty {
+.jtl-root .jtl-build-history__empty {
     padding-top: 4px;
 }
 
-.jtl-root .jtl-home-aside {
+.jtl-root .jtl-build-aside {
     width: 306px;
+    margin-left: 12px;
     flex-shrink: 0;
     flex-direction: column;
     padding: 16px;
@@ -712,50 +691,57 @@
     background-color: var(--jtl-surface);
 }
 
-.jtl-root .jtl-home-aside > * {
+.jtl-root .jtl-build-aside > * {
     margin-bottom: 12px;
 }
 
-.jtl-root .jtl-home-aside__title {
+.jtl-root .jtl-build-aside__title {
     font-size: 13px;
     -unity-font-style: bold;
     color: var(--jtl-text);
 }
 
-.jtl-root .jtl-home-aside__label {
+.jtl-root .jtl-build-aside__label {
     font-size: 12px;
     color: var(--jtl-text-secondary);
 }
 
-.jtl-root .jtl-home-aside__field-label {
+.jtl-root .jtl-build-aside__field-label {
     width: 116px;
     min-width: 116px;
     flex-shrink: 0;
 }
 
-.jtl-root .jtl-home-aside__note {
+.jtl-root .jtl-build-aside__note {
     font-size: 12px;
     color: var(--jtl-text-secondary);
     white-space: normal;
 }
 
-.jtl-root .jtl-home-aside__check {
+.jtl-root .jtl-build-aside__check {
     height: 28px;
     min-height: 28px;
 }
 
-.jtl-root .jtl-home-aside__separator {
+.jtl-root .jtl-build-aside__output-path {
+    font-size: 11px;
+    color: var(--jtl-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jtl-root .jtl-build-aside__separator {
     height: 1px;
     background-color: var(--jtl-border);
 }
 
-.jtl-root .jtl-dropdown.jtl-home-aside__output {
+.jtl-root .jtl-dropdown.jtl-build-aside__output {
     width: 84px;
     min-width: 84px;
     flex-grow: 0;
 }
 
-.jtl-root .jtl-segmented.jtl-home-tabs {
+.jtl-root .jtl-segmented.jtl-build-tabs {
     height: 38px;
     min-height: 38px;
     padding: 4px;
@@ -764,7 +750,7 @@
     background-color: var(--jtl-raised);
 }
 
-.jtl-root .jtl-home-tabs .jtl-segmented__option {
+.jtl-root .jtl-build-tabs .jtl-segmented__option {
     flex-grow: 1;
     flex-basis: 0;
     margin-left: 5px;
@@ -773,17 +759,17 @@
     font-size: 12px;
 }
 
-.jtl-root .jtl-home-tabs .jtl-segmented__option--first {
+.jtl-root .jtl-build-tabs .jtl-segmented__option--first {
     margin-left: 0;
 }
 
-.jtl-root .jtl-home-tabs .jtl-segmented__option--selected {
+.jtl-root .jtl-build-tabs .jtl-segmented__option--selected {
     background-color: var(--jtl-accent-strong);
     color: var(--jtl-text-on-accent);
     -unity-font-style: bold;
 }
 
-.jtl-root .jtl-button.jtl-home-aside__advanced {
+.jtl-root .jtl-button.jtl-build-aside__advanced {
     height: 40px;
     min-height: 40px;
     padding: 0 12px;
@@ -792,19 +778,19 @@
     justify-content: flex-start;
 }
 
-.jtl-root .jtl-home-aside__advanced .jtl-button__label {
+.jtl-root .jtl-build-aside__advanced .jtl-button__label {
     flex-grow: 1;
     -unity-text-align: middle-left;
 }
 
-.jtl-root .jtl-button.jtl-home-aside__build {
+.jtl-root .jtl-button.jtl-build-aside__build {
     height: 42px;
     min-height: 42px;
     border-radius: 11px;
     margin-bottom: 0;
 }
 
-.jtl-root .jtl-home-aside__build .jtl-button__label {
+.jtl-root .jtl-build-aside__build .jtl-button__label {
     font-size: 14px;
     -unity-font-style: bold;
 }

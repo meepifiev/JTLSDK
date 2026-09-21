@@ -12,8 +12,8 @@ namespace JTLStudio.SDK.Tests.Toolkit
 {
     public class ToolkitWindowTests
     {
-        private const int NavigationItemCount = 21;
-        private const int ConfigurationsItemIndex = 1;
+        private const int NavigationItemCount = 20;
+        private const int ConfigurationsItemIndex = 0;
         private const string RussianConfigurations = "Конфигурации";
         private const string EnglishConfigurations = "Configurations";
         private const string KeyAttributePattern = "(?:^|\\s)(?:[a-z]+-)?key=\"([^\"]+)\"";

@@ -33,7 +33,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private readonly Dictionary<ToolkitSectionId, ToolkitSection> _sections = new Dictionary<ToolkitSectionId, ToolkitSection>();
         private readonly List<NavigationItem> _navigationItems = new List<NavigationItem>();
         [SerializeField] private ToolkitLanguage _language = ToolkitLanguage.English;
-        [SerializeField] private ToolkitSectionId _section = ToolkitSectionId.Home;
+        [SerializeField] private ToolkitSectionId _section = ToolkitSectionId.Configurations;
         private int _buildAttempts;
         private ToolkitContext _context;
         private VisualElement _root;
@@ -173,13 +173,12 @@ namespace JTLStudio.SDK.Editor.Toolkit
                 item.Clicked += OnNavigationItemClicked;
             }
 
-            rootVisualElement.Q<Button>("configuration-button").clicked += OnConfigurationButtonClicked;
             rootVisualElement.Q<VisualElement>("documentation-link").AddManipulator(new Clickable(OpenSupport));
             rootVisualElement.Q<VisualElement>("support-link").AddManipulator(new Clickable(OpenSupport));
             CreateSections();
             _root.RegisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
             LocalizeShell();
-            Navigate(_sections.ContainsKey(_section) ? _section : ToolkitSectionId.Home);
+            Navigate(_sections.ContainsKey(_section) ? _section : ToolkitSectionId.Configurations);
         }
 
         private void ScheduleBuild()
@@ -208,7 +207,6 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private void CreateSections()
         {
             _sections.Clear();
-            Register(new HomeSection(_context));
             Register(new ConfigurationsSection(_context));
             Register(new ConfigurationDetailsSection(_context));
             Register(new SimulationSection(_context));
@@ -280,50 +278,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
 
         private void RefreshTopBar()
         {
-            SdkConfiguration active = _project.Active;
-            PlatformPresentation platforms = _context.Platforms;
-            PortalMark mark = rootVisualElement.Q<PortalMark>("configuration-mark");
-            mark.style.display = active == null ? DisplayStyle.None : DisplayStyle.Flex;
-
-            if (active != null)
-            {
-                mark.Portal = platforms.PortalMark(active.Platform);
-            }
-
-            rootVisualElement.Q<Label>("configuration-name").text = active == null ? _localization.Get("topbar.noConfiguration") : active.DisplayName;
             rootVisualElement.Q<Label>("package-pill").text = _localization.Get("topbar.packageVersion") + " " + ReadPackageVersion();
-        }
-
-        private void OnConfigurationButtonClicked()
-        {
-            GenericMenu menu = new GenericMenu();
-            SdkConfiguration active = _project.Active;
-
-            foreach (SdkConfiguration configuration in _project.Configurations)
-            {
-                SdkConfiguration captured = configuration;
-                menu.AddItem(new GUIContent(configuration.DisplayName), configuration == active, () => ActivateFromTopBar(captured));
-            }
-
-            menu.AddSeparator(string.Empty);
-            menu.AddItem(new GUIContent(_localization.Get("topbar.manageConfigurations")), false, () => Navigate(ToolkitSectionId.Configurations));
-            menu.ShowAsContext();
-        }
-
-        private void ActivateFromTopBar(SdkConfiguration configuration)
-        {
-            if (_project.Active == configuration)
-            {
-                return;
-            }
-
-            _project.Activate(configuration);
-            _context.Report(StatusKind.Success, "configurations.activated", configuration.DisplayName);
-
-            if (_currentSection != null)
-            {
-                Navigate(_currentSection.Id);
-            }
         }
 
         private void OpenSupport()

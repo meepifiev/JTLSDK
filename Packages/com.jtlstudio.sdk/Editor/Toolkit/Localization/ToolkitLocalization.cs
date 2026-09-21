@@ -22,12 +22,10 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             RegisterLanguages();
             RegisterPurchases();
             RegisterLeaderboardsAndFlags();
-            RegisterBuild();
             RegisterSimulation();
             RegisterSaves();
             RegisterPackageManager();
             RegisterAnalyzer();
-            RegisterHome();
         }
 
         public ToolkitLanguage Language { get; set; } = ToolkitLanguage.English;
@@ -64,53 +62,9 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             _entries[key] = new LocalizedText(english, russian);
         }
 
-        private void RegisterHome()
-        {
-            Add("home.title", "Build Once.", "Собери один раз.");
-            Add("home.titleAccent", "Publish Across Platforms.", "Публикуй везде.");
-            Add("home.description", "Export your Unity game to Yandex Games, YouTube Playables and more — with one streamlined workflow.", "Выгружай Unity-игру в Яндекс Игры, YouTube Playables и не только — в одном простом процессе.");
-            Add("home.start", "Get Started", "Начать");
-            Add("home.tagline", "SAME GAME|MORE PLAYERS|BIGGER OPPORTUNITIES", "ОДНА ИГРА|БОЛЬШЕ ИГРОКОВ|БОЛЬШЕ ВОЗМОЖНОСТЕЙ");
-            Add("home.recentBuilds", "Recent Builds", "Последние сборки");
-            Add("home.openBuild", "Open Build page", "Открыть сборку");
-            Add("home.noBuilds", "No builds yet.", "Сборок пока нет.");
-            Add("home.columnName", "NAME", "ИМЯ");
-            Add("home.columnPlatform", "TARGET PLATFORM", "ПЛОЩАДКА");
-            Add("home.columnSize", "SIZE", "РАЗМЕР");
-            Add("home.columnStatus", "STATUS", "СТАТУС");
-            Add("home.columnDate", "DATE", "ДАТА");
-            Add("home.size", "{0} MB", "{0} МБ");
-            Add("home.success", "Success", "Успешно");
-            Add("home.failed", "Failed", "Ошибка");
-            Add("home.today", "Today, {0}", "Сегодня, {0}");
-            Add("home.yesterday", "Yesterday, {0}", "Вчера, {0}");
-            Add("home.reveal", "Show in folder", "Показать в папке");
-            Add("home.activeTarget", "Active Target", "Активная цель");
-            Add("home.noTarget", "Create a configuration for a portal to build.", "Создай конфигурацию площадки, чтобы собрать игру.");
-            Add("home.createConfiguration", "Create configuration", "Создать конфигурацию");
-            Add("home.tabs", "Build Settings|Player Settings", "Сборка|Проект");
-            Add("home.platformConfiguration", "Platform Configuration", "Настройки платформы");
-            Add("home.buildTarget", "Build Target", "Платформа");
-            Add("home.compression", "Compression Format", "Сжатие");
-            Add("home.outputSettings", "Output Settings", "Вывод");
-            Add("home.buildFolder", "Build Folder", "Папка сборки");
-            Add("home.openFolder", "Open Folder", "Открыть папку");
-            Add("home.reset", "Reset", "Сбросить");
-            Add("home.buildFileName", "Build File Name", "Имя сборки");
-            Add("home.outputs", "folder|zip", "папка|zip");
-            Add("home.productSettings", "Product", "Продукт");
-            Add("home.productName", "Product Name", "Название");
-            Add("home.companyName", "Company Name", "Компания");
-            Add("home.version", "Version", "Версия");
-            Add("home.runtimeSettings", "Runtime", "Рантайм");
-            Add("home.stripping", "Managed Stripping", "Стриппинг");
-            Add("home.advanced", "Advanced", "Расширенные");
-            Add("home.buildProject", "Build Project", "Собрать проект");
-        }
 
         private void RegisterShell()
         {
-            Add("nav.home", "Home", "Главная");
             Add("nav.configurations", "Configurations", "Конфигурации");
             Add("nav.simulation", "Simulation", "Симуляция");
             Add("nav.template", "Template", "Шаблон");
@@ -143,21 +97,51 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("package.removeMessage", "Remove {0} from the project?", "Удалить {0} из проекта?");
             Add("package.installing", "Installing {0}…", "Установка {0}…");
             Add("package.removing", "Removing {0}…", "Удаление {0}…");
-            Add("build.title", "Build", "Сборка");
-            Add("build.settings", "Build settings", "Настройки сборки");
-            Add("build.configuration", "Configuration", "Конфигурация");
             Add("build.development", "Development build", "Development-сборка");
-            Add("build.output", "Output", "Вывод");
-            Add("build.outputs", "Folder|ZIP", "Папка|ZIP");
-            Add("build.path", "Path", "Путь");
             Add("build.browse", "Browse", "Выбрать");
-            Add("build.namePattern", "Name", "Имя");
             Add("build.number", "Build number", "Номер сборки");
-            Add("build.after", "After build", "После сборки");
-            Add("build.openFolder", "Open folder", "Открыть папку");
+            Add("build.openFolder", "Open folder after build", "Открывать папку после сборки");
+            Add("build.heroTitle", "Build Once.", "Собери один раз.");
+            Add("build.heroAccent", "Publish Across Platforms.", "Публикуй везде.");
+            Add("build.heroDescription", "Export your Unity game to Yandex Games, YouTube Playables and more — with one streamlined workflow.", "Выгружай Unity-игру в Яндекс Игры, YouTube Playables и не только — в одном простом процессе.");
+            Add("build.start", "Get Started", "Начать");
+            Add("build.tagline", "SAME GAME|MORE PLAYERS|BIGGER OPPORTUNITIES", "ОДНА ИГРА|БОЛЬШЕ ИГРОКОВ|БОЛЬШЕ ВОЗМОЖНОСТЕЙ");
+            Add("build.recentBuilds", "Recent Builds", "Последние сборки");
+            Add("build.noBuilds", "No builds yet.", "Сборок пока нет.");
+            Add("build.columnName", "NAME", "ИМЯ");
+            Add("build.columnPlatform", "TARGET PLATFORM", "ПЛОЩАДКА");
+            Add("build.columnSize", "SIZE", "РАЗМЕР");
+            Add("build.columnStatus", "STATUS", "СТАТУС");
+            Add("build.columnDate", "DATE", "ДАТА");
+            Add("build.size", "{0} MB", "{0} МБ");
+            Add("build.statusSuccess", "Success", "Успешно");
+            Add("build.statusFailed", "Failed", "Ошибка");
+            Add("build.today", "Today, {0}", "Сегодня, {0}");
+            Add("build.yesterday", "Yesterday, {0}", "Вчера, {0}");
+            Add("build.reveal", "Show in folder", "Показать в папке");
+            Add("build.activeTarget", "Active Target", "Активная цель");
+            Add("build.noTarget", "Create a configuration for a portal to build.", "Создай конфигурацию площадки, чтобы собрать игру.");
+            Add("build.createConfiguration", "Create configuration", "Создать конфигурацию");
+            Add("build.tabs", "Build Settings|Player Settings", "Сборка|Проект");
+            Add("build.platformConfiguration", "Platform Configuration", "Настройки платформы");
+            Add("build.buildTarget", "Build Target", "Платформа");
+            Add("build.compression", "Compression Format", "Сжатие");
+            Add("build.outputSettings", "Output Settings", "Вывод");
+            Add("build.buildFolder", "Build Folder", "Папка сборки");
+            Add("build.openOutput", "Open Folder", "Открыть папку");
+            Add("build.reset", "Reset", "Сбросить");
+            Add("build.buildFileName", "Build File Name", "Имя сборки");
+            Add("build.outputs", "folder|zip", "папка|zip");
+            Add("build.productSettings", "Product", "Продукт");
+            Add("build.productName", "Product Name", "Название");
+            Add("build.companyName", "Company Name", "Компания");
+            Add("build.version", "Version", "Версия");
+            Add("build.runtimeSettings", "Runtime", "Рантайм");
+            Add("build.stripping", "Managed Stripping", "Стриппинг");
+            Add("build.advanced", "Advanced", "Расширенные");
+            Add("build.buildProject", "Build Project", "Собрать проект");
             Add("build.preChecks", "Pre-build checks", "Проверки перед сборкой");
             Add("build.postChecks", "Post-build checks", "Проверки после сборки");
-            Add("build.build", "Build", "Собрать");
             Add("build.check.configuration", "Active configuration is set", "Активная конфигурация выбрана");
             Add("build.check.webgl", "WebGL module is installed", "Модуль WebGL установлен");
             Add("build.check.scenes", "Build Settings have an enabled scene", "В Build Settings есть включённая сцена");
@@ -226,8 +210,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("template.preview", "Preview", "Превью");
             Add("template.previewDevices", "Desktop|Mobile", "Десктоп|Мобильный");
             Add("template.progress", "Progress", "Прогресс");
-            Add("topbar.activeConfiguration", "Active configuration", "Активная конфигурация");
-            Add("topbar.package", "Package 1.0.0 · 1.1.0 available", "Пакет 1.0.0 · доступна 1.1.0");
         }
 
         private void RegisterLiveData()
@@ -511,38 +493,6 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("flags.add", "Add flag", "Добавить флаг");
         }
 
-        private void RegisterBuild()
-        {
-            Add("build.description", "Builds the active configuration and runs the portal checks for it.", "Собирает активную конфигурацию и выполняет проверки площадки.");
-            Add("build.showBlocked", "Show blocked state", "Показать заблокированное состояние");
-            Add("build.showReady", "Show ready state", "Показать готовое состояние");
-            Add("build.developmentBuild", "Development build", "Development build");
-            Add("build.developmentNote", "Build number badge is shown only in development builds.", "Плашка номера сборки видна только в development-сборках.");
-            Add("build.outputTypes", "Folder|ZIP archive", "Папка|ZIP-архив");
-            Add("build.nameResolves", "Resolves to SmashAndHit_YandexGames_b43", "Получится SmashAndHit_YandexGames_b43");
-            Add("build.buildNumber", "Build number", "Номер сборки");
-            Add("build.next", "next 43", "следующая 43");
-            Add("build.edit", "Edit", "Изменить");
-            Add("build.afterBuild", "After build", "После сборки");
-            Add("build.writeLog", "Write log line", "Строка в консоль");
-            Add("build.preBuildChecks", "Pre-build checks", "Проверки перед сборкой");
-            Add("build.checkTarget", "WebGL is the active build target", "Активная платформа сборки — WebGL");
-            Add("build.checkTemplate", "Template JTL SDK is selected", "Выбран шаблон JTL SDK");
-            Add("build.checkCompression", "Compression format matches the configuration", "Формат сжатия соответствует конфигурации");
-            Add("build.checkLanguages", "3 languages configured, default English", "Настроено 3 языка, по умолчанию английский");
-            Add("build.blockedHint", "Set Compression Format to Gzip in the configuration, then build again.", "Установите Compression Format = Gzip в конфигурации и соберите снова.");
-            Add("build.postBuildChecks", "Post-build checks", "Проверки после сборки");
-            Add("build.postBuildCaption", "YouTube Playables", "YouTube Playables");
-            Add("build.checkFileSize", "Each file under 30 MiB", "Каждый файл меньше 30 МиБ");
-            Add("build.checkFileCount", "At most 8000 files", "Не больше 8000 файлов");
-            Add("build.checkCompressionDisabled", "Compression disabled", "Сжатие выключено");
-            Add("build.checkNoExternal", "No external scripts", "Нет внешних скриптов");
-            Add("build.postBuildNote", "Run after a YouTube Playables build.", "Выполняются после сборки YouTube Playables.");
-            Add("build.outputPath", "Output: Builds/YandexGames/SmashAndHit_YandexGames_b43", "Вывод: Builds/YandexGames/SmashAndHit_YandexGames_b43");
-            Add("build.cleanOutput", "Clean output", "Очистить вывод");
-            Add("build.status", "Ready to build. Last build b42 finished in 2 m 14 s.", "Готово к сборке. Последняя сборка b42 заняла 2 мин 14 с.");
-            Add("build.statusBlocked", "Build blocked: compression format does not match the configuration.", "Сборка заблокирована: формат сжатия не соответствует конфигурации.");
-        }
 
         private void RegisterSimulation()
         {
