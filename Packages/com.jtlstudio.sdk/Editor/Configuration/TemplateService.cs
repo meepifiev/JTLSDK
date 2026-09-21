@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,18 +15,25 @@ namespace JTLStudio.SDK.Editor.Configuration
         public const string TemplateFolder = "Assets/WebGLTemplates/JTLSDK";
         public const string TemplateSetting = "PROJECT:JTLSDK";
 
-        private const string PackageTemplateFolder = "Packages/com.jtlstudio.sdk/Editor/Template~/JTLSDK";
+        private const string PackagePath = "Packages/com.jtlstudio.sdk";
+        private const string PackageTemplateFolder = "Editor/Template~/JTLSDK";
         private const string LogoFile = "logo.png";
         private const string LoaderBackgroundFile = "loader-background.png";
         private const string PageBackgroundFile = "page-background.png";
         private const string YandexHead = "<script src=\"/sdk.js\"></script>";
         private const string YouTubeHead = "<script src=\"https://www.youtube.com/game_api/v1\"></script>";
+        private const string CustomKeysProperty = "templateCustomKeys";
+        private const string VariablePattern = "\\{\\{\\{\\s*(JTLSDK_[A-Z_]+)\\s*\\}\\}\\}";
+
+        private readonly Regex _variables = new Regex(VariablePattern);
 
         public bool IsInstalled => File.Exists(Path.Combine(TemplateFolder, "index.html"));
 
         public void Install()
         {
-            string source = Path.GetFullPath(PackageTemplateFolder);
+            UnityEditor.PackageManager.PackageInfo package = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(PackagePath);
+            string root = package == null ? Path.GetFullPath(PackagePath) : package.resolvedPath;
+            string source = Path.Combine(root, PackageTemplateFolder);
 
             if (Directory.Exists(source) == false)
             {
@@ -43,6 +53,7 @@ namespace JTLStudio.SDK.Editor.Configuration
             }
 
             PlayerSettings.WebGL.template = TemplateSetting;
+            RegisterVariables();
             string dataFolder = Path.Combine(TemplateFolder, "TemplateData");
             bool hasLogo = CopyTexture(settings.Logo, Path.Combine(dataFolder, LogoFile));
             CopyTexture(settings.LoaderBackground.Image, Path.Combine(dataFolder, LoaderBackgroundFile));
@@ -73,7 +84,47 @@ namespace JTLStudio.SDK.Editor.Configuration
 
         private void Set(string name, string value)
         {
-            PlayerSettings.SetTemplateCustomValue(name, value ?? "");
+            string expected = value ?? "";
+            PlayerSettings.SetTemplateCustomValue(name, expected);
+
+            if (PlayerSettings.GetTemplateCustomValue(name) != expected)
+            {
+                throw new InvalidOperationException("WebGL template variable " + name + " is not registered. Reinstall the template.");
+            }
+        }
+
+        private void RegisterVariables()
+        {
+            PropertyInfo property = typeof(PlayerSettings).GetProperty(CustomKeysProperty, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (property == null)
+            {
+                throw new InvalidOperationException("PlayerSettings." + CustomKeysProperty + " is not available in this Unity version.");
+            }
+
+            List<string> keys = new List<string>((string[])property.GetValue(null) ?? Array.Empty<string>());
+
+            foreach (string file in Directory.GetFiles(TemplateFolder, "*", SearchOption.AllDirectories))
+            {
+                string extension = Path.GetExtension(file);
+
+                if (extension != ".html" && extension != ".css" && extension != ".js")
+                {
+                    continue;
+                }
+
+                foreach (Match match in _variables.Matches(File.ReadAllText(file)))
+                {
+                    string key = match.Groups[1].Value;
+
+                    if (keys.Contains(key) == false)
+                    {
+                        keys.Add(key);
+                    }
+                }
+            }
+
+            property.SetValue(null, keys.ToArray());
         }
 
         private string PlatformKey(PlatformId platform)

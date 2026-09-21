@@ -1446,32 +1446,36 @@ Rewarded:
 
 За основу берётся шаблон PluginYG2 (CC0), переписывается по стилю проекта и без инициализации площадки внутри `index.html`. Шаблон отвечает за экран загрузки, запуск Unity, подключение `jtlsdk-page.js` и вставку площадки.
 
-**Доставка.** Шаблон лежит в отдельном репозитории `meepifiev/JTLSDK-WebGLTemplate` с релизами. Тулкит показывает его в разделе «Пакет» рядом с модулями: установленная и доступная версия, кнопки «Установить» и «Обновить». Установка скачивает архив релиза и распаковывает в `Assets/WebGLTemplates/JTLSDK`. Если файлы шаблона правили вручную, перед обновлением тулкит спрашивает. Сборка без установленного шаблона блокируется проверкой.
+**Доставка.** В первой версии шаблон лежит в пакете, в `Editor/Template~/JTLSDK`. Кнопка «Установить шаблон» в разделе «Шаблон» копирует его в `Assets/WebGLTemplates/JTLSDK` и выбирает в Player Settings. Сборка сама ставит шаблон, если его нет. Позже шаблон переедет в отдельный репозиторий `meepifiev/JTLSDK-WebGLTemplate` с релизами: раздел «Пакет» покажет установленную и доступную версию, кнопки «Установить» и «Обновить», а перед обновлением вручную правленых файлов тулкит спросит.
 
 Файлы:
 
 ```text
 Assets/WebGLTemplates/JTLSDK/
   index.html
-  jtlsdk-page.js          предзагрузка, firstFrameReady, плашка, оверлей продолжения
+  thumbnail.png
   TemplateData/
     style.css
+    jtlsdk-page.js        экран загрузки, pixel ratio, пропорции, firstFrameReady, полноэкранный режим
     logo.png              копируется из настроек тулкита
-    background.jpg        если выбран фон-картинка
+    loader-background.png если у экрана загрузки фон-картинка
+    page-background.png   если у страницы фон-картинка
 ```
 
 Значения из тулкита попадают в шаблон через переменные Unity (`PlayerSettings.SetTemplateCustomValue`) перед сборкой. Правки `index.html` после сборки нет.
 
 | Переменная | Источник |
 |---|---|
-| `JTLSDK_LOGO`, `JTLSDK_LOGO_SIZE` | Шаблон › Логотип |
+| `JTLSDK_LOGO_DISPLAY`, `JTLSDK_LOGO_SIZE` | Шаблон › Логотип |
 | `JTLSDK_LOADER_BACKGROUND` | Шаблон › Экран загрузки › Фон (готовый CSS) |
-| `JTLSDK_PAGE_BACKGROUND` | Шаблон › Страница › Фон |
-| `JTLSDK_PROGRESS_*` | цвета, размеры, положение прогресс-бара |
-| `JTLSDK_ASPECT_RATIO`, `JTLSDK_ASPECT_MOBILE_OFF` | соотношение сторон |
-| `JTLSDK_DPR_DESKTOP`, `JTLSDK_DPR_MOBILE` | `auto`, число или `max:2.0` |
-| `JTLSDK_PLATFORM_HEAD` | вставка площадки: `<script src="/sdk.js">` или `game_api/v1` |
-| `JTLSDK_BUILD_NUMBER`, `JTLSDK_DEV_BADGE` | раздел «Сборка» |
+| `JTLSDK_PAGE_BACKGROUND` | Шаблон › Фон страницы |
+| `JTLSDK_PROGRESS_FILL`, `_TRACK`, `_WIDTH`, `_HEIGHT`, `_RADIUS`, `_POSITION` | прогресс-бар |
+| `JTLSDK_LOADING_TEXT` | текст под прогрессом |
+| `JTLSDK_ASPECT`, `JTLSDK_ASPECT_MOBILE` | пропорции канваса и их отключение на мобильных |
+| `JTLSDK_DPR_DESKTOP`, `JTLSDK_DPR_MOBILE` | `auto`, число или `max:2` |
+| `JTLSDK_FULLSCREEN_BUTTON` | кнопка полного экрана |
+| `JTLSDK_PLATFORM`, `JTLSDK_PLATFORM_HEAD` | площадка активной конфигурации и её скрипт в `<head>` |
+| `JTLSDK_DEV_BADGE` | плашка Development-сборки: `DEV · b43 · Yandex Games · v1.3.0` |
 
 Особенности YouTube в шаблоне: скрипт площадки первым в `<head>`, `firstFrameReady` сразу после показа экрана загрузки, поля под любое соотношение сторон, без блокировки ориентации, без `preventDefault` на Esc.
 
@@ -1595,5 +1599,11 @@ Assets/WebGLTemplates/JTLSDK/
 | 21.09.2026 | Настройки симуляции хранятся в `UserSettings/JTLSDKSimulation.json`, а не в ассете. |
 | 21.09.2026 | Статические методы разрешены в точках входа редактора (`[InitializeOnLoad]`, `[MenuItem]`), они только создают экземпляр. |
 | 21.09.2026 | Сообщения коммитов: одна строка, без описания и без соавторов. |
+| 21.09.2026 | Тулкит без пояснений: только значения и действия. Нет переключателя темы, кнопки помощи и версии пакета в сайдбаре. Поддержка и документация ведут на `t.me/jtlstudio`. |
+| 21.09.2026 | Конфигурацию не переименовывают. Карточка конфигурации показывает логотип площадки, название, define-символ и одну кнопку. Строки WebGL Template в конфигурации нет: шаблон один на все площадки. |
+| 21.09.2026 | В сайдбаре под MODULES перечислены все модули; у каждого своя страница с провайдерами по конфигурациям. |
+| 21.09.2026 | Шаблон WebGL в первой версии лежит в пакете (`Editor/Template~/JTLSDK`) и ставится тулкитом в `Assets/WebGLTemplates/JTLSDK`. Перенос в отдельный репозиторий остаётся в плане. |
+| 21.09.2026 | Настройки шаблона и сборки хранятся в `ProjectSettings/JTLSDKEditorSettings.asset` (`ScriptableSingleton`): они общие для проекта и не нужны в рантайме. |
+| 21.09.2026 | Скрипт площадки в `<head>` подставляет сборка через переменную шаблона `JTLSDK_PLATFORM_HEAD`: `/sdk.js` для Яндекса, `game_api/v1` для YouTube. |
 
 Открытых вопросов нет.

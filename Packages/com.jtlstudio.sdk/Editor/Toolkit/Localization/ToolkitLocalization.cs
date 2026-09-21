@@ -111,6 +111,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("build.check.fileSize", "Each file is under 30 MiB · largest {0} MiB", "Каждый файл меньше 30 МиБ · самый большой {0} МиБ");
             Add("build.check.fileCount", "At most 8000 files · {0}", "Не больше 8000 файлов · {0}");
             Add("build.check.scripts", "No external scripts in index.html", "В index.html нет внешних скриптов");
+            Add("build.check.variables", "Template variables are substituted", "Переменные шаблона подставлены");
             Add("build.done", "Build {0} · {1} MB · {2}", "Сборка {0} · {1} МБ · {2}");
             Add("build.failed", "Build failed: {0}", "Сборка не удалась: {0}");
             Add("template.title", "Template", "Шаблон");

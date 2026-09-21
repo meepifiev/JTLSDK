@@ -75,8 +75,18 @@ namespace JTLStudio.SDK.Editor.Build
             }
 
             int buildNumber = settings.BuildNumber + 1;
+            PlatformId platform = configuration == null ? PlatformId.Editor : configuration.Platform;
+            string configurationName = configuration == null ? "Editor" : configuration.DisplayName;
             string folder = Path.Combine(settings.BuildPath, ResolveName(settings, configuration, buildNumber));
-            _template.Apply(settings, configuration, buildNumber, settings.DevelopmentBuild);
+
+            try
+            {
+                _template.Apply(settings, configuration, buildNumber, settings.DevelopmentBuild);
+            }
+            catch (Exception exception)
+            {
+                return new BuildResult(false, folder, 0, 0, new List<BuildCheck>(), exception.Message);
+            }
 
             BuildPlayerOptions options = new BuildPlayerOptions
             {
@@ -93,12 +103,12 @@ namespace JTLStudio.SDK.Editor.Build
 
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
-                return new BuildResult(false, folder, 0, stopwatch.Elapsed.TotalSeconds, new List<BuildCheck>(), report.summary.result.ToString());
+                return new BuildResult(false, folder, 0, stopwatch.Elapsed.TotalSeconds, new List<BuildCheck>(), FirstError(report));
             }
 
             settings.BuildNumber = buildNumber;
             settings.Persist();
-            List<BuildCheck> postChecks = PostChecks(configuration, folder);
+            List<BuildCheck> postChecks = PostChecks(platform, folder);
             long bytes = FolderBytes(folder);
             string output = folder;
 
@@ -109,7 +119,7 @@ namespace JTLStudio.SDK.Editor.Build
                 Directory.Delete(folder, true);
             }
 
-            UnityEngine.Debug.Log("[JTL SDK] Build " + buildNumber + " · " + (configuration == null ? "Editor" : configuration.DisplayName) + " · " + (bytes / 1048576f).ToString("0.0", CultureInfo.InvariantCulture) + " MB · " + Path.GetFullPath(output));
+            UnityEngine.Debug.Log("[JTL SDK] Build " + buildNumber + " · " + configurationName + " · " + (bytes / 1048576f).ToString("0.0", CultureInfo.InvariantCulture) + " MB · " + Path.GetFullPath(output));
 
             if (settings.OpenFolderAfterBuild)
             {
@@ -119,11 +129,31 @@ namespace JTLStudio.SDK.Editor.Build
             return new BuildResult(true, output, bytes, stopwatch.Elapsed.TotalSeconds, postChecks, "");
         }
 
-        private List<BuildCheck> PostChecks(SdkConfiguration configuration, string folder)
+        private string FirstError(BuildReport report)
         {
-            List<BuildCheck> checks = new List<BuildCheck>();
+            foreach (BuildStep step in report.steps)
+            {
+                foreach (BuildStepMessage message in step.messages)
+                {
+                    if (message.type == LogType.Error || message.type == LogType.Exception)
+                    {
+                        return message.content;
+                    }
+                }
+            }
 
-            if (configuration == null || configuration.Platform != PlatformId.YouTubePlayables)
+            return report.summary.result.ToString();
+        }
+
+        private List<BuildCheck> PostChecks(PlatformId platform, string folder)
+        {
+            string index = Path.Combine(folder, "index.html");
+            List<BuildCheck> checks = new List<BuildCheck>
+            {
+                new BuildCheck("build.check.variables", File.Exists(index) && File.ReadAllText(index).Contains("{{{") == false)
+            };
+
+            if (platform != PlatformId.YouTubePlayables)
             {
                 return checks;
             }
@@ -139,7 +169,7 @@ namespace JTLStudio.SDK.Editor.Build
             checks.Add(new BuildCheck("build.check.fileSize", largest < MaximumFileBytes, (largest / 1048576f).ToString("0.0", CultureInfo.InvariantCulture)));
             checks.Add(new BuildCheck("build.check.fileCount", files.Length <= MaximumFiles, files.Length));
             checks.Add(new BuildCheck("build.check.compression", PlayerSettings.WebGL.compressionFormat == WebGLCompressionFormat.Disabled));
-            checks.Add(new BuildCheck("build.check.scripts", HasOnlyAllowedScripts(Path.Combine(folder, "index.html"))));
+            checks.Add(new BuildCheck("build.check.scripts", HasOnlyAllowedScripts(index)));
             return checks;
         }
 

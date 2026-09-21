@@ -1,0 +1,31 @@
+name: Bridge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Packages/com.jtlstudio.sdk/Bridge~/**"
+      - "Packages/com.jtlstudio.sdk/Runtime/**/*.jspre"
+      - ".github/workflows/bridge.yml"
+  pull_request:
+    paths:
+      - "Packages/com.jtlstudio.sdk/Bridge~/**"
+      - "Packages/com.jtlstudio.sdk/Runtime/**/*.jspre"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Packages/com.jtlstudio.sdk/Bridge~
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Packages/com.jtlstudio.sdk/Bridge~/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Generated bridge is committed
+        run: git diff --exit-code -- ../Runtime
