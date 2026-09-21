@@ -16,5 +16,12 @@
     "youtube-playables",
     "sdk"
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Demo",
+      "description": "Scene with a button for every module and on-screen results.",
+      "path": "Samples~/Demo"
+    }
+  ]
 }

@@ -54,7 +54,7 @@ JTL SDK - собственный платформенный слой студи�
 
 ```text
 JTLSDK/
-  Assets/                          демо-сцена, интеграционные тесты, тестовые ассеты
+  Assets/                          интеграционные тесты, тестовые ассеты
   Packages/com.jtlstudio.sdk/      сам пакет (то, что ставится в игры)
   ProjectSettings/
   Docs/                            этот документ и рабочие заметки
@@ -62,6 +62,8 @@ JTLSDK/
   .github/workflows/               CI
   LICENSE
 ```
+
+Демо-сцена лежит внутри пакета как UPM-сэмпл (раздел 3.2), а не в `Assets`.
 
 Установка в игру через Package Manager по ссылке с путём и тегом:
 
@@ -121,9 +123,24 @@ Packages/com.jtlstudio.sdk/
     Analyzer/          анализатор API
     SaveEditor/        окно сохранений
   Bridge~/             TypeScript-исходники моста, package.json, tsconfig.json
+  Samples~/Demo/       демо-сцена (UPM-сэмпл)
   Tests/               EditMode и PlayMode тесты
   Documentation~/      документация RU и EN
 ```
+
+**Демо-сцена как сэмпл.** Папка `Samples~/Demo` объявлена в `package.json`:
+
+```json
+"samples": [
+  {
+    "displayName": "Demo",
+    "description": "Scene with a button for every module and on-screen results.",
+    "path": "Samples~/Demo"
+  }
+]
+```
+
+В Package Manager у пакета есть вкладка Samples с кнопками Import и Remove. Import копирует сцену в `Assets/Samples/JTL SDK/<версия>/Demo`, Remove удаляет папку. В билд игры демо не попадает, пока его не импортировали. В репозитории разработки демо импортируется так же, а правки возвращаются в пакет пунктом меню `JTL SDK → Development → Sync Demo To Package`. Папка `Assets/Samples` в репозитории разработки в `.gitignore`.
 
 WebGL-шаблон в пакете не лежит. Он живёт в отдельном репозитории `meepifiev/JTLSDK-WebGLTemplate` со своими релизами, тулкит скачивает его с GitHub и ставит в `Assets/WebGLTemplates/JTLSDK` (раздел 11). Так же устроен шаблон PrimeGames у Prime.
 
@@ -1496,7 +1513,7 @@ Assets/WebGLTemplates/JTLSDK/
 **Тесты.**
 
 - EditMode: общие сервисы с фейковыми провайдерами. Единственный показ рекламы за раз, снятие паузы при исключении в колбэке, запрет записи в облако до успешной загрузки, перезагрузка сейва после авторизации, выдача до consume и повтор `Granted`, выбор языка, машина состояний gameplay, `WhenReady` в порядке регистрации.
-- PlayMode: демо-сцена в `Assets` проходит полный цикл на конфигурации Editor.
+- PlayMode: демо-сцена из `Samples~/Demo` проходит полный цикл на конфигурации Editor.
 - Ручная матрица перед релизом: черновик на Яндексе, McPlay для YouTube, три версии Unity.
 
 **CI (GitHub Actions).**
@@ -1507,7 +1524,7 @@ Assets/WebGLTemplates/JTLSDK/
 
 **Версии.** SemVer. `package.json` и тег совпадают. `CHANGELOG.md` ведётся вручную.
 
-**Демо-сцена** в `Assets/Demo`: кнопки на каждый модуль, вывод результата на экран. Она же используется как ручной тест на площадках.
+**Демо-сцена** в `Samples~/Demo`: кнопки на каждый модуль, вывод результата на экран. Она же используется как ручной тест на площадках.
 
 ---
 

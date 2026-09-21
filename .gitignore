@@ -48,3 +48,6 @@ crashlytics-build.properties
 
 # macOS
 .DS_Store
+
+# UPM samples imported for development
+/Assets/Samples/
