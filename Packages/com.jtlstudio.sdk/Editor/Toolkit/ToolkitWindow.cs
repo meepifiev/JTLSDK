@@ -34,6 +34,7 @@ namespace JTLStudio.SDK.Editor.Toolkit
         private readonly List<NavigationItem> _navigationItems = new List<NavigationItem>();
         [SerializeField] private ToolkitLanguage _language = ToolkitLanguage.English;
         [SerializeField] private ToolkitSectionId _section = ToolkitSectionId.Configurations;
+        [SerializeField] private List<string> _collapsedCategories = new List<string>();
         private int _buildAttempts;
         private ToolkitContext _context;
         private VisualElement _root;
@@ -168,6 +169,12 @@ namespace JTLStudio.SDK.Editor.Toolkit
             _navigationItems.Clear();
             _navigationItems.AddRange(rootVisualElement.Query<NavigationItem>().ToList());
 
+            foreach (NavigationCategory category in rootVisualElement.Query<NavigationCategory>().ToList())
+            {
+                category.Collapsed = _collapsedCategories.Contains(category.TextKey);
+                category.Toggled += OnCategoryToggled;
+            }
+
             foreach (NavigationItem item in _navigationItems)
             {
                 item.Clicked += OnNavigationItemClicked;
@@ -291,6 +298,16 @@ namespace JTLStudio.SDK.Editor.Toolkit
             if (_root != null)
             {
                 RefreshTopBar();
+            }
+        }
+
+        private void OnCategoryToggled(NavigationCategory category)
+        {
+            _collapsedCategories.Remove(category.TextKey);
+
+            if (category.Collapsed)
+            {
+                _collapsedCategories.Add(category.TextKey);
             }
         }
 
