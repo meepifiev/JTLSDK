@@ -506,7 +506,6 @@
 }
 
 .jtl-root .jtl-build-history {
-    flex-grow: 1;
     padding: 16px 18px;
 }
 
