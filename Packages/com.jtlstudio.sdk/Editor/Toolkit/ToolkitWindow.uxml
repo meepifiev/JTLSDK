@@ -18,23 +18,32 @@
                     <jtl:NavigationItem section="Analyzer" icon="analyzer" text-key="nav.analyzer" />
                 </ui:VisualElement>
                 <ui:VisualElement class="jtl-nav-separator" />
-                <jtl:LocalizedLabel key="nav.features" class="jtl-nav-heading" />
-                <ui:VisualElement class="jtl-nav-group">
-                    <jtl:NavigationItem section="Purchases" icon="purchases" text-key="nav.purchases" />
-                    <jtl:NavigationItem section="Saves" icon="saves" text-key="nav.saves" />
-                    <jtl:NavigationItem section="Languages" icon="languages" text-key="nav.languages" />
-                    <jtl:NavigationItem section="Leaderboards" icon="leaderboards" text-key="nav.leaderboards" />
-                    <jtl:NavigationItem section="Flags" icon="flags" text-key="nav.flags" />
-                </ui:VisualElement>
-                <ui:VisualElement class="jtl-nav-separator" />
                 <jtl:LocalizedLabel key="nav.modules" class="jtl-nav-heading" />
+                <jtl:LocalizedLabel key="nav.monetization" class="jtl-nav-subheading" />
                 <ui:VisualElement class="jtl-nav-group">
                     <jtl:NavigationItem section="Ads" icon="ads" text-key="nav.ads" />
+                    <jtl:NavigationItem section="Purchases" icon="purchases" text-key="nav.purchases" />
+                </ui:VisualElement>
+                <jtl:LocalizedLabel key="nav.players" class="jtl-nav-subheading" />
+                <ui:VisualElement class="jtl-nav-group">
+                    <jtl:NavigationItem section="Player" icon="player" text-key="nav.player" />
+                    <jtl:NavigationItem section="Saves" icon="saves" text-key="nav.saves" />
+                    <jtl:NavigationItem section="Leaderboards" icon="leaderboards" text-key="nav.leaderboards" />
+                </ui:VisualElement>
+                <jtl:LocalizedLabel key="nav.game" class="jtl-nav-subheading" />
+                <ui:VisualElement class="jtl-nav-group">
                     <jtl:NavigationItem section="GameEvents" icon="gameplay" text-key="nav.gameEvents" />
                     <jtl:NavigationItem section="Pause" icon="pause" text-key="nav.pause" />
                     <jtl:NavigationItem section="Time" icon="clock" text-key="nav.time" />
                     <jtl:NavigationItem section="Audio" icon="audio" text-key="nav.audio" />
-                    <jtl:NavigationItem section="Player" icon="player" text-key="nav.player" />
+                </ui:VisualElement>
+                <jtl:LocalizedLabel key="nav.content" class="jtl-nav-subheading" />
+                <ui:VisualElement class="jtl-nav-group">
+                    <jtl:NavigationItem section="Languages" icon="languages" text-key="nav.languages" />
+                    <jtl:NavigationItem section="Flags" icon="flags" text-key="nav.flags" />
+                </ui:VisualElement>
+                <jtl:LocalizedLabel key="nav.integration" class="jtl-nav-subheading" />
+                <ui:VisualElement class="jtl-nav-group">
                     <jtl:NavigationItem section="Platform" icon="platform" text-key="nav.platform" />
                     <jtl:NavigationItem section="Review" icon="review" text-key="nav.review" />
                     <jtl:NavigationItem section="GameLabel" icon="shortcut" text-key="nav.gameLabel" />

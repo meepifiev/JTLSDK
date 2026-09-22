@@ -24,7 +24,7 @@ https://github.com/meepifiev/JTLSDK.git?path=Packages/com.jtlstudio.sdk
 | Template | Экран загрузки, логотип, фон, прогресс, пропорции, pixel ratio. |
 | Package Manager | Обновления SDK из GitHub Releases, шаблон, модули. |
 | Code Analyzer | Находит в коде игры `Time.timeScale`, `AudioListener`, `PlayerPrefs`, `Cursor` и `Application.OpenURL` и заменяет их на вызовы SDK. |
-| Modules | Провайдер каждого модуля в каждой конфигурации. Покупки, лидерборды, флаги и языки описываются здесь. |
+| Modules | Монетизация, игроки, игра, контент и интеграция: провайдер каждого модуля в каждой конфигурации. Покупки, лидерборды, флаги и языки описываются здесь. |
 
 После правки товаров, лидербордов и флагов нажмите «Generate constants». Появятся классы `ProductIds`, `LeaderboardIds` и `FlagKeys`.
 

@@ -85,7 +85,11 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.gameEvents", "Game events", "Игровые события");
             Add("nav.review", "Review", "Отзыв");
             Add("nav.gameLabel", "Game label", "Ярлык игры");
-            Add("nav.features", "FEATURES", "ВОЗМОЖНОСТИ");
+            Add("nav.monetization", "Monetization", "Монетизация");
+            Add("nav.players", "Players", "Игроки");
+            Add("nav.game", "Game", "Игра");
+            Add("nav.content", "Content", "Контент");
+            Add("nav.integration", "Integration", "Интеграция");
             Add("nav.pause", "Pause", "Пауза");
             Add("nav.audio", "Audio", "Звук");
             Add("nav.platform", "Platform", "Площадка");

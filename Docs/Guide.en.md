@@ -24,7 +24,7 @@ Then open `JTL SDK › Toolkit`.
 | Template | Loading screen, logo, background, progress bar, aspect ratio, pixel ratio. |
 | Package Manager | SDK updates from GitHub Releases, the template, modules. |
 | Code Analyzer | Finds `Time.timeScale`, `AudioListener`, `PlayerPrefs`, `Cursor` and `Application.OpenURL` in game code and replaces them with SDK calls. |
-| Modules | The provider of every module in every configuration. Products, leaderboards, flags and languages are declared here. |
+| Modules | Monetization, players, game, content and integration: the provider of every module in every configuration. Products, leaderboards, flags and languages are declared here. |
 
 After editing products, leaderboards or flags, press "Generate constants". It writes the `ProductIds`, `LeaderboardIds` and `FlagKeys` classes.
 

@@ -72,6 +72,14 @@
     letter-spacing: 0.8px;
 }
 
+.jtl-root .jtl-nav-subheading {
+    height: 22px;
+    margin-top: 4px;
+    padding: 0 10px;
+    font-size: 11px;
+    color: var(--jtl-text-muted);
+}
+
 .jtl-root .jtl-nav-item {
     flex-direction: row;
     align-items: center;
@@ -331,6 +339,10 @@
 }
 
 .jtl-root--collapsed .jtl-nav-heading {
+    display: none;
+}
+
+.jtl-root--collapsed .jtl-nav-subheading {
     display: none;
 }
 
