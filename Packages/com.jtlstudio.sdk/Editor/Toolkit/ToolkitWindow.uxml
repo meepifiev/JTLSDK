@@ -27,7 +27,7 @@
                     <jtl:NavigationItem section="Leaderboards" icon="leaderboards" text-key="nav.leaderboards" />
                     <jtl:NavigationItem section="Flags" icon="flags" text-key="nav.flags" />
                 </ui:VisualElement>
-                <jtl:LocalizedLabel key="nav.outOfTheBox" class="jtl-nav-subheading" />
+                <jtl:LocalizedLabel key="nav.readyToUse" class="jtl-nav-subheading" />
                 <ui:VisualElement class="jtl-nav-group">
                     <jtl:NavigationItem section="Ads" icon="ads" text-key="nav.ads" />
                     <jtl:NavigationItem section="GameEvents" icon="gameplay" text-key="nav.gameEvents" />

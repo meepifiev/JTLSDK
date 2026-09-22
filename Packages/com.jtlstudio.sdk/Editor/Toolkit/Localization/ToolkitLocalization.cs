@@ -86,7 +86,7 @@ namespace JTLStudio.SDK.Editor.Toolkit.Localization
             Add("nav.review", "Review", "Отзыв");
             Add("nav.gameLabel", "Game label", "Ярлык игры");
             Add("nav.configurable", "Configurable", "Настраиваемые");
-            Add("nav.outOfTheBox", "Out of the box", "Из коробки");
+            Add("nav.readyToUse", "Ready to use", "Готовые к работе");
             Add("nav.pause", "Pause", "Пауза");
             Add("nav.audio", "Audio", "Звук");
             Add("nav.platform", "Platform", "Площадка");
